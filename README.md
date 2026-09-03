@@ -1,197 +1,396 @@
-# AI Development OS
+# AI-DEV-OS
 
-Bộ khung làm việc với AI Coding Agent dùng cho một repository phần mềm.
+A reusable operating system for working effectively with AI coding agents.
 
-Mục tiêu của bộ này không phải là nhét thật nhiều prompt vào dự án. Mục tiêu là tạo **hệ thống context có cấu trúc** để AI:
+AI-DEV-OS cung cấp một bộ khung để tổ chức context, rules, workflow, documentation và reusable skills cho các công cụ như Claude Code, Codex, GitHub Copilot và các AI coding agents khác.
 
-- hiểu sản phẩm trước khi sửa code;
-- biết kiến trúc, business rule và convention;
-- nghiên cứu trước khi thay đổi phần chưa hiểu;
-- lập kế hoạch cho việc phức tạp;
-- triển khai theo phạm vi đã thống nhất;
-- tự kiểm tra bằng test/build/lint thay vì chỉ nói "đã xong";
-- lưu lại kiến thức quan trọng cho lần làm việc sau;
-- dùng được với nhiều AI coding tool mà không phải viết lại toàn bộ hướng dẫn.
+> Đây là **template/framework tham khảo**, không phải một bộ luật bắt buộc cho mọi dự án.
 
 ---
 
-## 1. Cấu trúc
+## Vì sao repository này tồn tại?
+
+Khi làm việc với AI, vấn đề thường không phải là AI không biết code.
+
+Vấn đề là AI:
+
+- Không hiểu đầy đủ project.
+- Không biết business rule.
+- Không biết architecture.
+- Không biết coding convention.
+- Phải nghiên cứu lại codebase ở nhiều task.
+- Dễ làm sai vì thiếu context.
+- Đọc quá nhiều context không liên quan.
+- Không giữ được kinh nghiệm từ những lần sửa trước.
+
+AI-DEV-OS hướng tới việc biến repository thành **nguồn context có cấu trúc cho AI**.
+
+```text
+Human
+  ↓
+Task
+  ↓
+AI Agent
+  ↓
+AGENTS.md
+  ↓
+Relevant Docs / Skills
+  ↓
+Research
+  ↓
+Plan
+  ↓
+Implement
+  ↓
+Verify
+```
+
+---
+
+## Mục tiêu
+
+```text
+Hiểu project nhanh hơn
++
+Giảm việc nhắc lại context
++
+Giảm AI sửa sai
++
+Chuẩn hóa workflow
++
+Giảm context không cần thiết
++
+Tái sử dụng kinh nghiệm giữa các task
+```
+
+---
+
+## Nguyên tắc quan trọng nhất
+
+AI **không nên đọc toàn bộ repository documentation cho mọi task**.
+
+```text
+Không:
+
+Task
+↓
+Load 50+ docs
+↓
+Code
+```
+
+Thay vào đó:
+
+```text
+Task
+↓
+Read AGENTS.md
+↓
+Xác định context cần thiết
+↓
+Read relevant docs / skills
+↓
+Code
+```
+
+### Context Strategy
+
+```text
+Context thường trực
+→ càng nhỏ càng tốt
+
+Knowledge trong repository
+→ đủ đầy để tra cứu
+
+Context của từng task
+→ chỉ đọc những gì cần thiết
+```
+
+---
+
+## Cấu trúc chính
 
 ```text
 .
-├── AGENTS.md                         # Bản đồ chính cho AI coding agent
-├── CLAUDE.md                         # Adapter cho Claude Code
+├── AGENTS.md
+├── CLAUDE.md
 ├── .github/
-│   └── copilot-instructions.md       # Adapter cho GitHub Copilot
-│
-├── .agents/skills/                   # Repo skills cho Codex / Agent Skills
-├── .claude/skills/                   # Cùng skills cho Claude Code
+│   └── copilot-instructions.md
 │
 ├── docs/
-│   ├── ai/                           # Kiến thức bền vững của dự án
-│   ├── decisions/                    # ADR - quyết định kiến trúc
-│   └── work/                         # Research/spec/plan của từng việc
+│   ├── ai/
+│   ├── decisions/
+│   └── work/
 │
-├── templates/                        # Mẫu artifact cho feature/bug/release
-├── prompts/                          # Prompt thủ công khi không dùng Skills
-└── REFERENCES.md                     # Nguồn nghiên cứu của bộ khung
+├── .agents/
+│   └── skills/
+│
+├── .claude/
+│   └── skills/
+│
+├── prompts/
+├── templates/
+├── CONTRIBUTING.md
+├── LICENSE
+└── REFERENCES.md
 ```
 
 ---
 
-## 2. Triết lý chính
+## AGENTS.md
 
-### 2.1. AGENTS.md là bản đồ, không phải bách khoa toàn thư
+`AGENTS.md` là entry point chính cho AI agent.
 
-`AGENTS.md` chỉ chứa những điều AI phải biết gần như mọi lúc và các đường dẫn đến tài liệu chi tiết.
+Nó nên:
 
-Không đưa vào đó:
+- Ngắn.
+- Chỉ chứa rule quan trọng.
+- Chỉ cho AI biết tài liệu nào cần đọc.
+- Không chứa toàn bộ knowledge của project.
 
-- toàn bộ architecture;
-- tất cả business rule;
-- mô tả từng file;
-- tài liệu API dài;
-- checklist dài hàng trăm dòng.
+Có thể coi nó như:
 
-Những nội dung đó nằm trong `docs/` và AI chỉ đọc khi cần.
-
-### 2.2. Phân biệt 4 loại kiến thức
-
-| Loại | Đặt ở đâu | Ví dụ |
-|---|---|---|
-| Luật luôn áp dụng | `AGENTS.md` | phải test, không sửa ngoài scope |
-| Kiến thức dự án | `docs/ai/` | architecture, business rule |
-| Quyết định kỹ thuật | `docs/decisions/` | tại sao dùng PostgreSQL |
-| Quy trình lặp lại | `SKILL.md` | research, review, fix bug |
-
-### 2.3. Không dùng cùng một mức quy trình cho mọi task
-
-**Task nhỏ**: hiểu → sửa → verify.
-
-**Task vừa**: brief → plan → implement → verify.
-
-**Task lớn/rủi ro cao**: research → spec → plan → tasks → implement → verification.
-
-Không biến sửa typo thành dự án nghiên cứu. Cũng không xử lý thay đổi kiến trúc bằng một prompt hai dòng.
+```text
+AI README
++
+Project Map
++
+Critical Rules
+```
 
 ---
 
-## 3. Thiết lập cho dự án mới
+## docs/ai
 
-Không cần điền tất cả file ngay lập tức. Làm theo thứ tự:
+Đây là nơi lưu knowledge thực tế của project.
 
-1. `docs/ai/01-PROJECT-CONTEXT.md`
-2. `docs/ai/02-PRODUCT.md`
-3. `docs/ai/03-ARCHITECTURE.md`
-4. `docs/ai/04-CODEBASE-MAP.md`
-5. `docs/ai/05-BUSINESS-RULES.md`
-6. `docs/ai/06-CODING-STANDARDS.md`
-7. `docs/ai/07-COMMANDS.md`
-8. `docs/ai/08-TESTING.md`
-9. `docs/ai/09-SECURITY.md`
+Ví dụ:
 
-Sau đó cập nhật dần khi dự án phát triển.
+```text
+Product overview
+Architecture
+Business rules
+Database
+API
+Coding conventions
+Security
+Testing
+Deployment
+Operations
+Known pitfalls
+```
 
-> Không để nội dung giả trong file. Nếu chưa biết, ghi rõ `Chưa xác định` thay vì cho AI một thông tin suy đoán.
+AI chỉ đọc file liên quan tới task hiện tại.
 
 ---
 
-## 4. Cách dùng hàng ngày
+## Skills
 
-### Feature nhỏ
+Workflow lặp lại nhiều lần được đóng gói thành Skill.
 
-```text
-Yêu cầu
-→ AI đọc AGENTS.md + file liên quan
-→ sửa code
-→ chạy kiểm tra phù hợp
-→ báo thay đổi + bằng chứng verify
-```
-
-### Feature vừa/lớn
-
-Tạo thư mục:
+Ví dụ:
 
 ```text
-docs/work/YYYY-MM-DD-ten-cong-viec/
+research-codebase
+plan-change
+implement-plan
+fix-bug
+review-change
+verify-change
+update-project-knowledge
 ```
 
-Sau đó dùng:
-
-```text
-RESEARCH.md
-→ SPEC.md
-→ PLAN.md
-→ TASKS.md
-→ code
-→ VERIFICATION.md
-```
-
-Không phải task nào cũng cần đủ năm file. `docs/work/README.md` có quy tắc chọn mức quy trình.
+Mục tiêu là không phải viết lại cùng một prompt ở mọi task.
 
 ---
 
-## 5. Khi nào cập nhật hệ thống AI
-
-Khi AI mắc cùng một lỗi từ lần thứ hai, đừng chỉ nhắc lại trong chat.
-
-Đưa kiến thức đó về đúng nơi:
+## Workflow cho task lớn
 
 ```text
-Thông tin luôn đúng cho cả repo
-→ AGENTS.md hoặc docs/ai
+Research
+↓
+Specification
+↓
+Plan
+↓
+Tasks
+↓
+Implement
+↓
+Verification
+```
 
-Quy tắc chỉ cho một khu vực
-→ tài liệu/rule gần khu vực đó
+Không bắt buộc dùng full workflow cho mọi việc.
+
+## Workflow cho task nhỏ
+
+```text
+Understand
+↓
+Change
+↓
+Verify
+```
+
+> Process phải tỷ lệ với độ phức tạp của task.
+
+---
+
+## Khi nào nên cập nhật knowledge?
+
+Khi AI hoặc developer phát hiện một kiến thức có khả năng được dùng lại.
+
+```text
+Correction lặp lại
+→ Project rule
+
+Quy trình lặp lại
+→ Skill
 
 Quyết định kiến trúc
 → ADR
 
-Quy trình nhiều bước hay lặp lại
-→ Skill
+Bug/pitfall đặc biệt
+→ Known pitfall
 
-Lỗi/gotcha khó phát hiện
-→ KNOWN-PITFALLS.md
+Business behavior
+→ Business rules
 ```
 
-Xem `docs/ai/14-AI-SYSTEM-MAINTENANCE.md`.
+Mục tiêu là repository ngày càng hiểu chính nó tốt hơn.
 
 ---
 
-## 6. Dùng với từng AI
+## Technology-agnostic
 
-### Codex
-
-- Đọc `AGENTS.md` ở root.
-- Skills dùng bản trong `.agents/skills/`.
-- Với task phức tạp có thể gọi rõ skill, ví dụ `$research-codebase` hoặc `$plan-change` nếu client đang dùng hỗ trợ cú pháp này.
-
-### Claude Code
-
-- `CLAUDE.md` import `AGENTS.md`, tránh duy trì hai bộ luật khác nhau.
-- Skills nằm ở `.claude/skills/`.
-
-### GitHub Copilot
-
-- Luật repository nằm ở `.github/copilot-instructions.md`.
-- File này cố ý ngắn và dẫn Copilot đến cùng nguồn kiến thức trong `docs/ai/`.
-
-### Cursor
-
-- Cursor hỗ trợ `AGENTS.md` trực tiếp.
-- Chỉ thêm `.cursor/rules` sau khi dự án thực sự có rule theo path/framework cần tự động áp dụng.
-
----
-
-## 7. Nguyên tắc quan trọng nhất
+Core của AI-DEV-OS không gắn với:
 
 ```text
-Chat là tạm thời.
-Repository knowledge là lâu dài.
-
-Prompt dùng một lần → chat.
-Prompt dùng lặp lại → skill/template.
-Thông tin dự án → docs.
-Quyết định quan trọng → ADR.
-Bằng chứng hoàn thành → test/build/verification.
+.NET
+Java
+Node.js
+Python
+React
+Vue
+Flutter
+SQL Server
+PostgreSQL
 ```
+
+Project thực tế sẽ bổ sung rules cho stack của chính nó.
+
+```text
+AI-DEV-OS
+        ↓
+Project
+        ↓
+Technology Rules
+        ↓
+.NET + React + PostgreSQL
+```
+
+---
+
+## Quick Start
+
+### 1. Copy AI-DEV-OS vào repository
+
+Không cần giữ tất cả file nếu project không cần.
+
+### 2. Điền project knowledge
+
+Bắt đầu từ các tài liệu quan trọng:
+
+```text
+Product Overview
+Architecture
+Business Rules
+Coding Rules
+Testing
+Deployment
+```
+
+### 3. Chỉnh AGENTS.md
+
+Chỉ giữ:
+
+```text
+Critical Rules
+Commands
+Project Map
+Relevant Docs
+```
+
+### 4. Chạy task đầu tiên với AI
+
+Ví dụ:
+
+```text
+Research luồng authentication hiện tại trước.
+Sau đó đề xuất plan để thêm OAuth Google.
+Không implement trước khi plan rõ.
+```
+
+### 5. Sau mỗi task quan trọng
+
+Cập nhật những knowledge có giá trị lâu dài về repository.
+
+---
+
+## Không nên làm
+
+- Không tạo `AGENTS.md` hàng nghìn dòng.
+- Không duplicate documentation.
+- Không lưu mọi cuộc chat.
+- Không biến mọi workflow thành ceremony.
+- Không ép tất cả project dùng cùng một architecture.
+
+---
+
+## Repository này phù hợp với ai?
+
+- Developer dùng AI coding tools thường xuyên.
+- Team muốn chuẩn hóa cách AI làm việc.
+- Team muốn giảm việc AI phải nghiên cứu lại codebase.
+- Người xây nhiều sản phẩm và muốn có template dùng lại.
+- Project muốn lưu knowledge ngay trong repository.
+
+---
+
+## Project Status
+
+AI-DEV-OS hiện nên được xem là:
+
+```text
+v1
+```
+
+Một foundation để thử nghiệm trong các project thực tế.
+
+Nó nên tiếp tục thay đổi dựa trên usage thực tế, failure của AI, feedback của developer và những workflow thực sự lặp lại.
+
+---
+
+## Contributing
+
+Contributions, issues và experiments đều được hoan nghênh.
+
+Xem `CONTRIBUTING.md`.
+
+---
+
+## License
+
+MIT License.
+
+Bạn có thể sử dụng, sửa đổi và phân phối project theo các điều khoản của MIT License.
+
+---
+
+## Philosophy
+
+> Repository không chỉ chứa source code.
+>
+> Với AI-assisted development, repository còn nên chứa đủ knowledge để AI có thể hiểu **tại sao hệ thống được xây như vậy và nó phải thay đổi như thế nào**.
+
+AI-DEV-OS được xây quanh mục tiêu đó.
