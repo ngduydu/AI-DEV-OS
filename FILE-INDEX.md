@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 58
+Tổng số file: 66
 
 ```text
 .agents/skills/fix-bug/SKILL.md
@@ -17,11 +17,20 @@ Tổng số file: 58
 .claude/skills/review-change/SKILL.md
 .claude/skills/update-project-knowledge/SKILL.md
 .claude/skills/verify-change/SKILL.md
+.github/ISSUE_TEMPLATE/bug-report.yml
+.github/ISSUE_TEMPLATE/config.yml
+.github/ISSUE_TEMPLATE/improvement-proposal.yml
 .github/copilot-instructions.md
+.github/pull_request_template.md
 AGENTS.md
+CHANGELOG.md
 CLAUDE.md
+CONTRIBUTING.md
+FILE-INDEX.md
+LICENSE
 README.md
 REFERENCES.md
+SECURITY.md
 docs/ai/00-SETUP-CHECKLIST.md
 docs/ai/01-PROJECT-CONTEXT.md
 docs/ai/02-PRODUCT.md

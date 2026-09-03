@@ -1,0 +1,75 @@
+name: Bug report
+description: Báo lỗi, mâu thuẫn hoặc behavior không đúng trong AI-DEV-OS.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn bạn đã báo lỗi. Không đưa secret, credential hoặc dữ liệu nội bộ vào issue public.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Khu vực
+      options:
+        - AGENTS / agent instructions
+        - Claude / Codex / Copilot adapter
+        - Skill / workflow
+        - docs/ai
+        - Template / prompt
+        - Repository / community files
+        - Khác
+    validations:
+      required: true
+
+  - type: input
+    id: agent
+    attributes:
+      label: AI agent / tool
+      description: Claude Code, Codex, GitHub Copilot, Cursor, tool khác hoặc N/A.
+      placeholder: "Ví dụ: Codex"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề
+      description: Mô tả điều đang sai hoặc gây khó hiểu.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Cách tái hiện
+      description: Task, file hoặc workflow nào làm vấn đề xuất hiện?
+      placeholder: |
+        1. Copy template vào project...
+        2. Yêu cầu agent...
+        3. Agent đọc/không đọc...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kết quả mong muốn
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Thông tin bổ sung
+      description: Link, screenshot hoặc context không nhạy cảm nếu có.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Xác nhận
+      options:
+        - label: Tôi đã kiểm tra issue hiện có để tránh báo trùng.
+          required: true
+        - label: Issue này không chứa secret, credential hoặc dữ liệu nhạy cảm.
+          required: true

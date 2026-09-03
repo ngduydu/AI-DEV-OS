@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/ngduydu/AI-DEV-OS/security
+    about: Không đăng lỗ hổng hoặc secret trong issue public. Xem SECURITY.md trước khi báo cáo.

@@ -1,0 +1,71 @@
+name: Improvement proposal
+description: Đề xuất cải thiện rule, workflow, template hoặc cấu trúc AI-DEV-OS.
+title: "[Proposal] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ưu tiên proposal dựa trên vấn đề thực tế thay vì thêm file/prompt chỉ vì trông hữu ích.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề thực tế
+      description: Điều gì đang tốn thời gian, gây sai context hoặc khiến AI làm việc kém hiệu quả?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Cách đang xử lý
+      description: Hiện tại bạn hoặc agent phải làm gì để xử lý vấn đề này?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Đề xuất
+      description: Thay đổi cụ thể bạn muốn có.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: artifact
+    attributes:
+      label: Theo bạn thay đổi này nên nằm ở đâu?
+      options:
+        - AGENTS.md / always-on rule
+        - docs/ai
+        - Skill
+        - Template
+        - Prompt
+        - GitHub/community config
+        - Chưa chắc
+    validations:
+      required: true
+
+  - type: textarea
+    id: contextimpact
+    attributes:
+      label: Ảnh hưởng tới context
+      description: Nó làm giảm hay tăng lượng context AI phải đọc mặc định? Vì sao?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Ví dụ / bằng chứng sử dụng
+      description: Nếu có, mô tả project, task hoặc failure thực tế đã khiến bạn đề xuất thay đổi này.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Xác nhận
+      options:
+        - label: Tôi đã kiểm tra issue hiện có để tránh đề xuất trùng.
+          required: true
+        - label: Tôi hiểu AI-DEV-OS ưu tiên context nhỏ và progressive disclosure.
+          required: true
