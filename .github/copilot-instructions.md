@@ -1,18 +1,9 @@
-# Repository instructions
+# Repository Instructions
 
-Trước khi sửa code, hãy đọc `AGENTS.md` và tài liệu liên quan trong `docs/ai/`.
+Đọc `AGENTS.md`, sau đó dùng `docs/README.md` để chỉ nạp context liên quan đến task hiện tại.
 
-Quy tắc chính:
+Tuân theo `docs/ai/16-TASK-EXECUTION.md`: giải quyết ambiguity quan trọng trước khi implement, search/reuse code hiện có trước khi tạo mới, verify bằng evidence, chạy Knowledge Sync và đánh giá Production Gate trước khi gọi task Done.
 
-- Hiểu code hiện tại trước khi sửa.
-- Bám đúng scope và pattern hiện có.
-- Không tự tạo abstraction/core mới nếu chưa có nhu cầu rõ ràng.
-- Không suy đoán business rule; kiểm tra `docs/ai/05-BUSINESS-RULES.md` và code/test hiện có.
-- Dùng lệnh trong `docs/ai/07-COMMANDS.md` để build/test/lint.
-- Mọi thay đổi phải được verify; không tuyên bố test pass nếu chưa chạy.
-- Bug fix nên thêm regression test khi khả thi.
-- Kiểm tra security theo `docs/ai/09-SECURITY.md`.
-- Nếu behavior, architecture hoặc business rule thay đổi, cập nhật tài liệu tương ứng.
-- Với thay đổi lớn, dùng workflow trong `docs/work/README.md`: research → spec → plan → tasks → implement → verification.
+Không duplicate business rule, không refactor ngoài scope, không tuyên bố test/build pass nếu chưa chạy. Với task lớn/risky, dùng workflow trong `docs/work/README.md`.
 
-Khi trả lời, ưu tiên ngắn gọn: thay đổi gì, verify bằng gì, còn rủi ro gì.
+Khi báo cáo kết quả, nêu ngắn gọn: thay đổi, verification, knowledge sync và production risk còn lại.
