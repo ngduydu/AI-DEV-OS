@@ -1,8 +1,9 @@
 # File Index
 
-Tổng số file: 66
+Tổng số file: 76
 
 ```text
+.agents/skills/bootstrap-project/SKILL.md
 .agents/skills/fix-bug/SKILL.md
 .agents/skills/implement-plan/SKILL.md
 .agents/skills/plan-change/SKILL.md
@@ -10,6 +11,9 @@ Tổng số file: 66
 .agents/skills/review-change/SKILL.md
 .agents/skills/update-project-knowledge/SKILL.md
 .agents/skills/verify-change/SKILL.md
+.claude/agents/change-reviewer.md
+.claude/agents/production-reviewer.md
+.claude/skills/bootstrap-project/SKILL.md
 .claude/skills/fix-bug/SKILL.md
 .claude/skills/implement-plan/SKILL.md
 .claude/skills/plan-change/SKILL.md
@@ -23,6 +27,7 @@ Tổng số file: 66
 .github/copilot-instructions.md
 .github/pull_request_template.md
 AGENTS.md
+APPLY-TO-PROJECT.md
 CHANGELOG.md
 CLAUDE.md
 CONTRIBUTING.md
@@ -31,6 +36,7 @@ LICENSE
 README.md
 REFERENCES.md
 SECURITY.md
+docs/README.md
 docs/ai/00-SETUP-CHECKLIST.md
 docs/ai/01-PROJECT-CONTEXT.md
 docs/ai/02-PRODUCT.md
@@ -47,8 +53,11 @@ docs/ai/12-DEFINITION-OF-DONE.md
 docs/ai/13-KNOWN-PITFALLS.md
 docs/ai/14-AI-SYSTEM-MAINTENANCE.md
 docs/ai/15-GLOSSARY.md
+docs/ai/16-TASK-EXECUTION.md
 docs/decisions/ADR-TEMPLATE.md
 docs/decisions/README.md
+docs/modules/README.md
+docs/operations/README.md
 docs/work/README.md
 docs/work/_template/PLAN.md
 docs/work/_template/RESEARCH.md
