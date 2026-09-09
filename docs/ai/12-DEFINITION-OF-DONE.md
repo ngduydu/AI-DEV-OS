@@ -10,8 +10,15 @@ Một change chỉ được gọi là Done khi behavior đúng, verification có
 - [ ] Không còn ambiguity quan trọng bị che bằng assumption.
 - [ ] Không có thay đổi ngoài scope chưa giải thích.
 - [ ] Đã search/reuse implementation hiện có trước khi tạo mới.
-- [ ] Code tuân theo convention dự án.
+- [ ] Nếu tạo mới abstraction/helper/service/component, có lý do rõ vì sao existing code không phù hợp.
+- [ ] Không thêm dependency/package không cần thiết; dependency mới đã được đánh giá nếu có.
+- [ ] Code tuân theo convention dự án và canonical pattern liên quan.
+- [ ] Không over-engineering/future-proofing cho requirement chưa tồn tại.
+- [ ] Không có dead code/commented-out code/temp script/debug artifact/TODO mơ hồ do task để lại.
+- [ ] Comment/docs liên quan vẫn đúng với behavior mới.
 - [ ] Test liên quan pass.
+- [ ] Không sửa/xóa test đúng chỉ để né failure.
+- [ ] Không hard-code behavior chỉ để test hiện tại pass.
 - [ ] Build/lint/static checks phù hợp pass.
 - [ ] Regression risk đã được xem xét.
 - [ ] Security impact đã được xem xét nếu liên quan.
@@ -20,7 +27,7 @@ Một change chỉ được gọi là Done khi behavior đúng, verification có
 - [ ] Logging/monitoring/operability đã được xem xét nếu behavior production cần quan sát.
 - [ ] Medium/Large hoặc high-risk change đã được review độc lập khi khả thi.
 - [ ] Knowledge Sync đã chạy: docs/module/ADR/pitfall/skill được cập nhật nếu cần.
-- [ ] Không đưa secret hoặc debug artifact vào commit.
+- [ ] Không đưa secret hoặc dữ liệu nhạy cảm không cần thiết vào commit/log/output.
 - [ ] Kết quả verification được báo bằng bằng chứng thực tế.
 
 ## Knowledge Sync bắt buộc
