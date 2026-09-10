@@ -8,6 +8,7 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ### Added
 
+- `START-HERE.md` làm cửa vào duy nhất cho người mới: kiểm tra/cài Git, VS Code, Claude Code, project toolchain, copy AI-DEV-OS core, verify context, bootstrap và xử lý `READY / PARTIAL / BLOCKED` trước task đầu tiên.
 - `APPLY-TO-PROJECT.md` hướng dẫn bê AI-DEV-OS vào project mới/cũ mà không phải điền toàn bộ docs upfront.
 - `USAGE.md` hướng dẫn cách dùng hằng ngày: giao task thế nào, AI tự đọc file nào, khi nào hỏi lại và khi nào refresh bootstrap.
 - `CLAUDE-CODE-GUIDE.md` hướng dẫn cài và dùng Claude Code theo workflow thực tế với VS Code, CLI, Plan mode, Git/worktree, skills, subagents, hooks và AI-DEV-OS.
@@ -20,6 +21,7 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ### Changed
 
+- `README.md` giờ route người mới qua `START-HERE.md` trước, thay vì yêu cầu tự chọn giữa nhiều tài liệu setup.
 - `AGENTS.md` được rút xuống thành entry point cực ngắn.
 - `CLAUDE.md` chỉ import `AGENTS.md` để tránh hai nguồn sự thật.
 - `04-CODEBASE-MAP.md` được nâng thành nơi lưu canonical examples, reusable building blocks, sensitive/generated areas để phục vụ Reuse Gate.
