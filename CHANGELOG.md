@@ -10,6 +10,7 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 - `APPLY-TO-PROJECT.md` hướng dẫn bê AI-DEV-OS vào project mới/cũ mà không phải điền toàn bộ docs upfront.
 - `USAGE.md` hướng dẫn cách dùng hằng ngày: giao task thế nào, AI tự đọc file nào, khi nào hỏi lại và khi nào refresh bootstrap.
+- `CLAUDE-CODE-GUIDE.md` hướng dẫn cài và dùng Claude Code theo workflow thực tế với VS Code, CLI, Plan mode, Git/worktree, skills, subagents, hooks và AI-DEV-OS.
 - `docs/README.md` làm documentation map và progressive context router.
 - `docs/ai/16-TASK-EXECUTION.md` làm Task Execution Contract với Understanding Gate, Reuse Gate, Dependency Gate, Verification, Cleanup, Knowledge Sync và Production Gate.
 - `docs/modules/` cho knowledge theo domain/module, tạo on demand.
