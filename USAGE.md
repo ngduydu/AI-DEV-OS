@@ -8,6 +8,8 @@ Tài liệu này trả lời câu hỏi thực tế nhất:
 
 **Sau khi setup đúng, bạn chỉ cần giao task. Không cần nhắc AI đọc từng file ở mỗi lần làm việc.**
 
+Nếu bạn chưa cài hoặc chưa quen Claude Code, đọc trước `CLAUDE-CODE-GUIDE.md`.
+
 Với Claude Code, luồng context của project được thiết kế như sau:
 
 ```text
