@@ -70,6 +70,7 @@ Chi tiết:
 
 - `APPLY-TO-PROJECT.md` — bê gì sang project và bootstrap như nào.
 - `USAGE.md` — mỗi ngày giao task ra sao, AI tự đọc file nào, khi nào hỏi lại.
+- `CLAUDE-CODE-GUIDE.md` — cài Claude Code, dùng VS Code/CLI, Plan mode, worktree, skills/subagents và workflow khuyến nghị.
 
 ## Sau khi setup, có phải nhắc AI đọc docs mỗi task không?
 
@@ -127,6 +128,7 @@ Context của từng task
 ├── CLAUDE.md
 ├── APPLY-TO-PROJECT.md
 ├── USAGE.md
+├── CLAUDE-CODE-GUIDE.md
 │
 ├── docs/
 │   ├── README.md
@@ -179,6 +181,8 @@ docs/ai/06-CODING-STANDARDS.md
 Convention project-specific phải được bootstrap/fill từ evidence thật của project, không copy mù từ một stack/project khác.
 
 ## Claude Code
+
+Hướng dẫn cài đặt và cách dùng theo workflow đề xuất: `CLAUDE-CODE-GUIDE.md`.
 
 Claude Code dùng:
 
