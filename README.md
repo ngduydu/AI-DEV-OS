@@ -6,6 +6,18 @@ AI-DEV-OS giúp repository trở thành nguồn context có cấu trúc để AI
 
 > Mục tiêu không phải thay thế human review. Mục tiêu là để human tập trung review business và quyết định quan trọng, thay vì liên tục bắt lỗi agent quên context, duplicate code, thiếu test, thiếu docs hoặc bỏ sót production risk.
 
+## Lần đầu sử dụng?
+
+Bắt đầu duy nhất tại:
+
+```text
+START-HERE.md
+```
+
+File này dẫn từ số 0: kiểm tra/cài Git, VS Code, Claude Code, toolchain của project, copy đúng AI-DEV-OS core, verify context, bootstrap project và đưa repo tới trạng thái `READY / PARTIAL / BLOCKED` trước task đầu tiên.
+
+Không cần tự mò các file khác trước.
+
 ## Core workflow
 
 ```text
@@ -45,6 +57,10 @@ Workflow chi tiết: `docs/ai/16-TASK-EXECUTION.md`.
 ### Project đã có code
 
 ```text
+START-HERE.md
+↓
+Check machine/toolchain
+↓
 Copy AI-DEV-OS core
 ↓
 Run bootstrap-project
@@ -66,9 +82,10 @@ Giao task bình thường
 
 Chỉ điền những gì đã biết chắc: project context, product intent, architecture đã chốt và coding convention ban đầu. Codebase map, commands, testing, module docs và operations docs được bổ sung dần khi project hình thành.
 
-Chi tiết:
+Tài liệu theo mục đích:
 
-- `APPLY-TO-PROJECT.md` — bê gì sang project và bootstrap như nào.
+- `START-HERE.md` — cửa vào duy nhất cho người mới, từ cài đặt tới task đầu tiên.
+- `APPLY-TO-PROJECT.md` — chi tiết bê gì sang project và bootstrap như nào.
 - `USAGE.md` — mỗi ngày giao task ra sao, AI tự đọc file nào, khi nào hỏi lại.
 - `CLAUDE-CODE-GUIDE.md` — cài Claude Code, dùng VS Code/CLI, Plan mode, worktree, skills/subagents và workflow khuyến nghị.
 
@@ -124,6 +141,7 @@ Context của từng task
 
 ```text
 .
+├── START-HERE.md
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── APPLY-TO-PROJECT.md
