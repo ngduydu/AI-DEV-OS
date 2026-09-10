@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 77
+Tổng số file: 78
 
 ```text
 .agents/skills/bootstrap-project/SKILL.md
@@ -29,6 +29,7 @@ Tổng số file: 77
 AGENTS.md
 APPLY-TO-PROJECT.md
 CHANGELOG.md
+CLAUDE-CODE-GUIDE.md
 CLAUDE.md
 CONTRIBUTING.md
 FILE-INDEX.md
