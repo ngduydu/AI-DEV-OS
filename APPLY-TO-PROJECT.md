@@ -12,6 +12,8 @@ Copy core
 → project knowledge tự giàu dần sau mỗi task
 ```
 
+Sau khi setup xong, xem `USAGE.md` để biết cách giao task hằng ngày, AI tự đọc file nào, khi nào nó phải hỏi lại và khi nào cần chạy bootstrap lại.
+
 ## 1. Copy những gì?
 
 ### Bắt buộc
@@ -36,7 +38,7 @@ Sau khi copy core vào repository:
 4. Review nhanh các docs được tạo/cập nhật.
 5. Trả lời các `UNKNOWN` thật sự chặn task hoặc ảnh hưởng behavior quan trọng.
 6. Commit knowledge bootstrap.
-7. Giao task bình thường.
+7. Giao task bình thường theo `USAGE.md`.
 
 Không viết lại toàn bộ tài liệu bằng tay nếu codebase đã chứa đủ bằng chứng để AI tự tổng hợp.
 
@@ -87,7 +89,17 @@ Không cần prompt dài. Ví dụ:
 Sửa lỗi không cập nhật trạng thái máy khi hủy hợp đồng.
 ```
 
-Agent phải tự tuân theo `docs/ai/16-TASK-EXECUTION.md`:
+Sau khi setup đúng, **không cần nhắc AI đọc từng file**. Agent phải tự đi theo:
+
+```text
+CLAUDE.md
+→ AGENTS.md
+→ docs/README.md
+→ docs/ai/16-TASK-EXECUTION.md
+→ docs/module/code/test liên quan
+```
+
+và thực hiện:
 
 ```text
 Load context
@@ -104,6 +116,8 @@ Load context
 
 Nếu requirement quan trọng chưa rõ, agent phải tự tìm trong repo trước; vẫn không đủ bằng chứng thì hỏi lại thay vì đoán.
 
+Hướng dẫn chi tiết cách dùng hằng ngày: `USAGE.md`.
+
 ## 6. Khi nào setup được coi là đủ?
 
 Không cần mọi file đều đầy. Setup đủ khi AI có thể trả lời đáng tin cậy:
@@ -112,6 +126,7 @@ Không cần mọi file đều đầy. Setup đủ khi AI có thể trả lời 
 - Kiến trúc và stack hiện tại là gì?
 - Code liên quan thường nằm ở đâu?
 - Convention chính là gì?
+- Canonical example/building block nào nên reuse?
 - Build/run/test bằng lệnh nào?
 - Business rule của task hiện tại nằm ở đâu?
 - Điều gì chưa biết và có cần hỏi trước khi implement không?
@@ -125,6 +140,7 @@ Không cần mọi file đều đầy. Setup đủ khi AI có thể trả lời 
 - kiểm tra docs có mâu thuẫn code không;
 - chuyển procedure lặp lại thành Skill;
 - bổ sung module/operations docs từ những gì đã học thật;
+- refresh canonical examples/building blocks;
 - giữ `AGENTS.md` và `CLAUDE.md` cực ngắn.
 
 Nguyên tắc cuối cùng:

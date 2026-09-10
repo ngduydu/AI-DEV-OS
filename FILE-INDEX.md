@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 76
+Tổng số file: 77
 
 ```text
 .agents/skills/bootstrap-project/SKILL.md
@@ -36,6 +36,7 @@ LICENSE
 README.md
 REFERENCES.md
 SECURITY.md
+USAGE.md
 docs/README.md
 docs/ai/00-SETUP-CHECKLIST.md
 docs/ai/01-PROJECT-CONTEXT.md

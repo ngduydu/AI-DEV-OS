@@ -2,7 +2,7 @@
 
 Đây là contract mặc định cho mọi thay đổi trong repository.
 
-Mục tiêu không phải tạo thêm ceremony. Mục tiêu là để agent tạo ra change ở trạng thái **Review Ready / Production Candidate**: đã hiểu đủ, reuse đúng, có verification, knowledge không thất lạc và rủi ro production đã được xem xét.
+Mục tiêu không phải tạo thêm ceremony. Mục tiêu là để agent tạo ra change ở trạng thái **Review Ready / Production Candidate**: đã hiểu đủ, reuse đúng, tuân convention, có verification, knowledge không thất lạc và rủi ro production đã được xem xét.
 
 ## Flow
 
@@ -73,8 +73,10 @@ Trước khi sửa code:
 1. Đọc `docs/README.md`.
 2. Xác định module/khu vực bị ảnh hưởng.
 3. Đọc docs liên quan, không load toàn bộ docs.
-4. Đọc code và test hiện có trước khi đề xuất implementation.
-5. Search các implementation/pattern tương tự.
+4. Đọc `04-CODEBASE-MAP.md` nếu cần tìm canonical implementation/reusable building block.
+5. Đọc `06-CODING-STANDARDS.md` khi task tạo/sửa code.
+6. Đọc code và test hiện có trước khi đề xuất implementation.
+7. Search các implementation/pattern tương tự.
 
 Không đưa ra kết luận về code chưa đọc hoặc behavior repository chưa chứng minh.
 
@@ -110,41 +112,61 @@ Ví dụ phải hỏi nếu repository chưa chứng minh được:
 
 ## 4. Reuse Gate
 
-Trước khi tạo mới service/helper/component/validator/query/DTO pattern/business logic:
+Trước khi tạo mới service/helper/component/validator/query/mapper/DTO pattern/business logic:
 
-1. Search implementation tương tự.
-2. Đọc canonical pattern hiện có.
-3. Ưu tiên reuse hoặc extend nếu semantics phù hợp.
-4. Không tạo abstraction mới chỉ để "sạch hơn" hoặc vì agent quen pattern khác.
-5. Nếu vẫn cần tạo mới, phải có lý do kỹ thuật rõ ràng.
+1. Đọc canonical examples/reusable building blocks trong `04-CODEBASE-MAP.md` nếu có.
+2. Search implementation tương tự bằng domain term và behavior, không chỉ tên class dự kiến.
+3. Đọc canonical pattern hiện có.
+4. Ưu tiên reuse hoặc extend nếu semantics phù hợp.
+5. Không tạo abstraction mới chỉ để "sạch hơn" hoặc vì agent quen pattern khác.
+6. Nếu vẫn cần tạo mới, phải có lý do kỹ thuật rõ ràng.
 
 Không duplicate business rule quan trọng ở nhiều nơi nếu có thể có một nguồn thực thi rõ ràng.
 
-## 5. Plan
+Không reuse chỉ vì tên giống nhau nếu semantics khác.
 
-Task nhỏ có thể implement ngay sau khi qua hai gate trên.
+## 5. Dependency Gate
+
+Trước khi thêm package/library/service bên ngoài:
+
+1. Search dependency/building block hiện có.
+2. Kiểm tra project/platform standard library có đủ không.
+3. Chỉ thêm dependency nếu capability cần thiết không được đáp ứng hợp lý bằng code hiện có.
+4. Nêu lý do kỹ thuật và impact maintenance/security/license nếu project yêu cầu.
+5. Không upgrade dependency ngoài scope task trừ khi bắt buộc để hoàn thành change an toàn.
+
+Dependency ảnh hưởng architecture/public contract/deployment phải được xem như decision/risk tương ứng.
+
+## 6. Plan
+
+Task nhỏ có thể implement ngay sau khi qua các gate trên.
 
 Task vừa/lớn cần plan đủ để trả lời:
 
 - file/module nào thay đổi;
 - behavior nào thay đổi;
 - data/API contract nào bị ảnh hưởng;
+- implementation nào sẽ reuse/extend;
+- dependency mới có cần không;
 - test nào chứng minh đúng;
 - migration/rollback có cần không;
 - rủi ro chính là gì.
 
 Không plan vượt quá scope task.
 
-## 6. Implement
+## 7. Implement
 
 - Bám đúng scope và Acceptance Criteria.
 - Theo convention thật của project.
 - Ưu tiên thay đổi nhỏ, dễ review, dễ rollback.
 - Không refactor phần không liên quan chỉ vì tiện thể.
+- Không future-proof cho requirement chưa tồn tại.
+- Không tạo abstraction cho one-off nếu không có repetition/complexity thực tế.
 - Không hard-code secret hoặc dữ liệu nhạy cảm.
-- Với schema/data destructive, phải thiết kế rollback hoặc nêu rõ vì sao không thể rollback.
+- Không hard-code output chỉ để test hiện tại pass.
+- Với schema/data destructive, phải thiết kế rollback/recovery hoặc nêu rõ vì sao không thể rollback.
 
-## 7. Verify
+## 8. Verify
 
 Verification là evidence, không phải cảm giác.
 
@@ -153,8 +175,21 @@ Verification là evidence, không phải cảm giác.
 3. Bug fix nên có reproduction/regression test khi khả thi.
 4. Không nói `pass` nếu chưa chạy.
 5. Check không chạy được phải báo `NOT VERIFIED`, lý do và impact.
+6. Không sửa/xóa test đúng chỉ để né failure; nếu test sai, phải giải thích bằng evidence.
+7. Test phải xác minh behavior, không chỉ implementation detail vô nghĩa.
 
-## 8. Independent Review
+## 9. Cleanup Gate
+
+Trước review/Done:
+
+- không để dead code/commented-out code do task tạo ra;
+- không để temp script/file/debug output/logging nếu không phải artifact có chủ đích;
+- không để TODO mơ hồ kiểu `fix later`;
+- không để stale comment/docs do behavior vừa đổi;
+- không format/refactor hàng loạt file ngoài scope;
+- không để duplicate helper/business logic mà Reuse Gate lẽ ra phải phát hiện.
+
+## 10. Independent Review
 
 Không cần spawn reviewer cho mọi typo nhỏ.
 
@@ -162,12 +197,12 @@ Với task Medium/Large hoặc rủi ro đáng kể, ưu tiên review bằng con
 
 Claude Code có thể dùng:
 
-- `.claude/agents/change-reviewer.md` để tìm correctness/regression/duplication/convention issues;
+- `.claude/agents/change-reviewer.md` để tìm correctness/regression/duplication/convention/overengineering/test-gaming issues;
 - `.claude/agents/production-reviewer.md` cho security, migration, config, compatibility, observability và rollback.
 
 Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năng gây sai behavior hoặc production incident hơn style preference.
 
-## 9. Knowledge Sync — bắt buộc
+## 11. Knowledge Sync — bắt buộc
 
 Trước khi Done, kiểm tra knowledge vừa học có giá trị cho task sau không.
 
@@ -186,7 +221,7 @@ Nếu user đã giải thích một rule bền vững để gỡ ambiguity, khô
 
 Nếu không có durable knowledge mới, report ngắn gọn: `Knowledge Sync: no durable changes`.
 
-## 10. Production Gate
+## 12. Production Gate
 
 Trước khi gọi change là Production Candidate, đánh giá những mục liên quan:
 
@@ -205,7 +240,7 @@ Không phải task nào cũng cần mọi mục. Nhưng mục có liên quan kh�
 
 Nếu có production risk chưa được giải quyết hoặc chưa xác minh, không báo `Production Ready`; nêu rõ blocker/risk.
 
-## 11. Final Report
+## 13. Final Report
 
 Báo ngắn gọn và dựa trên evidence:
 
@@ -234,7 +269,9 @@ Không tuyên bố mạnh hơn bằng chứng hiện có.
 ```text
 Không hiểu đủ → không đoán.
 Chưa tìm code cũ → không tạo mới.
+Project đã có dependency phù hợp → không thêm cái mới.
 Chưa verify → không nói Done.
+Không game test để lấy màu xanh.
 Knowledge mới → không để chết trong chat.
 Risk production chưa xử lý → không gọi Production Ready.
 ```
