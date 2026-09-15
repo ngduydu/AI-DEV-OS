@@ -1,0 +1,28 @@
+name: Verify skills mirror
+
+on:
+  pull_request:
+    paths:
+      - ".claude/skills/**"
+      - ".agents/skills/**"
+
+jobs:
+  verify-skills-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync skills mirror
+        run: bash scripts/sync-skills.sh
+
+      - name: Verify generated mirror is committed
+        shell: bash
+        run: |
+          if ! git diff --quiet -- .agents/skills; then
+            echo "::error::.agents/skills is out of sync with .claude/skills."
+            echo "::error::Run 'bash scripts/sync-skills.sh' (or './scripts/sync-skills.ps1' on PowerShell), then commit the generated changes."
+            git diff -- .agents/skills
+            exit 1
+          fi
