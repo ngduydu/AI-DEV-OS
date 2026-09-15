@@ -42,12 +42,27 @@ Không nên làm `AGENTS.md` dài nếu nội dung có thể đặt trong tài l
 
 ### Thêm workflow lặp lại
 
-Cân nhắc thêm hoặc sửa:
+Chỉ thêm hoặc sửa source of truth tại:
 
 ```text
-.agents/skills/
 .claude/skills/
 ```
+
+Sau đó sinh lại mirror `.agents/skills/` bằng một trong hai lệnh:
+
+Bash:
+
+```bash
+bash scripts/sync-skills.sh
+```
+
+PowerShell:
+
+```powershell
+./scripts/sync-skills.ps1
+```
+
+Không sửa trực tiếp `.agents/skills/<skill>/SKILL.md`.
 
 ### Thêm template
 
