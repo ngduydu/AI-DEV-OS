@@ -1,8 +1,9 @@
 # File Index
 
-Tổng số file: 79
+Tổng số file: 83
 
 ```text
+.agents/skills/README.md
 .agents/skills/bootstrap-project/SKILL.md
 .agents/skills/fix-bug/SKILL.md
 .agents/skills/implement-plan/SKILL.md
@@ -26,6 +27,7 @@ Tổng số file: 79
 .github/ISSUE_TEMPLATE/improvement-proposal.yml
 .github/copilot-instructions.md
 .github/pull_request_template.md
+.github/workflows/verify-skills-sync.yml
 AGENTS.md
 APPLY-TO-PROJECT.md
 CHANGELOG.md
@@ -77,6 +79,8 @@ prompts/07-SECURITY-REVIEW.md
 prompts/08-REFACTOR.md
 prompts/09-UPDATE-DOCS.md
 prompts/10-HANDOFF.md
+scripts/sync-skills.ps1
+scripts/sync-skills.sh
 templates/BUG-BRIEF.md
 templates/FEATURE-BRIEF.md
 templates/POSTMORTEM.md
