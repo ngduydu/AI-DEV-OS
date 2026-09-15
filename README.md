@@ -137,7 +137,11 @@ Context của từng task
 
 `AGENTS.md` chỉ là entry point ngắn. `CLAUDE.md` chỉ import `AGENTS.md`. Tài liệu chi tiết nằm trong `docs/`, workflow lặp lại nằm trong Skills.
 
-## Cấu trúc chính
+## Cấu trúc repository và mỗi phần dùng để làm gì
+
+AI-DEV-OS không phải một package cài vào application. Nó là một bộ **instruction + project knowledge + reusable AI workflow** được đặt ngay trong repository để agent làm việc có context và có quy trình.
+
+Nhìn tổng thể:
 
 ```text
 .
@@ -166,6 +170,107 @@ Context của từng task
 ├── prompts/
 └── templates/
 ```
+
+### Nhóm core dùng trong project
+
+| Thành phần | Nó là gì? | Khi copy vào project thì để làm gì? |
+|---|---|---|
+| `AGENTS.md` | Entry point rule chung cho AI agent | Nói cho agent biết phải đọc documentation map nào, phải tuân workflow/gate nào và không được tự ý bỏ qua verify/reuse/clarification. Đây là file nhỏ nhưng luôn quan trọng. |
+| `docs/` | Bộ nhớ lâu dài của project | Lưu những thứ AI cần hiểu về project mà không nên chỉ nằm trong chat: product, architecture, codebase map, coding convention, commands, testing, business rules, module knowledge, operations, ADR... Sau bootstrap, AI sẽ đọc/update các file này theo task. |
+
+### Adapter dành cho Claude Code
+
+| Thành phần | Nó là gì? | Khi copy vào project thì để làm gì? |
+|---|---|---|
+| `CLAUDE.md` | Entry point riêng của Claude Code | Claude Code tự đọc file này. Trong AI-DEV-OS nó chỉ dẫn sang `AGENTS.md` để tránh duplicate rule. |
+| `.claude/skills/` | Các workflow tái sử dụng mà Claude Code có thể nhận diện và gọi | Cho Claude biết **cách làm một loại công việc lặp lại**, không chỉ biết “phải làm gì”. Ví dụ: `bootstrap-project`, `fix-bug`, `plan-change`, `verify-change`. |
+| `.claude/agents/` | Các subagent chuyên trách | Dùng khi cần một Claude context khác làm reviewer độc lập, ví dụ review change hoặc production risk. Không bắt buộc cho task nhỏ. |
+
+Nếu project chỉ dùng Claude Code, thường copy:
+
+```text
+AGENTS.md
+CLAUDE.md
+docs/
+.claude/skills/
+.claude/agents/   # optional
+```
+
+và **không cần `.agents/skills/`**.
+
+### Skill thực chất là gì?
+
+Có thể hiểu đơn giản:
+
+```text
+Prompt một lần
+→ chat
+
+Knowledge của project
+→ docs/
+
+Workflow lặp đi lặp lại
+→ skill
+```
+
+Một skill là một instruction/workflow được đóng gói để agent dùng lại. Ví dụ `fix-bug` có thể quy định:
+
+```text
+reproduce bug
+→ tìm root cause
+→ kiểm tra code hiện có
+→ sửa tối thiểu
+→ chạy regression verification
+→ review
+→ report
+```
+
+Với Claude Code, skill nằm ở:
+
+```text
+.claude/skills/<ten-skill>/SKILL.md
+```
+
+Ví dụ:
+
+```text
+.claude/skills/bootstrap-project/SKILL.md
+.claude/skills/fix-bug/SKILL.md
+```
+
+AI-DEV-OS đã có một số skill dùng chung. Khi team có một procedure lặp lại riêng, bạn có thể tự viết skill mới hoặc sửa skill hiện có.
+
+Ví dụ sau này project có quy trình đặc thù:
+
+```text
+update-stored-procedure
+release-admin-package
+create-database-migration
+review-report-query
+```
+
+thì có thể chuẩn hóa thành skill thay vì mỗi lần lại viết một prompt dài.
+
+Không cần biến mọi task thành skill. Chỉ tạo skill khi workflow đó **lặp lại, có quy tắc rõ và đáng tái sử dụng**.
+
+### Adapter dành cho agent khác
+
+| Thành phần | Nó là gì? | Khi copy vào project thì để làm gì? |
+|---|---|---|
+| `.agents/skills/` | Bản skill theo convention dành cho agent hỗ trợ đường dẫn này | Chỉ copy khi agent bạn dùng cần/hiểu adapter này. Nếu project chỉ dùng Claude Code thì bỏ qua. |
+
+Mục tiêu của repo là có core knowledge chung, còn adapter nào được copy sang product repo phụ thuộc agent thực tế đang dùng.
+
+### Các folder chủ yếu để người dùng tham khảo, không copy mặc định
+
+| Thành phần | Tác dụng |
+|---|---|
+| `START-HERE.md` | Onboarding từ số 0: cài tool, chọn agent, apply framework, bootstrap. |
+| `APPLY-TO-PROJECT.md` | Hướng dẫn chi tiết copy thành phần nào sang product repo và bootstrap ra sao. |
+| `USAGE.md` | Hướng dẫn cách giao task hằng ngày sau khi setup. |
+| `CLAUDE-CODE-GUIDE.md` | Hướng dẫn cài và vận hành Claude Code. |
+| `prompts/` | Prompt thủ công cho các tình huống cần chạy bằng tay hoặc tham khảo. Không cần nếu đã dùng skill tương ứng. |
+| `templates/` | Mẫu Feature Brief, Bug Brief, PR, Postmortem, Release Checklist... Chỉ copy khi team muốn áp dụng các mẫu này. |
 
 ## Project knowledge
 
