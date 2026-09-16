@@ -175,6 +175,8 @@ Nhìn tổng thể:
 
 | Thành phần | Nó là gì? | Khi copy vào project thì để làm gì? |
 |---|---|---|
+| `.ai-dev-os/VERSION` | Version baseline của AI-DEV-OS trong product repo | Giúp biết project đang dùng framework version nào để upgrade đúng thay vì copy đè toàn bộ framework. |
+| `UPGRADE.md` | Contract/migration guide của framework | Giải thích file nào được update, file nào phải preserve khi nâng AI-DEV-OS. |
 | `AGENTS.md` | Entry point rule chung cho AI agent | Nói cho agent biết phải đọc documentation map nào, phải tuân workflow/gate nào và không được tự ý bỏ qua verify/reuse/clarification. Đây là file nhỏ nhưng luôn quan trọng. |
 | `docs/` | Bộ nhớ lâu dài của project | Lưu những thứ AI cần hiểu về project mà không nên chỉ nằm trong chat: product, architecture, codebase map, coding convention, commands, testing, business rules, module knowledge, operations, ADR... Sau bootstrap, AI sẽ đọc/update các file này theo task. |
 
@@ -189,6 +191,8 @@ Nhìn tổng thể:
 Nếu project chỉ dùng Claude Code, thường copy:
 
 ```text
+.ai-dev-os/VERSION
+UPGRADE.md
 AGENTS.md
 CLAUDE.md
 docs/
@@ -412,3 +416,64 @@ Xem `CONTRIBUTING.md`.
 ## License
 
 MIT License.
+
+
+## Context efficiency và quota
+
+Sau bootstrap, AI-DEV-OS không coi "đọc nhiều hơn" là mặc định tốt hơn.
+
+~~~text
+CODEBASE-MAP
+→ direct read nếu đã biết file
+→ targeted text search
+→ structural search nếu cần
+→ graph/MCP nếu codebase lớn và đã bật
+→ source/test thật
+→ broaden/history chỉ khi evidence chưa đủ
+~~~
+
+Stack 2.2.0:
+
+- **ripgrep** — default text search.
+- **ast-grep** — optional structural search.
+- **Repomix** — optional bootstrap/snapshot/handoff.
+- **codebase-memory-mcp** — optional pilot cho large codebase.
+- **Sourcegraph MCP** — enterprise alternative khi tổ chức đã có Sourcegraph.
+
+Không bắt buộc cài tất cả. Tool mới phải qua `docs/ai/18-TOOL-ADOPTION.md`.
+
+Với Claude Code:
+
+~~~text
+task độc lập hoàn tất + Knowledge Sync
+→ /clear
+
+cùng task nhưng context lớn
+→ /compact
+~~~
+
+Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+
+## Framework version và upgrade
+
+Product repo từ baseline 2.2.0 có:
+
+~~~text
+.ai-dev-os/VERSION
+~~~
+
+Khi AI-DEV-OS thay đổi, không copy đè toàn bộ `docs/`.
+
+~~~text
+đọc current VERSION
+→ đọc UPGRADE.md của target version
+→ update framework-owned
+→ preserve project-owned
+→ merge mixed files
+→ verify
+→ bump VERSION
+~~~
+
+Repo đã apply trước 2.2.0 nhưng chưa có VERSION được coi là legacy/unversioned install và có thể nâng bằng skill `update-ai-dev-os`.
+
+Chi tiết: `UPGRADE.md`.
