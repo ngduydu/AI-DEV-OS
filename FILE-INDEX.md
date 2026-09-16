@@ -1,16 +1,18 @@
 # File Index
 
-Tổng số file: 79
+Tổng số file: 88
 
-```text
+~~~text
 .agents/skills/bootstrap-project/SKILL.md
 .agents/skills/fix-bug/SKILL.md
 .agents/skills/implement-plan/SKILL.md
 .agents/skills/plan-change/SKILL.md
 .agents/skills/research-codebase/SKILL.md
 .agents/skills/review-change/SKILL.md
+.agents/skills/update-ai-dev-os/SKILL.md
 .agents/skills/update-project-knowledge/SKILL.md
 .agents/skills/verify-change/SKILL.md
+.ai-dev-os/VERSION
 .claude/agents/change-reviewer.md
 .claude/agents/production-reviewer.md
 .claude/skills/bootstrap-project/SKILL.md
@@ -19,6 +21,7 @@ Tổng số file: 79
 .claude/skills/plan-change/SKILL.md
 .claude/skills/research-codebase/SKILL.md
 .claude/skills/review-change/SKILL.md
+.claude/skills/update-ai-dev-os/SKILL.md
 .claude/skills/update-project-knowledge/SKILL.md
 .claude/skills/verify-change/SKILL.md
 .github/ISSUE_TEMPLATE/bug-report.yml
@@ -38,6 +41,7 @@ README.md
 REFERENCES.md
 SECURITY.md
 START-HERE.md
+UPGRADE.md
 USAGE.md
 docs/README.md
 docs/ai/00-SETUP-CHECKLIST.md
@@ -57,10 +61,14 @@ docs/ai/13-KNOWN-PITFALLS.md
 docs/ai/14-AI-SYSTEM-MAINTENANCE.md
 docs/ai/15-GLOSSARY.md
 docs/ai/16-TASK-EXECUTION.md
+docs/ai/17-CONTEXT-RETRIEVAL.md
+docs/ai/18-TOOL-ADOPTION.md
 docs/decisions/ADR-TEMPLATE.md
 docs/decisions/README.md
 docs/modules/README.md
 docs/operations/README.md
+docs/superpowers/plans/2026-09-16-framework-lifecycle-context-retrieval.md
+docs/superpowers/specs/2026-09-16-framework-lifecycle-context-retrieval-design.md
 docs/work/README.md
 docs/work/_template/PLAN.md
 docs/work/_template/RESEARCH.md
@@ -82,4 +90,5 @@ templates/FEATURE-BRIEF.md
 templates/POSTMORTEM.md
 templates/PR-DESCRIPTION.md
 templates/RELEASE-CHECKLIST.md
-```
+templates/mcp/claude-codebase-memory.json
+~~~
