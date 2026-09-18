@@ -61,12 +61,16 @@ Trước mutation:
 4. Detect current target version:
    - có `.ai-dev-os/VERSION` → đọc version;
    - không có → `legacy-unversioned`.
-5. Xác nhận target có AI-DEV-OS artifacts, tối thiểu một trong:
-   - `AGENTS.md`
-   - `CLAUDE.md`
-   - `docs/01-development/ai-development.md`
-   - `docs/ai/16-TASK-EXECUTION.md` (legacy)
-   - `.claude/skills/bootstrap-project/SKILL.md`.
+5. Xác nhận target thực sự là repository đã apply AI-DEV-OS:
+   - nếu có `.ai-dev-os/VERSION` hoặc `.ai-dev-os/manifest.json` → recognized;
+   - nếu là legacy/unversioned → phải có **ít nhất 2** high-confidence artifacts trong:
+     - `UPGRADE.md`;
+     - `docs/01-development/ai-development.md`;
+     - `docs/ai/16-TASK-EXECUTION.md` (legacy);
+     - `.claude/skills/bootstrap-project/SKILL.md`;
+     - `.agents/skills/bootstrap-project/SKILL.md`.
+   - `AGENTS.md` hoặc `CLAUDE.md` **không đủ** để nhận diện vì nhiều repository không dùng AI-DEV-OS cũng có các file này.
+   - nếu không đạt điều kiện → STOP trước mutation và bảo dùng `/apply-ai-dev-os` nếu đây là repo mới.
 6. Detect adapters:
    - Claude active nếu target có `CLAUDE.md` hoặc `.claude/`;
    - generic active nếu target có `.agents/`.
