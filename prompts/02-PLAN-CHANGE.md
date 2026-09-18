@@ -13,4 +13,4 @@ Plan phải:
 - nêu rủi ro;
 - không thêm refactor ngoài scope.
 
-Với task lớn, dùng `docs/work/_template/PLAN.md`.
+Với task lớn, dùng `docs/06-work/_template/PLAN.md`.
