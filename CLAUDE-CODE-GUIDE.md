@@ -110,23 +110,22 @@ trong terminal thì cài standalone CLI riêng.
 
 ## 5. Cài standalone Claude Code CLI trên Windows
 
-Mở PowerShell:
+Mở PowerShell và ưu tiên WinGet:
 
 ```powershell
-irm https://claude.ai/install.ps1 | iex
+winget install --id Anthropic.ClaudeCode -e
 ```
 
-Nếu muốn ưu tiên release ổn định hơn:
+Nếu không có WinGet, tải installer từ domain chính thức về file trước rồi mới chạy stable channel:
 
 ```powershell
-& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) stable
+$installer = Join-Path $env:TEMP "claude-install.ps1"
+Invoke-WebRequest -UseBasicParsing -Uri "https://claude.ai/install.ps1" -OutFile $installer
+powershell -NoProfile -ExecutionPolicy Bypass -File $installer stable
+Remove-Item -LiteralPath $installer -Force
 ```
 
-Hoặc dùng WinGet:
-
-```powershell
-winget install Anthropic.ClaudeCode
-```
+Không dùng `irm ... | iex` hoặc `ScriptBlock::Create` với nội dung tải trực tiếp từ mạng trong hướng dẫn team. Với môi trường doanh nghiệp, áp dụng review/signature-policy nội bộ trước khi chạy installer.
 
 Kiểm tra sau cài:
 
