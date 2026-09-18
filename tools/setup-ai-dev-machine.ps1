@@ -12,6 +12,11 @@ if ($env:OS -ne "Windows_NT") {
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Results = New-Object System.Collections.Generic.List[object]
 
+# Pin third-party installer source to an immutable reviewed commit.
+# The upstream installer then performs mandatory SHA-256 verification for the release binary.
+$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"
+$CodebaseMemoryInstallerUrl = "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1"
+
 function Add-Result {
     param([string]$Name, [string]$Status, [string]$Detail)
     $Results.Add([PSCustomObject]@{ Name = $Name; Status = $Status; Detail = $Detail }) | Out-Null
@@ -152,7 +157,7 @@ function Ensure-CodebaseMemory {
 
     try {
         Write-Host "Đang tải installer chính thức của codebase-memory-mcp..." -ForegroundColor Cyan
-        Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1" -OutFile $installer
+        Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer
         Unblock-File $installer -ErrorAction SilentlyContinue
 
         Write-Host "Đang cài codebase-memory-mcp (binary only, không cho tool tự sửa agent config)..." -ForegroundColor Cyan
@@ -264,6 +269,8 @@ if ($SelfTest) {
 
     $required = @(
         '$installOutput = & powershell',
+        '$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"',
+        'Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer',
         'claude mcp remove --scope user codebase-memory-mcp',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',
