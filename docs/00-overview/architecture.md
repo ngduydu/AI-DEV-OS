@@ -63,4 +63,4 @@ Chưa xác định.
 
 ## Các quyết định liên quan
 
-Xem `docs/decisions/`.
+Xem `docs/05-decisions/`.
