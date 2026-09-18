@@ -74,6 +74,12 @@ Một convention được coi là **Confirmed** khi có ít nhất một trong c
 
 Nếu codebase không nhất quán, ghi conflict thay vì tự chọn một style ngẫu nhiên.
 
+## Conflict-safe knowledge layout
+
+Khi bootstrap, đảm bảo project có `docs/knowledge/README.md` từ framework.
+
+Không dồn discovery bootstrap mới vào một shared append-only list chỉ để "đủ tài liệu". Knowledge task về sau phải theo conflict-safe routing trong `docs/knowledge/README.md`.
+
 ## 4. Fill minimum docs
 
 Cập nhật trước các file có ích ngay:
