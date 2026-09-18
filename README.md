@@ -546,3 +546,14 @@ Repo đã có AI-DEV-OS thì dùng:
 ~~~text
 /update-ai-dev-os
 ~~~
+
+
+### Chọn agent khi apply
+
+`/apply-ai-dev-os` không tự mặc định Claude. Nếu chưa chỉ rõ, skill hỏi một lần để chọn:
+
+~~~text
+claude | generic | both
+~~~
+
+Sau đó chỉ copy đúng adapter của profile đã chọn.
