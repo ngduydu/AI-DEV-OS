@@ -45,8 +45,8 @@ try {
     & powershell -ExecutionPolicy Bypass -File $migrator -TargetRoot $temp -LayoutFile $layouts
     if ($LASTEXITCODE -ne 0) { throw "Dry-run failed" }
 
-    $statusAfterDryRun = ($gitExe = (Get-Command git.exe -ErrorAction Stop).Source
-    $statusAfterDryRun = (& $gitExe -C $temp status --porcelain)) -join [Environment]::NewLine
+    $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+    $statusAfterDryRun = ((& $gitExe -C $temp status --porcelain) -join [Environment]::NewLine)
     if (-not [string]::IsNullOrWhiteSpace($statusAfterDryRun)) {
         throw "Dry-run changed working tree"
     }
