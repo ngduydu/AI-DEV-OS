@@ -600,4 +600,4 @@ Repo **apply mới** dùng `ordered-v2` để tree có thứ tự rõ ràng gi�
 06-work
 ```
 
-Repo đã apply phiên bản cũ **không bị /update-ai-dev-os tự move folder**. Updater giữ `legacy-v1` để không phá branch đang chạy; layout và framework version được quản lý độc lập qua `.ai-dev-os/layouts.json` và target `.ai-dev-os/state.json`.
+Repo đã apply phiên bản cũ được `/update-ai-dev-os` tự migrate sang `ordered-v2` bằng inventory → collision preflight → `git mv` nguyên file → rewrite reference → verify content. Updater **không bootstrap lại project**, không suy đoán để split nội dung file cũ và chỉ ghi state/version sau khi bảo toàn dữ liệu đã pass.
