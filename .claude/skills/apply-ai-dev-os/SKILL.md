@@ -82,12 +82,12 @@ Không copy:
 
 ### Claude adapter
 
-Copy toàn bộ:
+Copy:
 
-- `.claude/skills/`
-- `.claude/agents/`
+- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/` vì apply là personal machine skill, không cần nằm trong product repo;
+- toàn bộ `.claude/agents/`.
 
-Không copy machine setup scripts vào product repo.
+Không copy machine setup scripts hoặc personal apply launcher vào product repo.
 
 ## Collision rule
 
