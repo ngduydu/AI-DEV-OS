@@ -82,6 +82,14 @@ def main() -> None:
     ]:
         require(updater, needle, "updater safety")
 
+    apply_skill = (root / ".claude" / "skills" / "apply-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
+    for needle in [
+        "Apply phải chạy trên branch riêng",
+        "feature/task branch khác",
+        "STOP trước mutation",
+    ]:
+        require(apply_skill, needle, "apply branch safety")
+
     tools_dir = root / "tools"
     for script in tools_dir.rglob("*.ps1"):
         text = script.read_text(encoding="utf-8-sig")
