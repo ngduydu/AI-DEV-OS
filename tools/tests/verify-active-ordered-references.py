@@ -59,6 +59,7 @@ def main() -> None:
         elif item.is_dir():
             files.extend(path for path in item.rglob("*") if path.is_file() and path.suffix in {".md", ".json"})
 
+    stale: list[str] = []
     for path in files:
         relative = path.relative_to(root).as_posix()
         if relative in ALLOW_LEGACY_REFERENCES:
@@ -66,7 +67,10 @@ def main() -> None:
         text = path.read_text(encoding="utf-8-sig")
         for legacy in LEGACY_PREFIXES:
             if legacy in text:
-                fail(f"stale legacy docs reference in active instruction: {relative}: {legacy}")
+                stale.append(f"{relative}: {legacy}")
+
+    if stale:
+        fail("stale legacy docs reference(s):\n- " + "\n- ".join(sorted(stale)))
 
     print("PASS: active docs and skills use ordered paths")
 
