@@ -93,7 +93,7 @@ Nếu canonical example đã lỗi thời hoặc không còn đại diện cho c
 |---|---|---|---|
 | | | | |
 
-Module có business rule/workflow riêng nên có docs trong `docs/modules/<module>/` khi knowledge đó giúp task sau làm đúng hơn.
+Module có business rule/workflow riêng nên có docs trong `docs/02-modules/<module>/` khi knowledge đó giúp task sau làm đúng hơn.
 
 ## Khu vực nhạy cảm
 
@@ -142,4 +142,4 @@ source/test/config hiện tại
 → cập nhật CODEBASE-MAP
 ~~~
 
-Chi tiết escalation và optional tools: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+Chi tiết escalation và optional tools: `docs/01-development/context-retrieval.md`.
