@@ -64,7 +64,8 @@ Trước mutation:
 5. Xác nhận target có AI-DEV-OS artifacts, tối thiểu một trong:
    - `AGENTS.md`
    - `CLAUDE.md`
-   - `docs/ai/16-TASK-EXECUTION.md`
+   - `docs/01-development/ai-development.md`
+   - `docs/ai/16-TASK-EXECUTION.md` (legacy)
    - `.claude/skills/bootstrap-project/SKILL.md`.
 6. Detect adapters:
    - Claude active nếu target có `CLAUDE.md` hoặc `.claude/`;
@@ -211,47 +212,13 @@ Script phải tự:
 
 Không bootstrap, không regenerate project knowledge, không yêu cầu agent đọc toàn bộ nội dung file để tự phân loại.
 
-## Phase 5 — Apply managed files theo target layout
+## Phase 5 — Apply managed files
 
-Đọc:
+Sau Phase 4.5, target phải ở `ordered-v2`.
 
-- `.ai-dev-os/manifest.json`
-- `.ai-dev-os/layouts.json`
+Đọc `.ai-dev-os/manifest.json` từ SOURCE.
 
-từ SOURCE.
-
-### Resolve target path
-
-Manifest luôn dùng **canonical source path**.
-
-Với mỗi managed path:
-
-1. sau Phase 4.5, target layout phải là `ordered-v2`;
-2. nếu có exact mapping trong `path_map` → dùng mapped target path;
-3. nếu không exact match nhưng thuộc `prefix_map` → rewrite longest matching prefix;
-4. nếu không có mapping → giữ nguyên path.
-
-Ví dụ:
-
-```text
-source manifest:
-docs/ai/16-TASK-EXECUTION.md
-
-legacy-v1 target:
-docs/ai/16-TASK-EXECUTION.md
-
-ordered-v2 target:
-docs/01-development/ai-development.md
-```
-
-### Rewrite reference trong text
-
-Khi source text được apply vào target:
-
-1. rewrite exact source path theo `path_map`;
-2. rewrite folder prefix theo `prefix_map`;
-3. chỉ rewrite path/reference, không đổi project semantics;
-4. không tạo duplicate legacy + ordered path.
+Manifest dùng **canonical ordered paths giống hệt source repository**. Không resolve ngược về legacy path.
 
 Chỉ xét entry active theo target adapter:
 
@@ -261,38 +228,45 @@ Chỉ xét entry active theo target adapter:
 
 ### ownership = framework
 
-Update **resolved target path** từ canonical source, sau khi render references theo target layout.
+Copy/update đúng canonical path từ SOURCE sang TARGET.
 
-Không dùng template/project file cũ làm source.
+Ví dụ:
 
-Nếu resolved target path không tồn tại, create.
+```text
+source:
+docs/01-development/ai-development.md
+
+target:
+docs/01-development/ai-development.md
+```
+
+Nếu target path không tồn tại sau migration, create.
 
 ### ownership = mixed
 
 Không copy đè.
 
-Thực hiện semantic merge trên **resolved target path**:
+Thực hiện semantic merge:
 
-1. đọc source canonical và render reference theo target layout;
-2. đọc target hiện tại;
+1. đọc canonical ordered source;
+2. đọc target hiện tại tại cùng ordered path;
 3. giữ toàn bộ project-specific knowledge/routing/rule còn đúng;
 4. thêm framework rule mới chưa có;
 5. loại duplicate rõ ràng;
 6. không thay project-specific content bằng placeholder/template source.
 
-Mixed files đặc biệt theo canonical source path:
+Mixed files đặc biệt:
 
 - `AGENTS.md`
 - `docs/README.md`
-- `docs/ai/00-SETUP-CHECKLIST.md`
-- `docs/ai/04-CODEBASE-MAP.md`
-- `docs/ai/14-AI-SYSTEM-MAINTENANCE.md`
-- `docs/decisions/README.md`
-- `docs/modules/README.md`
-- `docs/operations/README.md`
-- `docs/work/README.md`
-
-Khi target = `ordered-v2`, các path trên phải resolve sang folder số tương ứng trước khi merge.
+- `docs/00-overview/codebase-map.md`
+- `docs/01-development/setup-checklist.md`
+- `docs/01-development/documentation-governance.md`
+- `docs/02-modules/README.md`
+- `docs/03-knowledge/known-pitfalls.md`
+- `docs/04-operations/README.md`
+- `docs/05-decisions/README.md`
+- `docs/06-work/README.md`
 
 Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
 
@@ -323,7 +297,7 @@ Trước khi write VERSION:
 2. target docs layout = `ordered-v2`;
 3. inventory trước/sau có cùng số file logic, trừ duplicate-identical đã ghi nhận;
 4. mọi migrated file giữ nguyên content hash trước bước framework merge;
-5. tất cả active `framework` paths tồn tại ở **resolved target path**;
+5. tất cả active `framework` paths tồn tại ở đúng canonical ordered path;
 6. mixed files vẫn chứa project-specific knowledge trước upgrade;
 7. không còn broken reference tới migrated legacy docs path;
 8. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
