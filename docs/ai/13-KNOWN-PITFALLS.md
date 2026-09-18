@@ -9,7 +9,7 @@ File này tồn tại để giữ compatibility với knowledge cũ và làm rou
 Pitfall mới mặc định tạo file riêng tại:
 
 ```text
-docs/knowledge/pitfalls/<domain>-<failure-mode>.md
+docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 ```
 
 Xem policy đầy đủ tại:
