@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 98
+Tổng số file: 99
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
@@ -99,6 +99,7 @@ templates/RELEASE-CHECKLIST.md
 templates/mcp/claude-codebase-memory.json
 tools/install-personal-updater.ps1
 tools/setup-ai-dev-machine.ps1
+tools/tests/verify-apply-agent-selection.py
 tools/tests/verify-machine-setup.py
 tools/tests/verify-updater.py
 ~~~
