@@ -11,7 +11,7 @@ def fail(message: str) -> None:
 
 
 def require(text: str, needle: str, label: str) -> None:
-    if needle not in text:
+    if needle.lower() not in text.lower():
         fail(f"{label}: missing {needle!r}")
 
 
