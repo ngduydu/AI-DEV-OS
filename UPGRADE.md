@@ -211,3 +211,48 @@ Vì vậy:
 - CodeGraph không được cài trong 2.4.0 do overlap.
 
 Product repo đã lên 2.3.0 có thể chạy `/update-ai-dev-os` bình thường để nhận framework 2.4.0. Machine setup có thể chạy riêng trước hoặc sau, không cần chạy lại updater chỉ vì cài tool.
+
+
+## 2.6.0 — Conflict-safe Knowledge Sync
+
+### Mục tiêu
+
+Giảm conflict khi nhiều task/branch song song cùng Knowledge Sync.
+
+Từ 2.6.0:
+
+~~~text
+task discovery
+→ mặc định tạo file riêng trong docs/knowledge/
+
+shared canonical docs
+→ chỉ sửa khi canonical truth thực sự thay đổi
+~~~
+
+### Migration cho project đã dùng 2.5.x hoặc cũ hơn
+
+Chạy:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater phải:
+
+1. thêm `docs/knowledge/README.md`;
+2. cập nhật Task Execution / Knowledge Sync skills;
+3. cập nhật routing trong docs framework;
+4. preserve project-specific knowledge hiện có;
+5. **không di chuyển hoặc tách knowledge cũ tự động**;
+6. không tự tạo hàng loạt file knowledge từ nội dung cũ;
+7. chỉ bump VERSION sau verification.
+
+Các entry cũ trong `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/05-BUSINESS-RULES.md`, module docs và operations docs tiếp tục hợp lệ.
+
+### Team đang có branch task chạy song song
+
+Không cần dừng task đang chạy chỉ để migration framework.
+
+Sau khi task hiện tại merge/working tree sạch, chạy `/update-ai-dev-os` trước task tiếp theo.
+
+Branch đã sửa shared knowledge file trước 2.6.0 vẫn có thể gặp conflict khi merge; updater không thể xóa một conflict đã được tạo trước migration mà không đoán semantics. Từ task chạy trên 2.6.0 trở đi, discovery mới mặc định đi file riêng.
