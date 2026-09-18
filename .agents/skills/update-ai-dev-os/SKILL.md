@@ -35,6 +35,7 @@ Trước khi sửa TARGET:
 3. Đọc:
    - `.ai-dev-os/VERSION`
    - `.ai-dev-os/manifest.json`
+   - `.ai-dev-os/layouts.json`
    - `UPGRADE.md`
 4. Xác nhận source working tree clean.
 5. Xác nhận source branch là `main`.
@@ -44,6 +45,7 @@ Trước khi sửa TARGET:
    ```
 7. Đọc lại VERSION + manifest sau pull.
 8. Xác nhận `manifest.framework_version == VERSION`.
+9. Xác nhận `layouts.json` có ít nhất `legacy-v1` và `ordered-v2`.
 
 Nếu bất kỳ check nào fail: STOP trước target mutation.
 
@@ -67,8 +69,24 @@ Trước mutation:
 6. Detect adapters:
    - Claude active nếu target có `CLAUDE.md` hoặc `.claude/`;
    - generic active nếu target có `.agents/`.
+7. Detect target docs layout:
+   - có `.ai-dev-os/state.json` → đọc `docs_layout`;
+   - không có state → **coi là `legacy-v1`**.
+8. Validate layout tồn tại trong source `.ai-dev-os/layouts.json`.
 
-Nếu target version bằng source version, vẫn verify manifest/migration state. Nếu không có gì cần sửa thì report no-op.
+**Invariant quan trọng:** `/update-ai-dev-os` không tự đổi docs layout của target.
+
+```text
+repo cũ không có state
+→ legacy-v1
+→ giữ nguyên docs/ai, docs/modules, docs/operations...
+
+repo apply mới ordered-v2
+→ giữ ordered-v2
+→ update vào đúng 00-overview/01-development/... hiện có
+```
+
+Nếu target version bằng source version, vẫn verify manifest/migration/layout state. Nếu không có gì cần sửa thì report no-op.
 
 ## Phase 3 — Safe branch
 
@@ -135,9 +153,47 @@ Lý do: automatic split của knowledge cũ có rủi ro mất context/semantics
 
 Nếu mixed merge của `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` hoặc `docs/README.md` có nguy cơ mất project-specific content: report `CONFLICT`, không overwrite.
 
-## Phase 5 — Apply managed files
+## Phase 5 — Apply managed files theo target layout
 
-Đọc `.ai-dev-os/manifest.json` từ SOURCE.
+Đọc:
+
+- `.ai-dev-os/manifest.json`
+- `.ai-dev-os/layouts.json`
+
+từ SOURCE.
+
+### Resolve target path
+
+Manifest luôn dùng **canonical source path**.
+
+Với mỗi managed path:
+
+1. nếu target layout = `legacy-v1` → target path = source path;
+2. nếu target layout có exact mapping trong `path_map` → dùng mapped target path;
+3. nếu không exact match nhưng thuộc `prefix_map` → rewrite prefix;
+4. nếu không có mapping → giữ nguyên path.
+
+Ví dụ:
+
+```text
+source manifest:
+docs/ai/16-TASK-EXECUTION.md
+
+legacy-v1 target:
+docs/ai/16-TASK-EXECUTION.md
+
+ordered-v2 target:
+docs/01-development/ai-development.md
+```
+
+### Rewrite reference trong text
+
+Khi source text được apply vào target:
+
+1. rewrite exact source path theo `path_map`;
+2. rewrite folder prefix theo `prefix_map`;
+3. chỉ rewrite path/reference, không đổi project semantics;
+4. không tạo duplicate legacy + ordered path.
 
 Chỉ xét entry active theo target adapter:
 
@@ -147,26 +203,26 @@ Chỉ xét entry active theo target adapter:
 
 ### ownership = framework
 
-Update target path từ canonical source.
+Update **resolved target path** từ canonical source, sau khi render references theo target layout.
 
 Không dùng template/project file cũ làm source.
 
-Nếu target path không tồn tại, create.
+Nếu resolved target path không tồn tại, create.
 
 ### ownership = mixed
 
 Không copy đè.
 
-Thực hiện semantic merge:
+Thực hiện semantic merge trên **resolved target path**:
 
-1. đọc source canonical;
+1. đọc source canonical và render reference theo target layout;
 2. đọc target hiện tại;
 3. giữ toàn bộ project-specific knowledge/routing/rule còn đúng;
 4. thêm framework rule mới chưa có;
 5. loại duplicate rõ ràng;
 6. không thay project-specific content bằng placeholder/template source.
 
-Mixed files đặc biệt:
+Mixed files đặc biệt theo canonical source path:
 
 - `AGENTS.md`
 - `docs/README.md`
@@ -177,6 +233,8 @@ Mixed files đặc biệt:
 - `docs/modules/README.md`
 - `docs/operations/README.md`
 - `docs/work/README.md`
+
+Khi target = `ordered-v2`, các path trên phải resolve sang folder số tương ứng trước khi merge.
 
 Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
 
@@ -204,17 +262,20 @@ Chỉ report optional tool state nếu liên quan migration.
 Trước khi write VERSION:
 
 1. source VERSION và manifest version khớp;
-2. tất cả active `framework` paths tồn tại ở target;
-3. mixed files vẫn chứa project-specific knowledge trước upgrade;
-4. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
-5. nếu target có team policy thì `docs/README.md` route đúng;
-6. optional tool không bị auto-enabled;
-7. target working tree chỉ chứa expected upgrade changes;
-8. migration-specific checks trong UPGRADE.md đã pass;
-9. không còn unresolved conflict.
-10. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move;
-11. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
-12. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence.
+2. target docs layout không bị đổi trong quá trình update;
+3. tất cả active `framework` paths tồn tại ở **resolved target path**;
+4. mixed files vẫn chứa project-specific knowledge trước upgrade;
+5. không còn broken reference tới legacy path do layout rendering tạo ra;
+6. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
+7. nếu target có team policy thì `docs/README.md` route đúng;
+8. optional tool không bị auto-enabled;
+9. target working tree chỉ chứa expected upgrade changes;
+10. migration-specific checks trong UPGRADE.md đã pass;
+11. không còn unresolved conflict;
+12. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move;
+13. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
+14. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
+15. target không đồng thời có duplicate scaffold ở legacy path và ordered path.
 
 Nếu verification fail: KHÔNG bump version.
 
@@ -222,10 +283,19 @@ Nếu verification fail: KHÔNG bump version.
 
 Chỉ sau khi Phase 7 pass:
 
-1. copy source `.ai-dev-os/manifest.json` sang target;
-2. write target `.ai-dev-os/VERSION` = source version;
-3. chạy verification lần cuối;
-4. show diff summary.
+1. copy source `.ai-dev-os/manifest.json` và `.ai-dev-os/layouts.json` sang target;
+2. nếu target chưa có `.ai-dev-os/state.json`, tạo:
+   ```json
+   {
+     "docs_layout": "legacy-v1",
+     "docs_layout_version": 1
+   }
+   ```
+   để đánh dấu repo cũ mà **không move docs**;
+3. nếu target đã có state, preserve nguyên `docs_layout`;
+4. write target `.ai-dev-os/VERSION` = source version;
+5. chạy verification lần cuối;
+6. show diff summary.
 
 Không tự commit/push/PR trừ khi user yêu cầu.
 
@@ -240,6 +310,10 @@ Phiên bản trước:
 
 Phiên bản mới:
 - <source version>
+
+Docs layout:
+- legacy-v1 / ordered-v2
+- preserved, không auto-migrate layout
 
 Nhánh:
 - <branch>
