@@ -42,8 +42,9 @@ function File-Hash([string]$Path) {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
 }
 
-function Git([string]$Root, [string[]]$Args) {
-    & git -C $Root @Args
+function Invoke-GitCommand([string]$Root, [string[]]$Args) {
+    $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+    & $gitExe -C $Root @Args
     if ($LASTEXITCODE -ne 0) {
         throw ("Git command failed in {0}: git {1}" -f $Root, ($Args -join " "))
     }
@@ -227,7 +228,8 @@ if (-not $Apply) {
     exit 0
 }
 
-$status = (& git -C $root status --porcelain)
+$status = ($gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+$status = (& $gitExe -C $root status --porcelain))
 if ($LASTEXITCODE -ne 0) {
     throw "Target is not a Git repository: $root"
 }
@@ -243,10 +245,10 @@ try {
         }
 
         if ($item.Action -eq "Deduplicate") {
-            Git $root @("rm", "--", $item.Source)
+            Invoke-GitCommand $root @("rm", "--", $item.Source)
         }
         else {
-            Git $root @("mv", "--", $item.Source, $item.Destination)
+            Invoke-GitCommand $root @("mv", "--", $item.Source, $item.Destination)
         }
     }
 
@@ -267,7 +269,8 @@ try {
 }
 catch {
     Write-Host "Migration failed. Restoring clean pre-migration state."
-    & git -C $root reset --hard HEAD | Out-Null
-    & git -C $root clean -fd | Out-Null
+    $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+    & $gitExe -C $root reset --hard HEAD | Out-Null
+    & $gitExe -C $root clean -fd | Out-Null
     throw
 }
