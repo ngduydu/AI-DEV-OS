@@ -5,8 +5,9 @@ $migrator = Join-Path $repoRoot "tools/migrate-docs-layout.ps1"
 $layouts = Join-Path $repoRoot ".ai-dev-os/layouts.json"
 $temp = Join-Path ([IO.Path]::GetTempPath()) ("ai-dev-os-layout-test-" + [Guid]::NewGuid().ToString("N"))
 
-function Git([string]$Root, [string[]]$Args) {
-    & git -C $Root @Args | Out-Null
+function Invoke-GitCommand([string]$Root, [string[]]$Args) {
+    $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+    & $gitExe -C $Root @Args | Out-Null
     if ($LASTEXITCODE -ne 0) {
         throw ("git failed: {0}" -f ($Args -join " "))
     }
@@ -14,9 +15,9 @@ function Git([string]$Root, [string[]]$Args) {
 
 try {
     New-Item -ItemType Directory -Path $temp -Force | Out-Null
-    Git $temp @("init")
-    Git $temp @("config", "user.email", "test@example.com")
-    Git $temp @("config", "user.name", "AI DEV OS Test")
+    Invoke-GitCommand $temp @("init")
+    Invoke-GitCommand $temp @("config", "user.email", "test@example.com")
+    Invoke-GitCommand $temp @("config", "user.name", "AI DEV OS Test")
 
     $fixtures = @{
         "docs/ai/03-ARCHITECTURE.md" = "ARCH"
@@ -38,13 +39,14 @@ try {
         Set-Content -LiteralPath $path -Value $entry.Value -Encoding UTF8 -NoNewline
     }
 
-    Git $temp @("add", ".")
-    Git $temp @("commit", "-m", "fixture")
+    Invoke-GitCommand $temp @("add", ".")
+    Invoke-GitCommand $temp @("commit", "-m", "fixture")
 
     & powershell -ExecutionPolicy Bypass -File $migrator -TargetRoot $temp -LayoutFile $layouts
     if ($LASTEXITCODE -ne 0) { throw "Dry-run failed" }
 
-    $statusAfterDryRun = (& git -C $temp status --porcelain) -join [Environment]::NewLine
+    $statusAfterDryRun = ($gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+    $statusAfterDryRun = (& $gitExe -C $temp status --porcelain)) -join [Environment]::NewLine
     if (-not [string]::IsNullOrWhiteSpace($statusAfterDryRun)) {
         throw "Dry-run changed working tree"
     }
