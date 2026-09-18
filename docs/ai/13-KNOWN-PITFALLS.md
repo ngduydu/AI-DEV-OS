@@ -1,39 +1,37 @@
 # Known Pitfalls
 
-> Chỉ ghi những điều không hiển nhiên và đã từng gây lỗi/mất thời gian. Xóa khi không còn đúng.
+## Legacy / canonical router
 
-## KP-001 — <Tên>
+File này tồn tại để giữ compatibility với knowledge cũ và làm route cho pitfall.
 
-**Triệu chứng:**
+**Không thêm pitfall mới trực tiếp vào file này** trong task bình thường.
 
-...
+Pitfall mới mặc định tạo file riêng tại:
 
-**Nguyên nhân:**
+```text
+docs/knowledge/pitfalls/<domain>-<failure-mode>.md
+```
 
-...
+Xem policy đầy đủ tại:
 
-**Cách xử lý đúng:**
+```text
+docs/knowledge/README.md
+```
 
-...
+## Existing entries
 
-**Cách verify:**
+Các pitfall đã tồn tại từ trước 2.6.0 vẫn hợp lệ và phải được preserve khi upgrade.
 
-...
+Không di chuyển hoặc tách knowledge cũ tự động.
 
-**Liên quan:**
+Nếu project hiện có các entry bên dưới, updater phải giữ nguyên chúng khi semantic merge.
 
-- file/module: ...
-- issue/PR: ...
+## Khi nào file này được sửa?
 
----
+Chỉ sửa khi:
 
-## Khi nào thêm mục mới?
+- routing/policy canonical thay đổi;
+- đang làm knowledge-maintenance có chủ đích;
+- cần chỉnh/xóa một pitfall cũ đã trở thành stale và task thực sự có scope đó.
 
-Thêm khi:
-
-- AI/developer mắc cùng lỗi nhiều lần;
-- setup có behavior khó đoán;
-- dependency/framework có workaround quan trọng;
-- production incident cung cấp bài học có thể tái sử dụng.
-
-Không dùng file này cho kiến thức bình thường đã có trong architecture/business docs.
+Không append discovery mới của task vào đây.
