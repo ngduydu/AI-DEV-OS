@@ -26,20 +26,20 @@ def main() -> None:
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
-    knowledge = root / "docs" / "knowledge" / "README.md"
+    knowledge = root / "docs" / "03-knowledge" / "README.md"
     if not knowledge.exists():
-        fail("missing docs/knowledge/README.md")
+        fail("missing docs/03-knowledge/README.md")
     knowledge_text = knowledge.read_text(encoding="utf-8")
     for needle in [
         "mỗi discovery bền vững của task = một file entry riêng",
         "không có central index",
         "shared canonical docs",
-        "docs/knowledge/pitfalls/entries/",
-        "docs/knowledge/business-rules/entries/",
+        "docs/03-knowledge/pitfalls/entries/",
+        "docs/03-knowledge/business-rules/entries/",
     ]:
         require(knowledge_text, needle, "knowledge policy")
 
-    task_contract = (root / "docs" / "ai" / "16-TASK-EXECUTION.md").read_text(encoding="utf-8")
+    task_contract = (root / "docs" / "01-development" / "ai-development.md").read_text(encoding="utf-8")
     for needle in [
         "Conflict-safe Knowledge Sync",
         "mặc định tạo file riêng",
@@ -48,11 +48,11 @@ def main() -> None:
     ]:
         require(task_contract, needle, "task contract")
 
-    pitfalls = (root / "docs" / "ai" / "13-KNOWN-PITFALLS.md").read_text(encoding="utf-8")
+    pitfalls = (root / "docs" / "03-knowledge" / "known-pitfalls.md").read_text(encoding="utf-8")
     for needle in [
         "Legacy / canonical router",
         "Không thêm pitfall mới trực tiếp vào file này",
-        "docs/knowledge/pitfalls/",
+        "docs/03-knowledge/pitfalls/",
     ]:
         require(pitfalls, needle, "pitfalls router")
 
@@ -61,7 +61,7 @@ def main() -> None:
     for needle in [
         "mặc định tạo file riêng",
         "không sửa shared canonical docs",
-        "docs/knowledge/",
+        "docs/03-knowledge/",
         "Conflict Surface Gate",
     ]:
         require(claude_skill, needle, "claude knowledge skill")
@@ -78,23 +78,23 @@ def main() -> None:
 
     managed = {item["path"]: item for item in manifest["managed_files"]}
     for path in [
-        "docs/knowledge/README.md",
-        "docs/ai/13-KNOWN-PITFALLS.md",
+        "docs/03-knowledge/README.md",
+        "docs/03-knowledge/known-pitfalls.md",
         ".claude/skills/update-project-knowledge/SKILL.md",
         ".agents/skills/update-project-knowledge/SKILL.md",
-        "docs/ai/00-SETUP-CHECKLIST.md",
-        "docs/decisions/README.md",
-        "docs/modules/README.md",
-        "docs/operations/README.md",
-        "docs/work/README.md",
+        "docs/01-development/setup-checklist.md",
+        "docs/05-decisions/README.md",
+        "docs/02-modules/README.md",
+        "docs/04-operations/README.md",
+        "docs/06-work/README.md",
         ".claude/skills/fix-bug/SKILL.md",
         ".agents/skills/fix-bug/SKILL.md",
     ]:
         if path not in managed:
             fail(f"manifest missing managed path: {path}")
 
-    decisions = (root / "docs" / "decisions" / "README.md").read_text(encoding="utf-8")
-    require(decisions, "docs/decisions/entries/", "decisions routing")
+    decisions = (root / "docs" / "05-decisions" / "README.md").read_text(encoding="utf-8")
+    require(decisions, "docs/05-decisions/entries/", "decisions routing")
     require(decisions, "không dùng sequence toàn cục", "decisions routing")
 
     for path in [
@@ -102,7 +102,7 @@ def main() -> None:
         root / ".agents" / "skills" / "fix-bug" / "SKILL.md",
     ]:
         text = path.read_text(encoding="utf-8")
-        require(text, "docs/knowledge/pitfalls/entries/", str(path))
+        require(text, "docs/03-knowledge/pitfalls/entries/", str(path))
         if "Preserve a non-obvious recurring lesson in `docs/ai/13-KNOWN-PITFALLS.md`" in text:
             fail(f"{path}: stale shared-pitfall append guidance")
 
