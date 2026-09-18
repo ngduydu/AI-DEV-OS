@@ -78,23 +78,23 @@ Trước mutation:
 
 Nếu target version bằng source version nhưng layout còn legacy, vẫn phải chạy layout migration.
 
-## Phase 3 — Safe branch
+## Phase 3 — Dedicated update branch
 
-Nếu target đang ở `main` hoặc `master`:
+Không được chạy framework migration trực tiếp trên branch task đang phát triển.
 
-1. lấy `git config user.name`;
-2. chuyển thành slug lowercase, ký tự không hợp lệ → `-`;
-3. branch:
-   `<slug>/update-ai-dev-os-<source-version>`;
-4. nếu không có user.name, dùng:
-   `ai-dev-os/update-<source-version>`;
-5. tạo và switch branch.
+1. đọc current branch;
+2. nếu current branch là `main` hoặc `master`:
+   - lấy `git config user.name`;
+   - chuyển thành slug lowercase, ký tự không hợp lệ → `-`;
+   - branch đích: `<slug>/update-ai-dev-os-<source-version>`;
+   - fallback: `ai-dev-os/update-<source-version>`;
+   - nếu branch đích chưa tồn tại: tạo từ đúng HEAD hiện tại rồi switch;
+   - nếu branch đích đã tồn tại nhưng HEAD của nó khác HEAD hiện tại: STOP, không reuse branch cũ bằng suy đoán;
+   - nếu branch đích đã tồn tại và cùng HEAD: switch.
+3. nếu current branch đã đúng pattern update cho `<source-version>`: tiếp tục.
+4. nếu current branch là bất kỳ feature/task branch nào khác: **STOP trước mutation** và yêu cầu chạy lại từ `main`/`master`.
 
-Nếu branch đã tồn tại:
-- chỉ switch nếu working tree clean và branch dùng cho cùng target version;
-- nếu không chắc, STOP và report.
-
-Nếu target đã ở branch khác, tiếp tục trên branch hiện tại.
+Mục tiêu: framework update luôn nằm trên branch riêng, không trộn rename/migration vào task đang chạy của thành viên.
 
 Không commit/merge/push tự động trừ khi user yêu cầu.
 
