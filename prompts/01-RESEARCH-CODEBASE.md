@@ -13,4 +13,4 @@ Yêu cầu:
 5. Liệt kê file liên quan và vai trò của từng file.
 6. Nêu unknown/contradiction/risk.
 7. Chưa sửa code.
-8. Xuất kết quả theo `docs/work/_template/RESEARCH.md` nếu task đủ lớn.
+8. Xuất kết quả theo `docs/06-work/_template/RESEARCH.md` nếu task đủ lớn.

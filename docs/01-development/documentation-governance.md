@@ -8,23 +8,23 @@ Khi có knowledge mới, phân loại trước khi ghi.
 
 ### Conflict-safe default
 
-Knowledge **phát hiện trong task** mặc định tạo file riêng dưới `docs/knowledge/` để tránh nhiều branch cùng append vào shared file.
+Knowledge **phát hiện trong task** mặc định tạo file riêng dưới `docs/03-knowledge/` để tránh nhiều branch cùng append vào shared file.
 
 | Knowledge phát hiện trong task | Nơi lưu mặc định |
 |---|---|
-| Business rule / behavior bền vững | `docs/knowledge/business-rules/entries/<entry-id>-<rule>.md` |
-| Gotcha / failure mode khó nhớ | `docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md` |
-| Module discovery | `docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md` |
-| Deploy/migration/rollback/monitoring discovery | `docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md` |
-| Context chỉ phục vụ task hiện tại | `docs/work/` |
-| Quyết định architecture/public contract có trade-off | `docs/decisions/` ADR |
+| Business rule / behavior bền vững | `docs/03-knowledge/business-rules/entries/<entry-id>-<rule>.md` |
+| Gotcha / failure mode khó nhớ | `docs/03-knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md` |
+| Module discovery | `docs/03-knowledge/modules/<module>/entries/<entry-id>-<topic>.md` |
+| Deploy/migration/rollback/monitoring discovery | `docs/03-knowledge/operations/<system>/entries/<entry-id>-<topic>.md` |
+| Context chỉ phục vụ task hiện tại | `docs/06-work/` |
+| Quyết định architecture/public contract có trade-off | `docs/05-decisions/` ADR |
 | Procedure nhiều bước đã lặp lại, tương đối ổn định | Skill |
 
 Không có central index/summary/changelog phải append sau mỗi task. Với task-generated artifact, ưu tiên `entries/<entry-id>-<slug>.md`; không dùng global sequence.
 
 ### Shared canonical docs
 
-Chỉ sửa shared canonical docs như `docs/ai/`, `docs/modules/`, `docs/operations/` khi canonical truth thực sự thay đổi.
+Chỉ sửa shared canonical docs như `docs/ai/`, `docs/02-modules/`, `docs/04-operations/` khi canonical truth thực sự thay đổi.
 
 Ví dụ:
 
@@ -36,7 +36,7 @@ Ví dụ:
 
 Không sửa shared canonical file chỉ để lưu một discovery của task.
 
-Chi tiết: `docs/knowledge/README.md`.
+Chi tiết: `docs/03-knowledge/README.md`.
 
 
 ## User correction phải trở thành knowledge khi phù hợp

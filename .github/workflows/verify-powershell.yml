@@ -1,13 +1,10 @@
 name: Verify PowerShell
 
 on:
+  pull_request:
   push:
     branches:
-      - "**"
-  pull_request:
-    paths:
-      - "tools/**/*.ps1"
-      - ".github/workflows/verify-powershell.yml"
+      - main
 
 jobs:
   parse-windows-powershell:

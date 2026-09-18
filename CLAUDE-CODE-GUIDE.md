@@ -719,7 +719,7 @@ CODEBASE-MAP
 → broaden search/history chỉ khi cần
 ~~~
 
-Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+Chi tiết: `docs/01-development/context-retrieval.md`.
 
 ### Session hygiene
 
@@ -807,7 +807,7 @@ CODEBASE-MAP
 
 ### Tool nào được phép thêm?
 
-Xem `docs/ai/18-TOOL-ADOPTION.md`.
+Xem `docs/01-development/tool-adoption.md`.
 
 Không thêm tool vào team default chỉ vì nhiều sao hoặc claim tiết kiệm token. Phải qua community, maintenance, maturity, security, Windows/platform, evidence, overlap và fallback.
 

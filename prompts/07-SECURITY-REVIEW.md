@@ -1,6 +1,6 @@
 # Security Review
 
-Review thay đổi theo `docs/ai/09-SECURITY.md`.
+Review thay đổi theo `docs/01-development/security.md`.
 
 Tập trung vào:
 

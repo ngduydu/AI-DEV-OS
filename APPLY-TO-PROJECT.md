@@ -285,13 +285,13 @@ existing docs
 Sau đó fill/update knowledge có bằng chứng thật, chủ yếu:
 
 ```text
-docs/ai/01-PROJECT-CONTEXT.md
-docs/ai/02-PRODUCT.md
-docs/ai/03-ARCHITECTURE.md
-docs/ai/04-CODEBASE-MAP.md
-docs/ai/06-CODING-STANDARDS.md
-docs/ai/07-COMMANDS.md
-docs/ai/08-TESTING.md
+docs/00-overview/project-context.md
+docs/00-overview/product.md
+docs/00-overview/architecture.md
+docs/00-overview/codebase-map.md
+docs/01-development/coding-standards.md
+docs/01-development/commands.md
+docs/01-development/testing.md
 ```
 
 Không viết lại toàn bộ tài liệu bằng tay nếu repository đã chứa đủ evidence để AI tự tổng hợp.
@@ -323,12 +323,12 @@ docs: bootstrap project knowledge
 
 Chỉ điền mức tối thiểu đủ để bắt đầu:
 
-- `docs/ai/01-PROJECT-CONTEXT.md`
-- `docs/ai/02-PRODUCT.md`
-- `docs/ai/03-ARCHITECTURE.md` ở mức đã quyết định
-- `docs/ai/06-CODING-STANDARDS.md` với convention thật sự đã chốt
-- `docs/ai/07-COMMANDS.md` khi đã có lệnh build/run/test
-- `docs/ai/08-TESTING.md` khi test strategy đã rõ
+- `docs/00-overview/project-context.md`
+- `docs/00-overview/product.md`
+- `docs/00-overview/architecture.md` ở mức đã quyết định
+- `docs/01-development/coding-standards.md` với convention thật sự đã chốt
+- `docs/01-development/commands.md` khi đã có lệnh build/run/test
+- `docs/01-development/testing.md` khi test strategy đã rõ
 
 Không tạo nội dung giả để lấp đầy template. Module, operation, ADR, pitfall và skill chỉ xuất hiện khi project thực sự cần.
 
@@ -338,7 +338,7 @@ Ban đầu docs có thể rất ít. Điều đó bình thường.
 
 ```text
 Task chạm module Contract
-→ tạo/cập nhật docs/modules/contracts/
+→ tạo/cập nhật docs/02-modules/contracts/
 
 Phát hiện business rule mới
 → lưu vào module hoặc business rules phù hợp
@@ -353,7 +353,7 @@ Có procedure ổn định dùng nhiều lần
 → Skill
 
 Thay đổi cách deploy/migrate/rollback
-→ docs/operations/
+→ docs/04-operations/
 ```
 
 Không giữ knowledge quan trọng chỉ trong chat.
@@ -379,7 +379,7 @@ AGENTS.md
 ↓
 docs/README.md
 ↓
-docs/ai/16-TASK-EXECUTION.md
+docs/01-development/ai-development.md
 ↓
 docs/module/code/test liên quan
 ```
@@ -479,7 +479,7 @@ CODEBASE-MAP
 → source/test
 ~~~
 
-Với codebase lớn có thể chọn profile trong `docs/ai/17-CONTEXT-RETRIEVAL.md`: ripgrep mặc định, ast-grep/Repomix/codebase-memory-mcp khi thật sự có lợi.
+Với codebase lớn có thể chọn profile trong `docs/01-development/context-retrieval.md`: ripgrep mặc định, ast-grep/Repomix/codebase-memory-mcp khi thật sự có lợi.
 
 
 ## 10. Apply tự động bằng Claude Code

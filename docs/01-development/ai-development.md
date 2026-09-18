@@ -64,7 +64,7 @@ Architecture, auth/security/payment, migration dữ liệu, cross-cutting change
 Research → Spec → Plan → Tasks → Implement theo phase → Verify → Independent Review → Production Gate
 ```
 
-Dùng `docs/work/` khi artifacts giúp giữ context, review hoặc handoff.
+Dùng `docs/06-work/` khi artifacts giúp giữ context, review hoặc handoff.
 
 ## 2. Load Relevant Context
 
@@ -174,7 +174,7 @@ Không plan vượt quá scope task.
 Verification là evidence, không phải cảm giác.
 
 1. Chạy check nhỏ nhất đủ chứng minh behavior mới.
-2. Chạy check rộng hơn theo `docs/ai/07-COMMANDS.md` và `docs/ai/08-TESTING.md` khi phù hợp.
+2. Chạy check rộng hơn theo `docs/01-development/commands.md` và `docs/01-development/testing.md` khi phù hợp.
 3. Bug fix nên có reproduction/regression test khi khả thi.
 4. Không nói `pass` nếu chưa chạy.
 5. Check không chạy được phải báo `NOT VERIFIED`, lý do và impact.
@@ -211,25 +211,25 @@ Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năn
 
 Trước khi Done, kiểm tra knowledge vừa học có giá trị cho task sau không.
 
-**Rule mặc định: knowledge phát hiện trong task → mặc định tạo file riêng trong `docs/knowledge/`.**
+**Rule mặc định: knowledge phát hiện trong task → mặc định tạo file riêng trong `docs/03-knowledge/`.**
 
 Không append vào shared canonical file chỉ để ghi lại discovery của task.
 
 ```text
 business rule discovery
-→ docs/knowledge/business-rules/entries/<entry-id>-<rule>.md
+→ docs/03-knowledge/business-rules/entries/<entry-id>-<rule>.md
 
 pitfall discovery
-→ docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
+→ docs/03-knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 
 module discovery
-→ docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md
+→ docs/03-knowledge/modules/<module>/entries/<entry-id>-<topic>.md
 
 operations discovery
-→ docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
+→ docs/03-knowledge/operations/<system>/entries/<entry-id>-<topic>.md
 ```
 
-Không có central index/summary/changelog phải update sau mỗi task. Trước khi ghi durable artifact, chạy Conflict Surface Gate trong `docs/knowledge/README.md`: nếu change chỉ là append item/link/registry vào shared file thì tạo entry riêng.
+Không có central index/summary/changelog phải update sau mỗi task. Trước khi ghi durable artifact, chạy Conflict Surface Gate trong `docs/03-knowledge/README.md`: nếu change chỉ là append item/link/registry vào shared file thì tạo entry riêng.
 
 Chỉ sửa shared canonical docs khi **canonical truth thực sự thay đổi**, ví dụ architecture, project-wide rule, coding convention, command chính thức hoặc canonical implementation thay đổi do chính task này.
 
@@ -243,7 +243,7 @@ Nếu không có durable knowledge mới, report ngắn gọn:
 Knowledge Sync: no durable changes
 ```
 
-Policy đầy đủ: `docs/knowledge/README.md`.
+Policy đầy đủ: `docs/03-knowledge/README.md`.
 
 
 ## 12. Production Gate
@@ -315,4 +315,4 @@ Khi task độc lập hoàn tất và durable knowledge đã Knowledge Sync, v�
 
 Investigation lớn có thể dùng subagent context riêng khi việc đó giúp giữ main context nhỏ.
 
-Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+Chi tiết: `docs/01-development/context-retrieval.md`.

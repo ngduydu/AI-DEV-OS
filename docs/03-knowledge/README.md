@@ -16,22 +16,22 @@ Task-generated knowledge dùng `entries/`:
 
 ```text
 business rule / behavior
-→ docs/knowledge/business-rules/entries/<entry-id>-<slug>.md
+→ docs/03-knowledge/business-rules/entries/<entry-id>-<slug>.md
 
 pitfall / failure mode
-→ docs/knowledge/pitfalls/entries/<entry-id>-<slug>.md
+→ docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md
 
 module discovery
-→ docs/knowledge/modules/<module>/entries/<entry-id>-<slug>.md
+→ docs/03-knowledge/modules/<module>/entries/<entry-id>-<slug>.md
 
 operations discovery
-→ docs/knowledge/operations/<system>/entries/<entry-id>-<slug>.md
+→ docs/03-knowledge/operations/<system>/entries/<entry-id>-<slug>.md
 
 architecture/public-contract decision
-→ docs/decisions/entries/<entry-id>-<slug>.md
+→ docs/05-decisions/entries/<entry-id>-<slug>.md
 
 task-only context
-→ docs/work/<task-id>/
+→ docs/06-work/<task-id>/
 ```
 
 Folder con được tạo on demand. Không scaffold hàng loạt folder rỗng.
@@ -92,10 +92,10 @@ Chỉ chấp nhận sửa shared file khi conflict đó phản ánh cùng một 
 
 Các file như:
 
-- `docs/ai/03-ARCHITECTURE.md`;
-- `docs/ai/04-CODEBASE-MAP.md`;
-- `docs/ai/05-BUSINESS-RULES.md`;
-- `docs/ai/13-KNOWN-PITFALLS.md`;
+- `docs/00-overview/architecture.md`;
+- `docs/00-overview/codebase-map.md`;
+- `docs/03-knowledge/business-rules.md`;
+- `docs/03-knowledge/known-pitfalls.md`;
 - module/operations canonical docs;
 - `AGENTS.md` / `CLAUDE.md`;
 
@@ -132,8 +132,8 @@ Không split/rewrite semantics của knowledge cũ bằng suy đoán. Layout mig
 
 Các entry/nội dung cũ trong:
 
-- `docs/ai/13-KNOWN-PITFALLS.md`;
-- `docs/ai/05-BUSINESS-RULES.md`;
+- `docs/03-knowledge/known-pitfalls.md`;
+- `docs/03-knowledge/business-rules.md`;
 - module/operations docs hiện hữu;
 - ADR cũ, kể cả ADR dùng numbering;
 

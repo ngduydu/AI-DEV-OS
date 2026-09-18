@@ -41,7 +41,7 @@ Khi task ảnh hưởng production, agent phải đọc phần operations liên 
 Knowledge vận hành bền vững **phát hiện trong task** mặc định tạo entry riêng tại:
 
 ```text
-docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
+docs/03-knowledge/operations/<system>/entries/<entry-id>-<topic>.md
 ```
 
 Chỉ sửa canonical operations docs khi task thực sự thay đổi runbook/procedure/contract vận hành chính thức.

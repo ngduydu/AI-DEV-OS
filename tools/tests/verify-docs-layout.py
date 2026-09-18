@@ -58,13 +58,36 @@ def main() -> None:
         if path_map.get(source) != target:
             fail(f"bad ordered-v2 mapping: {source} -> {path_map.get(source)!r}")
 
+    # Canonical source itself must already use ordered-v2.
+    for relative in [
+        "docs/00-overview/architecture.md",
+        "docs/01-development/ai-development.md",
+        "docs/02-modules/README.md",
+        "docs/03-knowledge/README.md",
+        "docs/04-operations/README.md",
+        "docs/05-decisions/README.md",
+        "docs/06-work/README.md",
+    ]:
+        if not (root / relative).exists():
+            fail(f"canonical ordered path missing: {relative}")
+
+    for legacy in [
+        "docs/ai",
+        "docs/modules",
+        "docs/knowledge",
+        "docs/operations",
+        "docs/decisions",
+        "docs/work",
+    ]:
+        if (root / legacy).exists():
+            fail(f"legacy canonical folder still exists: {legacy}")
+
     apply_skill = (root / ".claude" / "skills" / "apply-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     for needle in [
         "ordered-v2",
-        "00-overview",
-        "01-development",
+        "Canonical source **đã dùng trực tiếp `ordered-v2`**",
         ".ai-dev-os/state.json",
-        "không để target vừa có ordered path vừa có bản duplicate ở legacy path",
+        "Không tạo lại legacy folders",
     ]:
         require(apply_skill, needle, "apply skill")
 
@@ -77,7 +100,7 @@ def main() -> None:
         "Collision preflight",
         "git mv",
         "không bootstrap",
-        "resolved target path",
+        "canonical ordered paths",
         "không còn duplicate scaffold ở legacy path và ordered path",
     ]:
         require(updater, needle, "claude updater")
@@ -99,7 +122,7 @@ def main() -> None:
         "Legacy docs inventory",
         "Collision preflight failed",
         "Get-FileHash",
-        'git -C',
+        '$gitExe -C',
         "docs_layout = \"ordered-v2\"",
         "reset --hard HEAD",
     ]:

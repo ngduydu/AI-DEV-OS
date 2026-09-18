@@ -4,12 +4,12 @@
   "layouts": {
     "legacy-v1": {
       "version": 1,
-      "description": "Layout tương thích cho repository đã apply trước 2.6.0. /update-ai-dev-os không tự đổi layout.",
+      "description": "Layout cũ của repository đã apply trước 2.6.0; dùng làm nguồn migration sang ordered-v2.",
       "path_map": {}
     },
     "ordered-v2": {
       "version": 2,
-      "description": "Layout docs có thứ tự rõ ràng, dùng cho repository apply mới.",
+      "description": "Canonical docs layout của AI-DEV-OS và mọi repository sau apply/update.",
       "roots": [
         "docs/00-overview",
         "docs/01-development",
