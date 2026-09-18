@@ -13,4 +13,4 @@ description: Diagnose and fix unintended software behavior using evidence and ro
 6. Apply the smallest fix that addresses the root cause.
 7. Run focused and regression verification.
 8. Check similar code paths only when evidence suggests the same defect pattern.
-9. Preserve a non-obvious recurring lesson in `docs/ai/13-KNOWN-PITFALLS.md` when valuable.
+9. Preserve a non-obvious recurring lesson through `update-project-knowledge`; default to an isolated file under `docs/knowledge/pitfalls/entries/`, never append it to `docs/ai/13-KNOWN-PITFALLS.md` in a normal task.
