@@ -76,23 +76,23 @@ Nếu codebase không nhất quán, ghi conflict thay vì tự chọn một styl
 
 ## Conflict-safe knowledge layout
 
-Khi bootstrap, đảm bảo project có `docs/knowledge/README.md` từ framework.
+Khi bootstrap, đảm bảo project có `docs/03-knowledge/README.md` từ framework.
 
-Không dồn discovery bootstrap mới vào một shared append-only list chỉ để "đủ tài liệu". Knowledge task về sau phải theo conflict-safe routing trong `docs/knowledge/README.md`.
+Không dồn discovery bootstrap mới vào một shared append-only list chỉ để "đủ tài liệu". Knowledge task về sau phải theo conflict-safe routing trong `docs/03-knowledge/README.md`.
 
 ## 4. Fill minimum docs
 
 Cập nhật trước các file có ích ngay:
 
-- `docs/ai/01-PROJECT-CONTEXT.md`
-- `docs/ai/02-PRODUCT.md` nếu là product repo và có evidence
-- `docs/ai/03-ARCHITECTURE.md`
-- `docs/ai/04-CODEBASE-MAP.md`
-- `docs/ai/06-CODING-STANDARDS.md`
-- `docs/ai/07-COMMANDS.md`
-- `docs/ai/08-TESTING.md`
+- `docs/00-overview/project-context.md`
+- `docs/00-overview/product.md` nếu là product repo và có evidence
+- `docs/00-overview/architecture.md`
+- `docs/00-overview/codebase-map.md`
+- `docs/01-development/coding-standards.md`
+- `docs/01-development/commands.md`
+- `docs/01-development/testing.md`
 
-Bổ sung `05-BUSINESS-RULES.md`, `09-SECURITY.md`, `docs/modules/`, `docs/operations/` chỉ khi project thực sự có knowledge để ghi.
+Bổ sung `05-BUSINESS-RULES.md`, `09-SECURITY.md`, `docs/02-modules/`, `docs/04-operations/` chỉ khi project thực sự có knowledge để ghi.
 
 Không bắt buộc mọi template field phải đầy trước task đầu tiên.
 
@@ -189,9 +189,9 @@ Nếu project đã có docs:
 
 Không scaffold hàng chục folder rỗng.
 
-Chỉ tạo `docs/modules/<module>/` khi module có business rule/workflow/data/API knowledge riêng đáng giữ.
+Chỉ tạo `docs/02-modules/<module>/` khi module có business rule/workflow/data/API knowledge riêng đáng giữ.
 
-Chỉ tạo `docs/operations/` content khi có deploy/migration/rollback/monitoring/troubleshooting knowledge thật.
+Chỉ tạo `docs/04-operations/` content khi có deploy/migration/rollback/monitoring/troubleshooting knowledge thật.
 
 ## 11. Project Readiness Gate
 
@@ -239,14 +239,14 @@ Next usage:
 - Giao task bình thường theo USAGE.md
 ```
 
-Sau bootstrap, **không chạy bootstrap lại mỗi task**. Mọi task tiếp tục theo `docs/ai/16-TASK-EXECUTION.md`.
+Sau bootstrap, **không chạy bootstrap lại mỗi task**. Mọi task tiếp tục theo `docs/01-development/ai-development.md`.
 
 ## 13. Context efficiency
 
 Sau bootstrap:
 
 - không chạy bootstrap lại mỗi task;
-- task thường đi theo `docs/ai/17-CONTEXT-RETRIEVAL.md`;
+- task thường đi theo `docs/01-development/context-retrieval.md`;
 - CODEBASE-MAP phải đủ hữu ích để route task về đúng area;
 - optional MCP/tool chỉ dùng nếu project đã chủ động bật;
 - không tự cài tool để làm bootstrap;
