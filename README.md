@@ -50,7 +50,7 @@ Production Gate
 Human Review
 ```
 
-Workflow chi tiết: `docs/ai/16-TASK-EXECUTION.md`.
+Workflow chi tiết: `docs/01-development/ai-development.md`.
 
 ## Apply nhanh vào project
 
@@ -302,10 +302,10 @@ Module và operations docs được tạo **on demand**, không scaffold hàng l
 Hai file quan trọng nhất khi tạo/sửa code:
 
 ```text
-docs/ai/04-CODEBASE-MAP.md
+docs/00-overview/codebase-map.md
 → canonical examples + reusable building blocks
 
-docs/ai/06-CODING-STANDARDS.md
+docs/01-development/coding-standards.md
 → naming, structure, error, validation, logging, async, DB, API/data format, dependency policy, comments, tool enforcement
 ```
 
@@ -444,7 +444,7 @@ Stack 2.2.0:
 - **codebase-memory-mcp** — optional pilot cho large codebase.
 - **Sourcegraph MCP** — enterprise alternative khi tổ chức đã có Sourcegraph.
 
-Không bắt buộc cài tất cả. Tool mới phải qua `docs/ai/18-TOOL-ADOPTION.md`.
+Không bắt buộc cài tất cả. Tool mới phải qua `docs/01-development/tool-adoption.md`.
 
 Với Claude Code:
 
@@ -456,7 +456,7 @@ cùng task nhưng context lớn
 → /compact
 ~~~
 
-Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+Chi tiết: `docs/01-development/context-retrieval.md`.
 
 ## Framework version và upgrade
 
@@ -569,7 +569,7 @@ Từ 2.6.0, knowledge phát hiện trong task không mặc định append vào s
 
 ~~~text
 task discovery
-→ docs/knowledge/<category>/<descriptive-file>.md
+→ docs/03-knowledge/<category>/<descriptive-file>.md
 
 canonical truth thay đổi
 → shared canonical docs
