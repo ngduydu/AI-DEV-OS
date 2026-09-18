@@ -228,8 +228,8 @@ if (-not $Apply) {
     exit 0
 }
 
-$status = ($gitExe = (Get-Command git.exe -ErrorAction Stop).Source
-$status = (& $gitExe -C $root status --porcelain))
+$gitExe = (Get-Command git.exe -ErrorAction Stop).Source
+$status = (& $gitExe -C $root status --porcelain)
 if ($LASTEXITCODE -ne 0) {
     throw "Target is not a Git repository: $root"
 }
