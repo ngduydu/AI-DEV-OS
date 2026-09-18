@@ -33,3 +33,7 @@ jobs:
       - name: Run machine setup self-test
         shell: powershell
         run: .\tools\setup-ai-dev-machine.ps1 -SelfTest
+
+      - name: Verify apply agent selection contract
+        shell: powershell
+        run: python .\tools\tests\verify-apply-agent-selection.py .
