@@ -192,10 +192,10 @@ Convention nào đã chốt?
 Điền những gì biết chắc vào:
 
 ```text
-docs/ai/01-PROJECT-CONTEXT.md
-docs/ai/02-PRODUCT.md
-docs/ai/03-ARCHITECTURE.md
-docs/ai/06-CODING-STANDARDS.md
+docs/00-overview/project-context.md
+docs/00-overview/product.md
+docs/00-overview/architecture.md
+docs/01-development/coding-standards.md
 ```
 
 Phần chưa biết quan trọng thì Claude phải hỏi; phần chưa cần thì để thiếu.
@@ -572,7 +572,7 @@ APPLY-TO-PROJECT.md
 docs/README.md
 → router project knowledge
 
-docs/ai/16-TASK-EXECUTION.md
+docs/01-development/ai-development.md
 → execution contract
 ```
 
@@ -598,7 +598,7 @@ Sau khi project đủ lớn mới cân nhắc:
 - Repomix cho bootstrap/snapshot;
 - codebase-memory-mcp cho graph/dependency/impact.
 
-Xem `docs/ai/17-CONTEXT-RETRIEVAL.md` và `docs/ai/18-TOOL-ADOPTION.md`.
+Xem `docs/01-development/context-retrieval.md` và `docs/01-development/tool-adoption.md`.
 
 Project đã apply bản cũ thì **không làm onboarding lại từ đầu**; xem `UPGRADE.md`.
 
