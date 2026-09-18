@@ -42,11 +42,11 @@ function File-Hash([string]$Path) {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
 }
 
-function Invoke-GitCommand([string]$Root, [string[]]$Args) {
+function Invoke-GitCommand([string]$Root, [string[]]$GitArgs) {
     $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
-    & $gitExe -C $Root @Args
+    & $gitExe -C $Root @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        throw ("Git command failed in {0}: git {1}" -f $Root, ($Args -join " "))
+        throw ("Git command failed in {0}: git {1}" -f $Root, ($GitArgs -join " "))
     }
 }
 
