@@ -480,3 +480,32 @@ CODEBASE-MAP
 ~~~
 
 Với codebase lớn có thể chọn profile trong `docs/ai/17-CONTEXT-RETRIEVAL.md`: ripgrep mặc định, ast-grep/Repomix/codebase-memory-mcp khi thật sự có lợi.
+
+
+## 10. Apply tự động bằng Claude Code
+
+Sau khi máy đã chạy setup AI-DEV-OS một lần, không cần copy file thủ công nữa.
+
+Mở repository cần apply bằng Claude Code và chạy:
+
+~~~text
+/apply-ai-dev-os
+~~~
+
+Skill sẽ tự:
+
+~~~text
+canonical AI-DEV-OS source
+→ preflight source + target
+→ tạo branch riêng nếu đang main/master
+→ copy core + Claude adapter + project knowledge scaffold
+→ không copy repo-meta/docs superpowers
+→ chạy bootstrap-project ngay
+→ READY / PARTIAL / BLOCKED
+~~~
+
+Nếu repo đã có AI-DEV-OS thì không dùng lệnh này; dùng:
+
+~~~text
+/update-ai-dev-os
+~~~

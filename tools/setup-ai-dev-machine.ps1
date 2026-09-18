@@ -156,9 +156,12 @@ function Ensure-CodebaseMemory {
         Unblock-File $installer -ErrorAction SilentlyContinue
 
         Write-Host "Đang cài codebase-memory-mcp (binary only, không cho tool tự sửa agent config)..." -ForegroundColor Cyan
-        & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config
-        if ($LASTEXITCODE -ne 0) {
-            Add-Result "codebase-memory-mcp" "FAIL" "Installer thất bại với mã $LASTEXITCODE."
+        $installOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config 2>&1
+        $installExitCode = $LASTEXITCODE
+        $installOutput | ForEach-Object { Write-Host $_ }
+
+        if ($installExitCode -ne 0) {
+            Add-Result "codebase-memory-mcp" "FAIL" "Installer thất bại với mã $installExitCode."
             return $null
         }
 
@@ -180,47 +183,6 @@ function Ensure-CodebaseMemory {
     }
 }
 
-function Get-UserMcpEntry {
-    param([string]$Name)
-
-    $claudeJson = Join-Path $HOME ".claude.json"
-    if (-not (Test-Path $claudeJson)) { return $null }
-
-    try {
-        $cfg = Get-Content $claudeJson -Raw | ConvertFrom-Json
-        if ($cfg.mcpServers -and $cfg.mcpServers.PSObject.Properties.Name -contains $Name) {
-            return $cfg.mcpServers.$Name
-        }
-    } catch {
-        return $null
-    }
-
-    return $null
-}
-
-function Normalize-McpCommandPath {
-    param([string]$Value)
-
-    if ([string]::IsNullOrWhiteSpace($Value)) {
-        return $null
-    }
-
-    $candidate = $Value.Trim()
-
-    if (
-        ($candidate.StartsWith('"') -and $candidate.EndsWith('"')) -or
-        ($candidate.StartsWith("'") -and $candidate.EndsWith("'"))
-    ) {
-        $candidate = $candidate.Substring(1, $candidate.Length - 2).Trim()
-    }
-
-    try {
-        return [System.IO.Path]::GetFullPath($candidate)
-    } catch {
-        return $candidate
-    }
-}
-
 function Ensure-ClaudeMcp {
     param([string]$CbmExe)
 
@@ -228,45 +190,53 @@ function Ensure-ClaudeMcp {
         Add-Result "Claude MCP" "SKIP" "Đã bỏ qua theo tham số -SkipMcp."
         return
     }
+
     if (-not $CbmExe) {
         Add-Result "Claude MCP" "BLOCKED" "Chưa có codebase-memory-mcp executable."
         return
     }
+
     if (-not (Test-Command "claude")) {
-        Add-Result "Claude MCP" "BLOCKED" "Không tìm thấy Claude Code CLI. Cài Claude Code CLI rồi chạy lại script để đăng ký MCP user-scope."
+        Add-Result "Claude MCP" "BLOCKED" "Không tìm thấy Claude Code CLI."
         return
     }
 
-    $existing = Get-UserMcpEntry "codebase-memory-mcp"
-    if ($existing) {
-        $existingCommand = [string]$existing.command
-        $existingNormalized = Normalize-McpCommandPath $existingCommand
-        $expectedNormalized = Normalize-McpCommandPath $CbmExe
+    # Entry này do AI-DEV-OS quản lý. Luôn đăng ký lại canonical command để
+    # tự sửa mọi config cũ/hỏng và tránh logic so sánh path phức tạp.
+    $removeOutput = & claude mcp remove --scope user codebase-memory-mcp 2>&1
+    $removeOutput | ForEach-Object { Write-Host $_ }
 
-        if ($existingNormalized -and $expectedNormalized -and ($existingNormalized -ine $expectedNormalized)) {
-            Add-Result "Claude MCP" "BLOCKED" "User-scope MCP 'codebase-memory-mcp' đã tồn tại nhưng command khác với binary vừa phát hiện. Existing='$existingCommand'. Expected='$CbmExe'. Không tự overwrite config đang có."
-            return
-        }
-        Add-Result "Claude MCP" "PASS" "User-scope MCP đã tồn tại."
-    } else {
-        Write-Host "Đang đăng ký codebase-memory-mcp cho Claude Code ở user scope..." -ForegroundColor Cyan
-        & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe
-        if ($LASTEXITCODE -ne 0) {
-            Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $LASTEXITCODE."
-            return
-        }
-        Add-Result "Claude MCP" "PASS" "Đã đăng ký user-scope cho mọi project trên máy."
+    Write-Host "Đang đăng ký codebase-memory-mcp cho Claude Code ở user scope..." -ForegroundColor Cyan
+    $addOutput = & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe 2>&1
+    $addExitCode = $LASTEXITCODE
+    $addOutput | ForEach-Object { Write-Host $_ }
+
+    if ($addExitCode -ne 0) {
+        Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $addExitCode."
+        return
     }
 
-    try {
-        $details = (& claude mcp get codebase-memory-mcp 2>&1 | Out-String).Trim()
-        if ($LASTEXITCODE -eq 0) {
-            Add-Result "Claude MCP verify" "PASS" ($details -replace "\r?\n", " | ")
-        } else {
-            Add-Result "Claude MCP verify" "BLOCKED" "Đã có config nhưng health check chưa pass. Restart Claude Code rồi chạy /mcp."
-        }
-    } catch {
-        Add-Result "Claude MCP verify" "BLOCKED" "Không chạy được health check. Restart Claude Code rồi chạy /mcp."
+    $getOutput = & claude mcp get codebase-memory-mcp 2>&1
+    $getExitCode = $LASTEXITCODE
+    $getText = ($getOutput | Out-String).Trim()
+
+    if ($getExitCode -ne 0) {
+        Add-Result "Claude MCP" "FAIL" "Đăng ký xong nhưng không đọc lại được MCP config."
+        return
+    }
+
+    if ($getText -notmatch [regex]::Escape($CbmExe)) {
+        Add-Result "Claude MCP" "FAIL" "MCP config chưa trỏ đúng executable canonical: $CbmExe"
+        return
+    }
+
+    $listOutput = & claude mcp list 2>&1
+    $listText = ($listOutput | Out-String).Trim()
+
+    if ($listText -match "codebase-memory-mcp" -and $listText -match "Connected") {
+        Add-Result "Claude MCP" "PASS" "codebase-memory-mcp đã Connected."
+    } else {
+        Add-Result "Claude MCP" "BLOCKED" "Config đã đúng nhưng chưa Connected. Restart Claude Code/terminal rồi chạy 'claude mcp list'."
     }
 }
 
@@ -290,21 +260,23 @@ function Ensure-PersonalUpdater {
 }
 
 if ($SelfTest) {
-    $quoted = '"C:\Program Files\codebase-memory-mcp\codebase-memory-mcp.exe"'
-    $expected = [System.IO.Path]::GetFullPath("C:\Program Files\codebase-memory-mcp\codebase-memory-mcp.exe")
-    $actual = Normalize-McpCommandPath $quoted
+    $scriptText = Get-Content $PSCommandPath -Raw
 
-    if ($actual -ne $expected) {
-        throw "SELF-TEST FAIL: quoted MCP command path normalization."
+    $required = @(
+        '$installOutput = & powershell',
+        'claude mcp remove --scope user codebase-memory-mcp',
+        'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
+        'claude mcp get codebase-memory-mcp',
+        'claude mcp list'
+    )
+
+    foreach ($needle in $required) {
+        if (-not $scriptText.Contains($needle)) {
+            throw "SELF-TEST FAIL: thiếu contract '$needle'."
+        }
     }
 
-    $nonPath = 'cmd /c codebase-memory-mcp'
-    $fallback = Normalize-McpCommandPath $nonPath
-    if ([string]::IsNullOrWhiteSpace($fallback)) {
-        throw "SELF-TEST FAIL: non-path MCP command fallback."
-    }
-
-    Write-Host "SELF-TEST PASS: MCP command normalization."
+    Write-Host "SELF-TEST PASS: machine setup MCP flow."
     exit 0
 }
 

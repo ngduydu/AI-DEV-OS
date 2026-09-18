@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$SourceRoot = ""
 )
 
@@ -11,10 +11,15 @@ if ([string]::IsNullOrWhiteSpace($SourceRoot)) {
 }
 
 $canonicalSkill = Join-Path $SourceRoot ".claude\skills\update-ai-dev-os\SKILL.md"
+$canonicalApplySkill = Join-Path $SourceRoot ".claude\skills\apply-ai-dev-os\SKILL.md"
 $versionFile = Join-Path $SourceRoot ".ai-dev-os\VERSION"
 
 if (-not (Test-Path $canonicalSkill)) {
     throw "Canonical updater skill not found: $canonicalSkill"
+}
+
+if (-not (Test-Path $canonicalApplySkill)) {
+    throw "Canonical apply skill not found: $canonicalApplySkill"
 }
 
 if (-not (Test-Path $versionFile)) {
@@ -58,10 +63,49 @@ The canonical skill is the source of truth for all upgrade behavior.
 
 Set-Content -Path $targetFile -Value $content -Encoding UTF8
 
+$applyTargetDir = Join-Path $HOME ".claude\skills\apply-ai-dev-os"
+$applyTargetFile = Join-Path $applyTargetDir "SKILL.md"
+New-Item -ItemType Directory -Force -Path $applyTargetDir | Out-Null
+
+$applyContent = @"
+---
+name: apply-ai-dev-os
+description: Use when the current repository does not yet contain AI-DEV-OS and should be initialized from the canonical local AI-DEV-OS source without manual copying.
+disable-model-invocation: true
+---
+
+# Global AI-DEV-OS Apply Launcher
+
+Canonical AI-DEV-OS source:
+
+```text
+$SourceRoot
+```
+
+For every invocation:
+
+1. Treat the current working repository as the TARGET repository.
+2. Read and follow the canonical apply skill from:
+   `$canonicalApplySkill`
+3. Pass this exact source root to the canonical workflow:
+   `$SourceRoot`
+4. Do not modify the AI-DEV-OS source repository except the canonical workflow's safe `git pull --ff-only` preflight.
+5. If the source path no longer exists, stop and tell the user to rerun machine setup from AI-DEV-OS.
+
+The canonical apply skill is the source of truth.
+"@
+
+Set-Content -Path $applyTargetFile -Value $applyContent -Encoding UTF8
+
 Write-Host "Installed personal updater skill:"
 Write-Host "  $targetFile"
+Write-Host "Installed personal apply skill:"
+Write-Host "  $applyTargetFile"
 Write-Host "Canonical source:"
 Write-Host "  $SourceRoot"
 Write-Host ""
-Write-Host "Restart Claude Code, open any AI-DEV-OS project, then run:"
+Write-Host "Restart Claude Code."
+Write-Host "Repo mới chưa có AI-DEV-OS:"
+Write-Host "  /apply-ai-dev-os"
+Write-Host "Repo đã có AI-DEV-OS:"
 Write-Host "  /update-ai-dev-os"

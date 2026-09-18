@@ -6,6 +6,22 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.5.0 — One-command apply
+
+### Added
+
+- Personal Claude Code skill `/apply-ai-dev-os`.
+- Canonical apply workflow cho repo chưa có AI-DEV-OS.
+- Machine setup cài cả `/apply-ai-dev-os` và `/update-ai-dev-os`.
+
+### Changed
+
+- MCP setup đăng ký lại deterministic `codebase-memory-mcp` user-scope bằng đúng executable canonical.
+- Third-party installer output không còn có thể lọt vào MCP command config.
+- Framework version nâng lên `2.5.0`.
+
+
+
 ## 2.4.0 — Machine tooling setup
 
 ### Added
