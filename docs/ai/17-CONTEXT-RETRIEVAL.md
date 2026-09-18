@@ -25,7 +25,7 @@ biết file/path rồi?
    → ast-grep nếu có
    ↓
    codebase lớn + cần graph/dependency/impact?
-   → codebase-memory-mcp nếu project đã bật
+   → codebase-memory-mcp nếu máy đã setup + MCP Connected
    ↓
    đọc source + tests liên quan
    ↓
@@ -205,3 +205,25 @@ direct read
 ~~~
 
 Mục tiêu là giảm rediscovery/context rác mà không giảm correctness.
+
+
+## Machine tooling 2.4.0
+
+Team có thể setup tool một lần trên mỗi máy từ repository AI-DEV-OS:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Script này nằm ở **AI-DEV-OS source**, không copy vào product repository.
+
+Sau setup, các tool có thể sẵn sàng trên mọi repo của máy:
+
+- `ripgrep`;
+- `ast-grep`;
+- `Repomix`;
+- `codebase-memory-mcp` qua Claude MCP user-scope.
+
+Có tool sẵn **không có nghĩa task nào cũng phải gọi**. Vẫn dùng escalation order của tài liệu này.
+
+Trước khi dùng graph/memory cho một repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, fallback về CODEBASE-MAP + targeted search + source.
