@@ -114,9 +114,9 @@ function Ensure-Repomix {
     }
 
     Write-Host "Đang cài Repomix..." -ForegroundColor Cyan
-    & npm install -g repomix
+    & npm install -g repomix@1.18.0
     if ($LASTEXITCODE -ne 0) {
-        Add-Result "Repomix" "FAIL" "npm install -g repomix thất bại với mã $LASTEXITCODE."
+        Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
         return
     }
 
