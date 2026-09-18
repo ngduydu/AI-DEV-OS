@@ -74,7 +74,7 @@ try {
 
     $maliciousLayout = Join-Path $tempRoot "malicious-layout.json"
     $layout = Get-Content -LiteralPath $layouts -Raw -Encoding UTF8 | ConvertFrom-Json
-    $layout.layouts.'ordered-v2'.prefix_map.'docs/ai/' = "../outside/"
+    $layout.layouts.'ordered-v2'.prefix_map.'docs/ai/' = "safe/../../outside/"
     ($layout | ConvertTo-Json -Depth 20) | Set-Content -LiteralPath $maliciousLayout -Encoding UTF8
 
     $previousEap = $ErrorActionPreference
