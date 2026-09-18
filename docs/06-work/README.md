@@ -50,8 +50,8 @@ Research
 Ưu tiên task identifier/branch slug để mỗi task có folder riêng:
 
 ```text
-docs/work/hhm-123-user-subscription/
-docs/work/2026-09-18-user-subscription/
+docs/06-work/hhm-123-user-subscription/
+docs/06-work/2026-09-18-user-subscription/
 ```
 
 Không dùng một shared work file cho nhiều task song song.
@@ -70,8 +70,8 @@ Có thể copy từ `_template/`.
 
 Knowledge còn giá trị lâu dài phải đi theo conflict-safe routing:
 
-- business/pitfall/module/operations discovery → `docs/knowledge/**/entries/`;
-- architecture/public-contract decision → `docs/decisions/entries/`;
+- business/pitfall/module/operations discovery → `docs/03-knowledge/**/entries/`;
+- architecture/public-contract decision → `docs/05-decisions/entries/`;
 - recurring procedure ổn định → Skill;
 - canonical docs chỉ sửa khi task thật sự thay đổi canonical truth.
 
