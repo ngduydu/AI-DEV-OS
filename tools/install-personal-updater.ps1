@@ -30,6 +30,7 @@ $content = @"
 ---
 name: update-ai-dev-os
 description: Use when a repository already contains AI-DEV-OS files and needs to upgrade from the canonical local AI-DEV-OS source without manually copying or merging framework files.
+disable-model-invocation: true
 ---
 
 # Global AI-DEV-OS Updater Launcher
