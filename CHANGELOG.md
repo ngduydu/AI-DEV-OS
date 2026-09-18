@@ -6,6 +6,23 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.6.0 — Conflict-safe Knowledge Sync
+
+### Added
+
+- `docs/knowledge/README.md` với mô hình mỗi knowledge item một file riêng.
+- Migration updater cho repo 2.5.x/cũ hơn mà không auto-split knowledge cũ.
+- Regression test cho branch-safe Knowledge Sync.
+
+### Changed
+
+- Task discovery không còn mặc định append vào shared canonical docs.
+- `13-KNOWN-PITFALLS.md` trở thành legacy/canonical router; knowledge cũ vẫn được preserve.
+- Knowledge Sync skills của Claude và generic adapter dùng isolated files mặc định.
+- Shared canonical docs chỉ đổi khi canonical truth thực sự đổi.
+
+
+
 ## 2.5.1 — Agent-aware apply
 
 ### Changed
