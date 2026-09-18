@@ -101,6 +101,41 @@
       "path": ".agents/skills/update-project-knowledge/SKILL.md",
       "ownership": "framework",
       "scope": "generic"
+    },
+    {
+      "path": "docs/ai/00-SETUP-CHECKLIST.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/modules/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/operations/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/work/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/fix-bug/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/fix-bug/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
     }
   ]
 }
