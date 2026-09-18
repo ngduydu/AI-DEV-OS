@@ -12,5 +12,5 @@ description: Research an unfamiliar feature, bug, subsystem, or code path before
 5. Find existing patterns and canonical examples before proposing new abstractions.
 6. Identify constraints, side effects, tests, integrations and risky boundaries.
 7. Do not edit production code during research.
-8. For substantial work, write findings using `docs/work/_template/RESEARCH.md`.
+8. For substantial work, write findings using `docs/06-work/_template/RESEARCH.md`.
 9. End with: findings, relevant paths, unknowns, risks, and what must be decided before planning.
