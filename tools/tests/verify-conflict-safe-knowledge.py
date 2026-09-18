@@ -31,11 +31,11 @@ def main() -> None:
         fail("missing docs/knowledge/README.md")
     knowledge_text = knowledge.read_text(encoding="utf-8")
     for needle in [
-        "mỗi knowledge item = một file riêng",
+        "mỗi discovery bền vững của task = một file entry riêng",
         "không có central index",
         "shared canonical docs",
-        "docs/knowledge/pitfalls/",
-        "docs/knowledge/business-rules/",
+        "docs/knowledge/pitfalls/entries/",
+        "docs/knowledge/business-rules/entries/",
     ]:
         require(knowledge_text, needle, "knowledge policy")
 
@@ -44,6 +44,7 @@ def main() -> None:
         "Conflict-safe Knowledge Sync",
         "mặc định tạo file riêng",
         "không append vào shared canonical file",
+        "Conflict Surface Gate",
     ]:
         require(task_contract, needle, "task contract")
 
@@ -61,6 +62,7 @@ def main() -> None:
         "mặc định tạo file riêng",
         "không sửa shared canonical docs",
         "docs/knowledge/",
+        "Conflict Surface Gate",
     ]:
         require(claude_skill, needle, "claude knowledge skill")
         require(generic_skill, needle, "generic knowledge skill")
@@ -77,9 +79,29 @@ def main() -> None:
         "docs/ai/13-KNOWN-PITFALLS.md",
         ".claude/skills/update-project-knowledge/SKILL.md",
         ".agents/skills/update-project-knowledge/SKILL.md",
+        "docs/ai/00-SETUP-CHECKLIST.md",
+        "docs/decisions/README.md",
+        "docs/modules/README.md",
+        "docs/operations/README.md",
+        "docs/work/README.md",
+        ".claude/skills/fix-bug/SKILL.md",
+        ".agents/skills/fix-bug/SKILL.md",
     ]:
         if path not in managed:
             fail(f"manifest missing managed path: {path}")
+
+    decisions = (root / "docs" / "decisions" / "README.md").read_text(encoding="utf-8")
+    require(decisions, "docs/decisions/entries/", "decisions routing")
+    require(decisions, "không dùng sequence toàn cục", "decisions routing")
+
+    for path in [
+        root / ".claude" / "skills" / "fix-bug" / "SKILL.md",
+        root / ".agents" / "skills" / "fix-bug" / "SKILL.md",
+    ]:
+        text = path.read_text(encoding="utf-8")
+        require(text, "docs/knowledge/pitfalls/entries/", str(path))
+        if "Preserve a non-obvious recurring lesson in `docs/ai/13-KNOWN-PITFALLS.md`" in text:
+            fail(f"{path}: stale shared-pitfall append guidance")
 
     print("PASS: conflict-safe knowledge sync contract")
 
