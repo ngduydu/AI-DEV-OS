@@ -217,19 +217,19 @@ Không append vào shared canonical file chỉ để ghi lại discovery của t
 
 ```text
 business rule discovery
-→ docs/knowledge/business-rules/<domain>-<rule>.md
+→ docs/knowledge/business-rules/entries/<entry-id>-<rule>.md
 
 pitfall discovery
-→ docs/knowledge/pitfalls/<domain>-<failure-mode>.md
+→ docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 
 module discovery
-→ docs/knowledge/modules/<module>-<topic>.md
+→ docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md
 
 operations discovery
-→ docs/knowledge/operations/<system>-<topic>.md
+→ docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
 ```
 
-Không có central index phải update sau mỗi task.
+Không có central index/summary/changelog phải update sau mỗi task. Trước khi ghi durable artifact, chạy Conflict Surface Gate trong `docs/knowledge/README.md`: nếu change chỉ là append item/link/registry vào shared file thì tạo entry riêng.
 
 Chỉ sửa shared canonical docs khi **canonical truth thực sự thay đổi**, ví dụ architecture, project-wide rule, coding convention, command chính thức hoặc canonical implementation thay đổi do chính task này.
 
