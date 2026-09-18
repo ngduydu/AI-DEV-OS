@@ -41,3 +41,8 @@ jobs:
       - name: Verify conflict-safe knowledge sync contract
         shell: powershell
         run: python .\tools\tests\verify-conflict-safe-knowledge.py .
+
+
+      - name: Verify ordered docs layout compatibility
+        shell: powershell
+        run: python .\tools\tests\verify-docs-layout.py .
