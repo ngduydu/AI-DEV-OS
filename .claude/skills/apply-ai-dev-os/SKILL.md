@@ -28,7 +28,7 @@ Giá trị hợp lệ:
 - `generic`
 - `both`
 
-Không tự suy đoán agent.
+Không tự suy đoán agent. **Không được mặc định agent**.
 
 ## 2. Source
 
