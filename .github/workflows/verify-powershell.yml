@@ -37,3 +37,7 @@ jobs:
       - name: Verify apply agent selection contract
         shell: powershell
         run: python .\tools\tests\verify-apply-agent-selection.py .
+
+      - name: Verify conflict-safe knowledge sync contract
+        shell: powershell
+        run: python .\tools\tests\verify-conflict-safe-knowledge.py .
