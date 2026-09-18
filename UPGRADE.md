@@ -239,15 +239,15 @@ Chạy:
 
 Updater phải:
 
-1. thêm `docs/knowledge/README.md`;
-2. cập nhật Task Execution / Knowledge Sync skills;
-3. cập nhật routing trong docs framework;
-4. preserve project-specific knowledge hiện có;
-5. **không di chuyển hoặc tách knowledge cũ tự động**;
-6. không tự tạo hàng loạt file knowledge từ nội dung cũ;
-7. chỉ bump VERSION sau verification;
-8. update các active skill/routing docs còn hướng task mới vào shared append-only files;
-9. với task-generated artifact mới, dùng `entries/<entry-id>-<slug>.md` và không dùng global sequence.
+1. preserve toàn bộ project-specific knowledge hiện có;
+2. **không bootstrap lại project**;
+3. tự migrate nguyên file legacy sang ordered folder bằng deterministic mapping;
+4. không split/rewrite semantics bên trong knowledge cũ bằng suy đoán;
+5. thêm conflict-safe knowledge policy;
+6. cập nhật Task Execution / Knowledge Sync / fix-bug routing;
+7. update mọi active instruction còn hướng task mới vào shared append-only files;
+8. với task-generated artifact mới, dùng `entries/<entry-id>-<slug>.md` và không dùng global sequence;
+9. chỉ bump VERSION sau migration + verification PASS.
 
 Các entry cũ trong `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/05-BUSINESS-RULES.md`, module docs và operations docs tiếp tục hợp lệ.
 
@@ -261,17 +261,17 @@ Branch đã sửa shared knowledge file trước 2.6.0 vẫn có thể gặp con
 
 ### Compatibility với repo đang chạy task
 
-Updater **không auto-move/rename/xóa** knowledge cũ và không rewrite project-owned entries.
+Các file cũ như `13-KNOWN-PITFALLS.md`, business rules, module/operations docs và ADR numbering cũ **không bị mất nội dung**.
 
-Các file cũ như `13-KNOWN-PITFALLS.md`, business rules, module/operations docs, ADR numbering cũ vẫn tiếp tục được đọc.
+Migration có thể đổi **path** của nguyên file để đưa về ordered layout, nhưng:
 
-Migration chỉ:
-- thêm policy/routing mới;
-- cập nhật framework-owned skill/contract;
-- semantic-merge mixed routing docs và preserve project content;
-- tạo `entries/` on demand khi task mới thực sự cần ghi knowledge.
+- dùng `git mv` để giữ rename history;
+- giữ content nguyên vẹn trước bước rewrite reference;
+- không split một file cũ thành nhiều file bằng suy đoán;
+- không bootstrap lại project;
+- không yêu cầu AI đọc lại toàn bộ codebase để tái tạo knowledge.
 
-Vì vậy repo đã apply hiện tại không cần sửa tay từng file knowledge trước khi chạy `/update-ai-dev-os`.
+Repo đã apply hiện tại chỉ cần chạy `/update-ai-dev-os`; updater tự inventory, move, rewrite reference và verify.
 
 
 ## Docs layout versioning — từ 2.6.0
