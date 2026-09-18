@@ -5,7 +5,7 @@ Thư mục này chứa canonical knowledge theo từng domain/module để agent
 Không tạo sẵn hàng loạt folder rỗng. Khi một module bắt đầu có đủ business rule/workflow riêng, có thể tạo:
 
 ```text
-docs/modules/<module>/
+docs/02-modules/<module>/
 ```
 
 Tùy nhu cầu, canonical module docs có thể có:
@@ -25,7 +25,7 @@ Không bắt buộc đủ các file trên.
 1. Đọc module docs hiện có.
 2. Đọc implementation/test thực tế.
 3. Discovery bền vững mới của task mặc định ghi file riêng tại:
-   `docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md`.
+   `docs/03-knowledge/modules/<module>/entries/<entry-id>-<topic>.md`.
 4. Chỉ sửa canonical module docs khi chính task làm thay đổi canonical contract/rule/workflow tương ứng.
 5. Nếu behavior quan trọng không thể suy ra an toàn, hỏi user trước khi implement.
 6. Nếu một rule áp dụng toàn project, không duplicate vào từng module.
