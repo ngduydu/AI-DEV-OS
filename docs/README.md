@@ -13,7 +13,7 @@ Task context        → chỉ nạp những gì liên quan
 ## Mặc định trước mọi task
 
 1. Hiểu yêu cầu hiện tại.
-2. Đọc `docs/ai/16-TASK-EXECUTION.md`.
+2. Đọc `docs/01-development/ai-development.md`.
 3. Xác định module/khu vực code bị ảnh hưởng.
 4. Đọc `04-CODEBASE-MAP.md` khi cần tìm canonical implementation/reuse source.
 5. Đọc `06-CODING-STANDARDS.md` khi task tạo/sửa code.
@@ -23,25 +23,25 @@ Task context        → chỉ nạp những gì liên quan
 
 | Khi task liên quan | Đọc |
 |---|---|
-| Product / behavior | `docs/ai/02-PRODUCT.md`, business rules liên quan |
-| Architecture | `docs/ai/03-ARCHITECTURE.md`, `docs/decisions/` |
-| Tìm code / reuse / tạo implementation mới | `docs/ai/04-CODEBASE-MAP.md`, module docs, code/test hiện có |
-| Business rule | canonical: `docs/ai/05-BUSINESS-RULES.md`; task discovery: `docs/knowledge/business-rules/` |
-| Coding convention / naming / error / validation / DB / API format | `docs/ai/06-CODING-STANDARDS.md` |
-| Build / run / test / lint / format | `docs/ai/07-COMMANDS.md`, `docs/ai/08-TESTING.md` |
-| Security | `docs/ai/09-SECURITY.md` |
-| Git / PR | `docs/ai/10-GIT-WORKFLOW.md` |
-| Ready / ambiguity | `docs/ai/11-DEFINITION-OF-READY.md` |
-| Done | `docs/ai/12-DEFINITION-OF-DONE.md` |
-| Gotcha / lỗi khó nhớ | existing/canonical route: `docs/ai/13-KNOWN-PITFALLS.md`; task discovery: `docs/knowledge/pitfalls/` |
-| Knowledge maintenance | `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` |
-| Context/token-efficient retrieval | `docs/ai/17-CONTEXT-RETRIEVAL.md` |
-| Chọn/đánh giá tool | `docs/ai/18-TOOL-ADOPTION.md` |
-| Module cụ thể | `docs/modules/` |
-| Deploy / migration / rollback / monitoring | `docs/operations/` |
-| Quyết định có trade-off | `docs/decisions/` |
-| Knowledge bền vững phát hiện trong task | `docs/knowledge/` |
-| Context chỉ cho task hiện tại | `docs/work/` |
+| Product / behavior | `docs/00-overview/product.md`, business rules liên quan |
+| Architecture | `docs/00-overview/architecture.md`, `docs/05-decisions/` |
+| Tìm code / reuse / tạo implementation mới | `docs/00-overview/codebase-map.md`, module docs, code/test hiện có |
+| Business rule | canonical: `docs/03-knowledge/business-rules.md`; task discovery: `docs/03-knowledge/business-rules/` |
+| Coding convention / naming / error / validation / DB / API format | `docs/01-development/coding-standards.md` |
+| Build / run / test / lint / format | `docs/01-development/commands.md`, `docs/01-development/testing.md` |
+| Security | `docs/01-development/security.md` |
+| Git / PR | `docs/01-development/git-workflow.md` |
+| Ready / ambiguity | `docs/01-development/definition-of-ready.md` |
+| Done | `docs/01-development/definition-of-done.md` |
+| Gotcha / lỗi khó nhớ | existing/canonical route: `docs/03-knowledge/known-pitfalls.md`; task discovery: `docs/03-knowledge/pitfalls/` |
+| Knowledge maintenance | `docs/01-development/documentation-governance.md` |
+| Context/token-efficient retrieval | `docs/01-development/context-retrieval.md` |
+| Chọn/đánh giá tool | `docs/01-development/tool-adoption.md` |
+| Module cụ thể | `docs/02-modules/` |
+| Deploy / migration / rollback / monitoring | `docs/04-operations/` |
+| Quyết định có trade-off | `docs/05-decisions/` |
+| Knowledge bền vững phát hiện trong task | `docs/03-knowledge/` |
+| Context chỉ cho task hiện tại | `docs/06-work/` |
 
 ## Khi tạo code mới
 
@@ -63,7 +63,7 @@ Không dùng convention hoặc architecture từ trí nhớ của agent nếu pr
 - Ưu tiên source gần nhất với behavior đang sửa: module docs → code/test → global docs.
 - Nếu docs và code mâu thuẫn, không tự chọn ngẫu nhiên; xác minh và nêu mâu thuẫn.
 - Không dùng docs cũ làm lý do để bỏ qua evidence rõ ràng từ code/test/history.
-- Knowledge bền vững phát hiện trong task phải được đồng bộ theo `docs/knowledge/README.md`; mặc định tạo file riêng để tránh conflict giữa branch.
+- Knowledge bền vững phát hiện trong task phải được đồng bộ theo `docs/03-knowledge/README.md`; mặc định tạo file riêng để tránh conflict giữa branch.
 - Nếu cùng một rule xuất hiện ở nhiều file và mâu thuẫn, ưu tiên sửa source of truth thay vì thêm một bản sao mới.
 
 ## Bootstrap project
@@ -92,4 +92,4 @@ CODEBASE-MAP
 → broaden/history chỉ khi evidence chưa đủ
 ~~~
 
-Xem `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+Xem `docs/01-development/context-retrieval.md`.
