@@ -91,8 +91,9 @@ def main() -> None:
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for needle in [
         "Docs layout versioning",
-        "không được tự đổi docs layout",
-        "migration riêng có chủ đích",
+        "tự migrate sang \`ordered-v2\`",
+        "không bootstrap lại project",
+        "content hash",
     ]:
         require(upgrade, needle, "upgrade docs")
 
