@@ -284,15 +284,10 @@ Source of truth:
 .ai-dev-os/layouts.json
 ```
 
-Có hai layout:
+Layout đích chuẩn:
 
 ```text
-legacy-v1
-→ repo đã apply trước 2.6.0
-→ giữ nguyên docs/ai, docs/modules, docs/operations, docs/decisions, docs/work
-
 ordered-v2
-→ repo apply mới
 → docs/00-overview
 → docs/01-development
 → docs/02-modules
@@ -302,32 +297,38 @@ ordered-v2
 → docs/06-work
 ```
 
-### Rule bắt buộc của /update-ai-dev-os
+### Repo cũ được migrate thế nào?
 
-`/update-ai-dev-os` **không được tự đổi docs layout**.
+Repo chưa có `.ai-dev-os/state.json` hoặc đang ở `legacy-v1` được `/update-ai-dev-os` tự migrate sang `ordered-v2`.
 
-Repo cũ chưa có `.ai-dev-os/state.json` được nhận diện là `legacy-v1`.
+Migration **không bootstrap lại project** và không tái sinh knowledge.
 
-Sau update thành công, updater có thể tạo state marker:
+Flow bắt buộc:
 
-```json
-{
-  "docs_layout": "legacy-v1",
-  "docs_layout_version": 1
-}
+```text
+inventory toàn bộ docs legacy
+→ resolve destination bằng path_map/prefix_map
+→ collision preflight
+→ git mv giữ nguyên content
+→ rewrite docs references
+→ semantic merge framework rules
+→ verify file/content preservation
+→ ghi state ordered-v2
+→ bump VERSION cuối cùng
 ```
 
-nhưng không move/rename project docs.
+### Bảo toàn dữ liệu
 
-Repo `ordered-v2` phải tiếp tục update vào ordered path hiện tại thông qua mapping trong `layouts.json`.
+- exact canonical file dùng `path_map`;
+- file project-specific không biết trước vẫn được giữ bằng `prefix_map`;
+- không split nội dung bên trong file cũ bằng suy đoán;
+- destination khác nội dung → STOP trước mutation, không overwrite;
+- destination giống hệt → deduplicate có kiểm soát;
+- content hash được kiểm tra trước/sau bước move;
+- không chạy `bootstrap-project` trong upgrade.
 
-### Vì sao không auto-migrate repo cũ sang ordered-v2?
+### Branch đang chạy
 
-Vì team có thể đang có branch task song song tham chiếu path cũ. Tự move hàng loạt docs trong `/update-ai-dev-os` sẽ tạo:
+Migration layout là thay đổi có chủ đích của framework. Git rename history phải được giữ bằng `git mv` để branch cũ có cơ hội merge rename-aware.
 
-- diff lớn không liên quan task;
-- rename/delete conflict với branch đang chạy;
-- broken reference trong task branch cũ;
-- khó review và khó rollback.
-
-Nếu sau này muốn đổi một repo cũ sang `ordered-v2`, đó phải là migration riêng có chủ đích, không nằm trong updater framework thông thường.
+Conflict đã được tạo từ trước khi migration (ví dụ một branch đang sửa cùng shared file legacy) không thể được xóa bằng cách đoán semantics. Nhưng sau migration, task mới không còn append discovery vào shared docs nên conflict rác không tiếp tục phát sinh.
