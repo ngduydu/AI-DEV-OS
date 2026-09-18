@@ -2,116 +2,108 @@
 
 Mục tiêu: lưu knowledge bền vững mà không biến các file dùng chung thành điểm conflict khi nhiều task/branch chạy song song.
 
-## Rule mặc định
+## Nguyên tắc bất biến
 
-**mỗi knowledge item = một file riêng**.
+1. **Mỗi discovery bền vững của task = một file entry riêng.**
+2. Không append discovery mới vào shared summary/index/list chỉ để "ghi lại cho đủ".
+3. Không dùng sequence toàn cục như `0001`, `KP-001`, `BR-001` cho entry mới.
+4. Shared canonical docs chỉ sửa khi chính task làm thay đổi canonical truth tương ứng.
+5. Knowledge cũ phải được preserve; upgrade không auto-split, auto-move hoặc rewrite nội dung project.
 
-Knowledge phát hiện trong một task không được append mặc định vào một shared file đang được nhiều branch cùng sửa.
+## Routing mặc định
 
-Ví dụ:
-
-```text
-docs/knowledge/
-├── business-rules/
-│   └── salespaper-bha-document-flow.md
-├── pitfalls/
-│   └── rabbitmq-publish-does-not-create-queue.md
-├── modules/
-│   └── salespaper-webhook-contract.md
-└── operations/
-    └── deploy-salespaper-worker.md
-```
-
-Các folder con được tạo on demand. Không scaffold hàng loạt folder rỗng.
-
-## Không có central index
-
-Không có central index bắt buộc phải append sau mỗi task.
-
-Retrieval dùng:
-
-- `docs/README.md` để biết route;
-- CODEBASE-MAP/module docs khi đã có canonical route;
-- targeted search trong `docs/knowledge/` khi cần;
-- source/tests vẫn là ground truth.
-
-Mục tiêu là để hai task độc lập có thể tạo hai file khác nhau và merge gần như không chạm nhau.
-
-## Naming
-
-Tên file phải:
-
-- mô tả domain/behavior, không dùng tên chung như `note.md`;
-- lowercase kebab-case;
-- đủ cụ thể để search được;
-- không phụ thuộc số thứ tự toàn cục.
-
-Ví dụ tốt:
+Task-generated knowledge dùng `entries/`:
 
 ```text
-docs/knowledge/pitfalls/rabbitmq-publish-does-not-create-queue.md
-docs/knowledge/business-rules/salespaper-bha-document-flow.md
+business rule / behavior
+→ docs/knowledge/business-rules/entries/<entry-id>-<slug>.md
+
+pitfall / failure mode
+→ docs/knowledge/pitfalls/entries/<entry-id>-<slug>.md
+
+module discovery
+→ docs/knowledge/modules/<module>/entries/<entry-id>-<slug>.md
+
+operations discovery
+→ docs/knowledge/operations/<system>/entries/<entry-id>-<slug>.md
+
+architecture/public-contract decision
+→ docs/decisions/entries/<entry-id>-<slug>.md
+
+task-only context
+→ docs/work/<task-id>/
 ```
 
-Không dùng sequence chung kiểu `KP-001`, `BR-023` cho file mới vì nhiều branch có thể chọn trùng số.
+Folder con được tạo on demand. Không scaffold hàng loạt folder rỗng.
 
-## Khi nào sửa shared canonical docs?
+Nếu project đã có cấu trúc `<section>/entries/` tương đương, ưu tiên dùng cấu trúc có sẵn thay vì tạo một shared file tổng hợp mới.
 
-Shared canonical docs chỉ sửa khi **canonical truth thực sự thay đổi**, ví dụ:
+## Entry ID và tên file
 
-- architecture hiện hành thay đổi;
-- coding convention chính thức thay đổi;
-- command build/test chính thức thay đổi;
-- public contract/rule project-wide được thay đổi có chủ đích;
-- CODEBASE-MAP cần thay route/canonical implementation vì code thật đã đổi.
-
-Không sửa shared canonical docs chỉ để ghi lại một discovery của task.
+Ưu tiên identifier đã có của task:
 
 ```text
-discovery của task
-→ mặc định tạo file riêng trong docs/knowledge/
-
-canonical truth thực sự thay đổi
-→ sửa shared canonical docs phù hợp
+<hhm-123>-<topic>.md
+<issue-42>-<topic>.md
+<branch-slug>-<topic>.md
 ```
 
-Nếu hai branch cùng thay canonical truth và conflict, đó là conflict có ý nghĩa cần review, không phải conflict rác.
-
-## Categories
-
-### Business rules
+Nếu không có task identifier ổn định:
 
 ```text
-docs/knowledge/business-rules/<domain>-<rule>.md
+<yyyy-mm-dd>-<task-slug>-<topic>.md
 ```
 
-Dùng cho rule bền vững được phát hiện/xác nhận trong task nhưng chưa cần sửa canonical project-wide contract.
+Tên phải lowercase kebab-case, đủ cụ thể để search được và không phụ thuộc global counter.
 
-### Pitfalls
+Hai branch độc lập phải có khả năng tạo hai file khác nhau mà không cần phối hợp trước để "xin số".
 
-```text
-docs/knowledge/pitfalls/<domain>-<failure-mode>.md
-```
+## Không có central index bắt buộc
 
-Dùng cho gotcha/failure mode khó nhớ, có khả năng lặp lại.
+Không update một file chung chỉ để đăng ký entry mới.
 
-### Module knowledge
+Đặc biệt, không append task discovery vào các dạng file dễ trở thành conflict hotspot như:
 
-```text
-docs/knowledge/modules/<module>-<topic>.md
-```
+- `README.md` chỉ để thêm link mới;
+- `changelog.md`;
+- `decisions.md`;
+- `known-issues.md`;
+- `roadmap.md`;
+- shared business-rule/pitfall list;
+- shared registry/index khác.
 
-Dùng cho discovery cục bộ của module khi chưa cần consolidate vào module canonical docs.
+Các file đó chỉ đổi khi task thật sự có scope thay đổi chính nội dung canonical của chúng.
 
-### Operations
+Retrieval dùng targeted search trong `entries/`, route hiện có và source/tests. Không cần một danh sách trung tâm phải sửa sau mỗi task.
 
-```text
-docs/knowledge/operations/<system>-<topic>.md
-```
+## Conflict Surface Gate
 
-Dùng cho deploy/migration/rollback/monitoring/troubleshooting discovery.
+Trước khi ghi durable artifact, kiểm tra:
 
-## Nội dung mỗi file
+1. File đích có phải file chung mà nhiều branch có khả năng cùng sửa không?
+2. Change có phải kiểu append item, thêm link, tăng sequence hoặc cập nhật registry/list không?
+3. Có thể lưu thành file entry riêng với task-local identifier không?
+
+Nếu câu trả lời là có, **mặc định tạo entry riêng**.
+
+Chỉ chấp nhận sửa shared file khi conflict đó phản ánh cùng một canonical truth đang bị hai branch thay đổi thật sự. Đó là conflict có ý nghĩa cần review, không phải conflict do thiết kế documentation.
+
+## Shared canonical docs
+
+Các file như:
+
+- `docs/ai/03-ARCHITECTURE.md`;
+- `docs/ai/04-CODEBASE-MAP.md`;
+- `docs/ai/05-BUSINESS-RULES.md`;
+- `docs/ai/13-KNOWN-PITFALLS.md`;
+- module/operations canonical docs;
+- `AGENTS.md` / `CLAUDE.md`;
+
+không được sửa chỉ để persist một discovery của task.
+
+Chỉ sửa khi task thực sự thay đổi canonical contract/rule/route tương ứng.
+
+## Nội dung mỗi entry
 
 Giữ ngắn và có evidence:
 
@@ -134,29 +126,29 @@ Giữ ngắn và có evidence:
 
 Không biến task transcript thành documentation.
 
-## Existing knowledge từ trước 2.6.0
+## Existing knowledge trước 2.6.0
 
 Không di chuyển hoặc tách knowledge cũ tự động.
 
-Các entry cũ trong:
+Các entry/nội dung cũ trong:
 
 - `docs/ai/13-KNOWN-PITFALLS.md`;
 - `docs/ai/05-BUSINESS-RULES.md`;
 - module/operations docs hiện hữu;
+- ADR cũ, kể cả ADR dùng numbering;
 
 vẫn hợp lệ và tiếp tục được đọc.
 
-Từ 2.6.0, **knowledge mới phát hiện trong task** đi theo conflict-safe rule ở tài liệu này.
-
-Việc consolidate knowledge cũ/mới là maintenance riêng, không nằm trên critical path của task.
+Từ 2.6.0, knowledge mới phát hiện trong task đi theo conflict-safe routing ở tài liệu này.
 
 ## Maintenance định kỳ
 
-Khi có nhiều isolated knowledge file:
+Consolidation là task maintenance riêng, không nằm trên critical path của từng task.
 
-- gộp những file thực sự trùng;
+Khi maintenance:
+
+- gộp entry thực sự trùng;
 - promote rule thành canonical docs nếu nó đã trở thành source of truth;
 - xóa stale knowledge;
-- giữ redirect/reference nếu việc di chuyển có thể làm search cũ mất dấu.
-
-Không consolidate trong từng task trừ khi task đó chính là knowledge maintenance.
+- sửa redirect/reference nếu cần;
+- không tạo lại central append-only index.
