@@ -154,11 +154,13 @@ Nhìn tổng thể:
 │
 ├── docs/
 │   ├── README.md
-│   ├── ai/
-│   ├── modules/
-│   ├── operations/
-│   ├── decisions/
-│   └── work/
+│   ├── 00-overview/       # repo apply mới
+│   ├── 01-development/
+│   ├── 02-modules/
+│   ├── 03-knowledge/
+│   ├── 04-operations/
+│   ├── 05-decisions/
+│   └── 06-work/
 │
 ├── .claude/
 │   ├── skills/
@@ -283,11 +285,13 @@ Mục tiêu của repo là có core knowledge chung, còn adapter nào được 
 Knowledge được phân loại:
 
 ```text
-Project-wide knowledge   → docs/ai/
-Module/domain knowledge  → docs/modules/<module>/
-Operations knowledge     → docs/operations/
-Architecture decisions   → docs/decisions/
-Task-only context         → docs/work/
+Overview/canonical map   → docs/00-overview/
+Development rules        → docs/01-development/
+Module/domain knowledge  → docs/02-modules/
+Task discoveries         → docs/03-knowledge/
+Operations knowledge     → docs/04-operations/
+Architecture decisions   → docs/05-decisions/
+Task-only context         → docs/06-work/
 Recurring procedure      → Skill
 ```
 
@@ -580,3 +584,20 @@ Repo đã apply phiên bản cũ chỉ cần chạy:
 ~~~
 
 Updater preserve knowledge cũ và không auto-split/move nội dung project.
+
+
+### Docs layout có version
+
+Repo **apply mới** dùng `ordered-v2` để tree có thứ tự rõ ràng giống tài liệu kỹ thuật chuyên nghiệp:
+
+```text
+00-overview
+01-development
+02-modules
+03-knowledge
+04-operations
+05-decisions
+06-work
+```
+
+Repo đã apply phiên bản cũ **không bị /update-ai-dev-os tự move folder**. Updater giữ `legacy-v1` để không phá branch đang chạy; layout và framework version được quản lý độc lập qua `.ai-dev-os/layouts.json` và target `.ai-dev-os/state.json`.
