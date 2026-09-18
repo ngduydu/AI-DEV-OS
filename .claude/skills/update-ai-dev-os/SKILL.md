@@ -115,6 +115,24 @@ thì:
 
 Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
 
+### Conflict-safe knowledge migration — 2.6.0
+
+Khi source version >= `2.6.0`:
+
+1. tạo/update `docs/knowledge/README.md` theo manifest;
+2. cập nhật conflict-safe Knowledge Sync policy qua managed files;
+3. preserve toàn bộ project-specific knowledge đang có trong shared/mixed docs;
+4. **không di chuyển hoặc tách knowledge cũ tự động** từ:
+   - `docs/ai/13-KNOWN-PITFALLS.md`;
+   - `docs/ai/05-BUSINESS-RULES.md`;
+   - module/operations docs hiện hữu;
+5. không tạo hàng loạt isolated file bằng cách đoán boundary từ text cũ;
+6. từ sau upgrade, knowledge mới của task đi theo `docs/knowledge/README.md`.
+
+Lý do: automatic split của knowledge cũ có rủi ro mất context/semantics và tạo diff lớn trong repo đang có branch chạy song song.
+
+Nếu mixed merge của `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` hoặc `docs/README.md` có nguy cơ mất project-specific content: report `CONFLICT`, không overwrite.
+
 ## Phase 5 — Apply managed files
 
 Đọc `.ai-dev-os/manifest.json` từ SOURCE.
@@ -187,6 +205,7 @@ Trước khi write VERSION:
 7. target working tree chỉ chứa expected upgrade changes;
 8. migration-specific checks trong UPGRADE.md đã pass;
 9. không còn unresolved conflict.
+10. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move.
 
 Nếu verification fail: KHÔNG bump version.
 
