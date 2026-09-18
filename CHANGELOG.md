@@ -6,6 +6,23 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.6.1 — Update/apply hardening
+
+### Fixed
+
+- Sửa PowerShell Git helper dùng tên `$Args` làm mất tham số native command trên Windows PowerShell 5.1.
+- Update migration từ chối path traversal/reparse point và kiểm tra collision trước mutation.
+- Rollback không còn dùng `git clean -fd` trên toàn repository.
+- Active docs/skills được kiểm tra để không quay lại legacy docs paths.
+- Repo đã ở 2.6.0 vẫn nhận được hardening này qua version bump 2.6.1 thay vì bị updater coi là no-op.
+
+### Security
+
+- GitHub Actions dùng quyền `contents: read`, checkout pin full commit SHA và không persist credential.
+- codebase-memory-mcp installer/release và Repomix được pin version/source.
+- Thêm migration safety tests và security regression gate.
+
+
 ## 2.6.0 — Conflict-safe Knowledge Sync + Ordered Docs Migration
 
 ### Added
