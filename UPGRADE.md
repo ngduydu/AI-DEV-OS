@@ -187,3 +187,27 @@ Updater phải:
    ```
 
 Nếu có conflict có nguy cơ làm mất project rule, **không bump VERSION**.
+
+
+## 2.4.0 — Machine tooling setup
+
+2.4.0 bổ sung setup tool dùng chung cho máy developer.
+
+Chạy từ repository AI-DEV-OS local:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Đây là **machine setup**, không phải product-repo migration.
+
+Vì vậy:
+
+- `/update-ai-dev-os` vẫn nâng framework docs/skills trong product repo;
+- `setup-ai-dev-machine.ps1` chỉ chạy một lần trên từng máy developer;
+- script không được copy vào product repo;
+- script không sửa project `.mcp.json`;
+- codebase-memory-mcp được đăng ký Claude MCP ở user scope;
+- CodeGraph không được cài trong 2.4.0 do overlap.
+
+Product repo đã lên 2.3.0 có thể chạy `/update-ai-dev-os` bình thường để nhận framework 2.4.0. Machine setup có thể chạy riêng trước hoặc sau, không cần chạy lại updater chỉ vì cài tool.
