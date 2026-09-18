@@ -557,3 +557,26 @@ claude | generic | both
 ~~~
 
 Sau đó chỉ copy đúng adapter của profile đã chọn.
+
+
+## Conflict-safe Knowledge Sync
+
+Từ 2.6.0, knowledge phát hiện trong task không mặc định append vào shared docs.
+
+~~~text
+task discovery
+→ docs/knowledge/<category>/<descriptive-file>.md
+
+canonical truth thay đổi
+→ shared canonical docs
+~~~
+
+Mục tiêu là để nhiều branch song song tạo knowledge độc lập mà không sinh conflict rác.
+
+Repo đã apply phiên bản cũ chỉ cần chạy:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater preserve knowledge cũ và không auto-split/move nội dung project.
