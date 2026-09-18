@@ -1,8 +1,8 @@
 # Operations Documentation
 
-Thư mục này chứa knowledge cần để thay đổi có thể đi từ code tới production an toàn.
+Thư mục này chứa canonical knowledge cần để thay đổi có thể đi từ code tới production an toàn.
 
-Không tạo file rỗng chỉ để đủ cấu trúc. Tạo khi project thực sự có nội dung cần giữ, ví dụ:
+Không tạo file rỗng chỉ để đủ cấu trúc. Canonical operations docs có thể gồm:
 
 ```text
 environments.md
@@ -38,6 +38,12 @@ Khi task ảnh hưởng production, agent phải đọc phần operations liên 
 - dependency failure;
 - deployment order/feature flag.
 
-Nếu knowledge vận hành quan trọng được phát hiện trong task, cập nhật thư mục này trong Knowledge Sync.
+Knowledge vận hành bền vững **phát hiện trong task** mặc định tạo entry riêng tại:
 
-Mục tiêu: human review tập trung vào quyết định và business, không phải phát hiện agent đã quên deploy/rollback/config cơ bản.
+```text
+docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
+```
+
+Chỉ sửa canonical operations docs khi task thực sự thay đổi runbook/procedure/contract vận hành chính thức.
+
+Không append discovery mới vào shared troubleshooting/deployment list chỉ để lưu lại knowledge.
