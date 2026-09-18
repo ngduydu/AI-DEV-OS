@@ -810,3 +810,41 @@ CODEBASE-MAP
 Xem `docs/ai/18-TOOL-ADOPTION.md`.
 
 Không thêm tool vào team default chỉ vì nhiều sao hoặc claim tiết kiệm token. Phải qua community, maintenance, maturity, security, Windows/platform, evidence, overlap và fallback.
+
+## 29. Cài updater dùng cho mọi repository
+
+Claude Code hỗ trợ personal skills trong thư mục user. AI-DEV-OS dùng cơ chế này để tránh phải copy updater mới vào từng repository.
+
+Trong AI-DEV-OS local:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install-personal-updater.ps1
+~~~
+
+Installer tạo:
+
+~~~text
+~/.claude/skills/update-ai-dev-os/SKILL.md
+~~~
+
+Personal skill chỉ là launcher; logic upgrade canonical vẫn nằm trong:
+
+~~~text
+<AI-DEV-OS>/.claude/skills/update-ai-dev-os/SKILL.md
+~~~
+
+Vì vậy framework nâng version sau này không cần reinstall launcher, miễn AI-DEV-OS source vẫn ở cùng path.
+
+### Upgrade một product repo
+
+Mở product repo bằng Claude Code rồi chạy:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater tự kiểm tra source/target Git state, tạo branch update nếu cần, preserve project knowledge, xử lý migration, verify và mới bump version.
+
+Nếu AI-DEV-OS local được move sang thư mục khác, chạy installer lại.
+
+Hiện tại updater xử lý **một repository mỗi lần**. Update-all nhiều repository chỉ làm sau khi one-repo updater đã được kiểm nghiệm ổn định.
