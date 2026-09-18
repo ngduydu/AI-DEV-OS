@@ -107,41 +107,27 @@ Tên folder có prefix số để:
 
 Không tự nghĩ tên/path khác. Source of truth là `.ai-dev-os/layouts.json`, layout `ordered-v2`.
 
-## 6. Copy theo layout manifest
+## 6. Copy canonical ordered layout
 
-Canonical source vẫn có thể lưu file ở path nội bộ của framework.
+Canonical source **đã dùng trực tiếp `ordered-v2`**.
 
-Khi copy sang repo mới:
+Không render từ `docs/ai/` sang folder khác khi apply.
 
-1. lấy `ordered-v2.path_map` từ `.ai-dev-os/layouts.json`;
-2. source path có mapping → copy sang mapped target path;
-3. source path không có mapping → giữ nguyên target path;
-4. với text file đã copy, rewrite reference path theo:
-   - exact `path_map` trước;
-   - sau đó `prefix_map`;
-5. rewrite chỉ path/reference, không thay đổi project semantics.
-
-Ví dụ:
+Copy đúng canonical paths từ source:
 
 ```text
-source:
-docs/ai/03-ARCHITECTURE.md
-
-target:
-docs/00-overview/architecture.md
+docs/00-overview/
+docs/01-development/
+docs/02-modules/
+docs/03-knowledge/
+docs/04-operations/
+docs/05-decisions/
+docs/06-work/
 ```
 
-và:
+`.ai-dev-os/layouts.json` chỉ còn dùng để migrate repository cũ khi chạy `/update-ai-dev-os`.
 
-```text
-source reference:
-docs/knowledge/pitfalls/entries/
-
-target reference:
-docs/03-knowledge/pitfalls/entries/
-```
-
-Không để target vừa có ordered path vừa có bản duplicate ở legacy path.
+Không tạo lại legacy folders như `docs/ai/`, `docs/modules/`, `docs/knowledge/`, `docs/operations/`, `docs/decisions/`, `docs/work/`.
 
 ## 7. Core luôn apply
 
@@ -154,16 +140,19 @@ Mọi profile đều copy/render:
 - `AGENTS.md`
 - `docs/README.md`
 
-Project docs được render theo `ordered-v2`:
+Project docs copy trực tiếp từ canonical ordered source:
 
-- toàn bộ mapped file từ `docs/ai/*.md`;
-- `docs/modules/README.md`;
-- `docs/knowledge/README.md`;
-- `docs/operations/README.md`;
-- `docs/decisions/README.md`;
-- `docs/decisions/ADR-TEMPLATE.md`;
-- `docs/work/README.md`;
-- toàn bộ `docs/work/_template/*.md`.
+- toàn bộ `docs/00-overview/`;
+- toàn bộ `docs/01-development/`;
+- `docs/02-modules/README.md`;
+- `docs/03-knowledge/README.md`;
+- `docs/03-knowledge/business-rules.md`;
+- `docs/03-knowledge/known-pitfalls.md`;
+- `docs/04-operations/README.md`;
+- `docs/05-decisions/README.md`;
+- `docs/05-decisions/ADR-TEMPLATE.md`;
+- `docs/06-work/README.md`;
+- toàn bộ `docs/06-work/_template/*.md`.
 
 Không copy:
 
@@ -212,8 +201,6 @@ Copy thêm:
 - toàn bộ `.claude/skills/` trừ `.claude/skills/apply-ai-dev-os/`
 - toàn bộ `.claude/agents/`
 
-Text content phải được rewrite docs reference theo target layout.
-
 Không copy `.agents/skills/`.
 
 ### generic
@@ -244,7 +231,7 @@ Không tự xóa project docs hiện hữu.
 
 Sau khi copy thành công, chạy bootstrap một lần theo profile.
 
-Bootstrap phải làm việc với **target paths sau render**, không dùng source legacy path.
+Bootstrap phải làm việc trực tiếp với canonical ordered paths.
 
 Bootstrap phải:
 
