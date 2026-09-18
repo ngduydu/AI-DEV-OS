@@ -70,7 +70,7 @@ prompts/
 Dùng ADR:
 
 ```text
-docs/decisions/
+docs/05-decisions/
 ```
 
 ## Pull Request
