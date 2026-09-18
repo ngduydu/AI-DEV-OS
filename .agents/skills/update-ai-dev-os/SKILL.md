@@ -71,22 +71,11 @@ Trước mutation:
    - generic active nếu target có `.agents/`.
 7. Detect target docs layout:
    - có `.ai-dev-os/state.json` → đọc `docs_layout`;
-   - không có state → **coi là `legacy-v1`**.
+   - không có state → coi là `legacy-v1`.
 8. Validate layout tồn tại trong source `.ai-dev-os/layouts.json`.
+9. Nếu target = `legacy-v1` và source có `ordered-v2`, **lập migration plan sang ordered-v2**. Không bootstrap lại project.
 
-**Invariant quan trọng:** `/update-ai-dev-os` không tự đổi docs layout của target.
-
-```text
-repo cũ không có state
-→ legacy-v1
-→ giữ nguyên docs/ai, docs/modules, docs/operations...
-
-repo apply mới ordered-v2
-→ giữ ordered-v2
-→ update vào đúng 00-overview/01-development/... hiện có
-```
-
-Nếu target version bằng source version, vẫn verify manifest/migration/layout state. Nếu không có gì cần sửa thì report no-op.
+Nếu target version bằng source version nhưng layout còn legacy, vẫn phải chạy layout migration.
 
 ## Phase 3 — Safe branch
 
@@ -133,25 +122,106 @@ thì:
 
 Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
 
-### Conflict-safe knowledge migration — 2.6.0
+### Conflict-safe knowledge + ordered layout migration — 2.6.0
 
 Khi source version >= `2.6.0`:
 
-1. tạo/update `docs/knowledge/README.md` theo manifest;
-2. cập nhật conflict-safe Knowledge Sync policy qua managed files;
-3. preserve toàn bộ project-specific knowledge đang có trong shared/mixed docs;
-4. **không di chuyển hoặc tách knowledge cũ tự động** từ:
-   - `docs/ai/13-KNOWN-PITFALLS.md`;
-   - `docs/ai/05-BUSINESS-RULES.md`;
-   - module/operations docs hiện hữu;
-5. không tạo hàng loạt isolated file bằng cách đoán boundary từ text cũ;
-6. từ sau upgrade, knowledge mới của task đi theo `docs/knowledge/README.md`;
-7. update các framework/mixed routing file có thể còn chỉ dẫn append vào shared docs;
-8. verify không còn active skill/task contract nào route task discovery vào shared `KNOWN-PITFALLS`, shared module/operations list hoặc numbered ADR.
+1. preserve toàn bộ project-specific content hiện có;
+2. **không bootstrap lại project**;
+3. chuyển legacy docs sang `ordered-v2` bằng deterministic path mapping trong `.ai-dev-os/layouts.json`;
+4. exact canonical files dùng `path_map`;
+5. file legacy chưa biết trước nhưng nằm dưới root đã biết dùng `prefix_map`, giữ nguyên relative filename/subfolder;
+6. không split nội dung bên trong một file cũ bằng suy đoán;
+7. cập nhật conflict-safe Knowledge Sync policy;
+8. từ sau migration, task discovery mới dùng entry-per-file;
+9. update mọi active skill/routing còn hướng append vào shared docs;
+10. verify không mất file, không mất content, không có duplicate legacy/ordered scaffold.
 
-Lý do: automatic split của knowledge cũ có rủi ro mất context/semantics và tạo diff lớn trong repo đang có branch chạy song song.
+Ví dụ:
 
-Nếu mixed merge của `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` hoặc `docs/README.md` có nguy cơ mất project-specific content: report `CONFLICT`, không overwrite.
+```text
+docs/ai/03-ARCHITECTURE.md
+→ docs/00-overview/architecture.md
+
+docs/ai/custom-project-note.md
+→ docs/01-development/project/custom-project-note.md
+
+docs/modules/sales/*
+→ docs/02-modules/sales/*
+
+docs/operations/*
+→ docs/04-operations/*
+
+docs/decisions/*
+→ docs/05-decisions/*
+```
+
+Không được dùng bootstrap để tái tạo knowledge vì sẽ tốn token và có nguy cơ khác nội dung cũ.
+
+
+## Phase 4.5 — Legacy → ordered-v2 migration
+
+Chỉ chạy khi target layout = `legacy-v1`.
+
+### A. Inventory trước mutation
+
+1. Liệt kê toàn bộ file dưới:
+   - `docs/ai/`
+   - `docs/team/`
+   - `docs/modules/`
+   - `docs/knowledge/`
+   - `docs/operations/`
+   - `docs/decisions/`
+   - `docs/work/`
+2. Với mỗi file, tính:
+   - source path;
+   - destination path theo exact `path_map` hoặc longest matching `prefix_map`;
+   - content hash trước migration.
+3. Không bỏ qua file chỉ vì framework không biết tên file đó.
+4. Tạo migration plan đầy đủ trước khi move file đầu tiên.
+
+### B. Collision preflight
+
+Trước mutation, với mọi destination:
+
+- destination chưa tồn tại → OK;
+- destination tồn tại và content giống hệt → đánh dấu deduplicate;
+- destination tồn tại nhưng content khác → STOP toàn migration, report cả source/destination; không overwrite, không merge đoán.
+
+Không được bắt đầu move nếu còn collision chưa xử lý.
+
+### C. Move preserving content
+
+1. Tạo destination folder khi cần.
+2. Dùng `git mv` cho từng file để Git giữ rename history.
+3. Với duplicate-identical, giữ một bản và xóa path legacy bằng Git.
+4. Không sửa nội dung trong bước move.
+5. Không bootstrap, không regenerate project docs.
+
+### D. Rewrite references
+
+Sau khi move xong:
+
+1. search toàn repo các legacy path;
+2. rewrite exact path trước, prefix sau;
+3. áp dụng cho Markdown, skill, config/instruction text;
+4. không rewrite source code string nếu path đó là runtime value trừ khi evidence xác nhận đó là docs reference;
+5. search lại và yêu cầu không còn broken legacy reference thuộc migrated docs.
+
+### E. State
+
+Chỉ sau khi move + reference rewrite + verification pass:
+
+```json
+{
+  "docs_layout": "ordered-v2",
+  "docs_layout_version": 2
+}
+```
+
+ghi vào `.ai-dev-os/state.json`.
+
+Nếu fail ở bất kỳ bước nào: không ghi state ordered-v2 và không bump VERSION.
 
 ## Phase 5 — Apply managed files theo target layout
 
@@ -168,9 +238,9 @@ Manifest luôn dùng **canonical source path**.
 
 Với mỗi managed path:
 
-1. nếu target layout = `legacy-v1` → target path = source path;
-2. nếu target layout có exact mapping trong `path_map` → dùng mapped target path;
-3. nếu không exact match nhưng thuộc `prefix_map` → rewrite prefix;
+1. sau Phase 4.5, target layout phải là `ordered-v2`;
+2. nếu có exact mapping trong `path_map` → dùng mapped target path;
+3. nếu không exact match nhưng thuộc `prefix_map` → rewrite longest matching prefix;
 4. nếu không có mapping → giữ nguyên path.
 
 Ví dụ:
@@ -262,20 +332,23 @@ Chỉ report optional tool state nếu liên quan migration.
 Trước khi write VERSION:
 
 1. source VERSION và manifest version khớp;
-2. target docs layout không bị đổi trong quá trình update;
-3. tất cả active `framework` paths tồn tại ở **resolved target path**;
-4. mixed files vẫn chứa project-specific knowledge trước upgrade;
-5. không còn broken reference tới legacy path do layout rendering tạo ra;
-6. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
-7. nếu target có team policy thì `docs/README.md` route đúng;
-8. optional tool không bị auto-enabled;
-9. target working tree chỉ chứa expected upgrade changes;
-10. migration-specific checks trong UPGRADE.md đã pass;
-11. không còn unresolved conflict;
-12. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move;
-13. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
-14. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
-15. target không đồng thời có duplicate scaffold ở legacy path và ordered path.
+2. target docs layout = `ordered-v2`;
+3. inventory trước/sau có cùng số file logic, trừ duplicate-identical đã ghi nhận;
+4. mọi migrated file giữ nguyên content hash trước bước framework merge;
+5. tất cả active `framework` paths tồn tại ở **resolved target path**;
+6. mixed files vẫn chứa project-specific knowledge trước upgrade;
+7. không còn broken reference tới migrated legacy docs path;
+8. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
+9. nếu target có team policy thì route mới đúng;
+10. optional tool không bị auto-enabled;
+11. target working tree chỉ chứa expected upgrade + layout migration changes;
+12. migration-specific checks trong UPGRADE.md đã pass;
+13. không còn unresolved conflict;
+14. conflict-safe knowledge policy đã có;
+15. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
+16. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
+17. không còn duplicate scaffold ở legacy path và ordered path;
+18. không có bước bootstrap-project nào được chạy trong upgrade.
 
 Nếu verification fail: KHÔNG bump version.
 
@@ -284,18 +357,10 @@ Nếu verification fail: KHÔNG bump version.
 Chỉ sau khi Phase 7 pass:
 
 1. copy source `.ai-dev-os/manifest.json` và `.ai-dev-os/layouts.json` sang target;
-2. nếu target chưa có `.ai-dev-os/state.json`, tạo:
-   ```json
-   {
-     "docs_layout": "legacy-v1",
-     "docs_layout_version": 1
-   }
-   ```
-   để đánh dấu repo cũ mà **không move docs**;
-3. nếu target đã có state, preserve nguyên `docs_layout`;
-4. write target `.ai-dev-os/VERSION` = source version;
-5. chạy verification lần cuối;
-6. show diff summary.
+2. write/update `.ai-dev-os/state.json` = `ordered-v2 / 2`;
+3. write target `.ai-dev-os/VERSION` = source version;
+4. chạy verification lần cuối;
+5. show diff summary.
 
 Không tự commit/push/PR trừ khi user yêu cầu.
 
@@ -312,8 +377,10 @@ Phiên bản mới:
 - <source version>
 
 Docs layout:
-- legacy-v1 / ordered-v2
-- preserved, không auto-migrate layout
+- trước: legacy-v1 / ordered-v2
+- sau: ordered-v2
+- migrated files: <n>
+- preserved content: PASS / FAIL
 
 Nhánh:
 - <branch>
