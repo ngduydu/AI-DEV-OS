@@ -122,7 +122,7 @@ def main() -> None:
         "Legacy docs inventory",
         "Collision preflight failed",
         "Get-FileHash",
-        'git -C',
+        '$gitExe -C',
         "docs_layout = \"ordered-v2\"",
         "reset --hard HEAD",
     ]:
