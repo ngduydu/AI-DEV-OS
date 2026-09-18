@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 96
+Tổng số file: 98
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
@@ -16,6 +16,7 @@ Tổng số file: 96
 .ai-dev-os/manifest.json
 .claude/agents/change-reviewer.md
 .claude/agents/production-reviewer.md
+.claude/skills/apply-ai-dev-os/SKILL.md
 .claude/skills/bootstrap-project/SKILL.md
 .claude/skills/fix-bug/SKILL.md
 .claude/skills/implement-plan/SKILL.md
@@ -30,6 +31,7 @@ Tổng số file: 96
 .github/ISSUE_TEMPLATE/improvement-proposal.yml
 .github/copilot-instructions.md
 .github/pull_request_template.md
+.github/workflows/verify-powershell.yml
 AGENTS.md
 APPLY-TO-PROJECT.md
 CHANGELOG.md
