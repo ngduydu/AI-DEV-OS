@@ -272,3 +272,62 @@ Migration chỉ:
 - tạo `entries/` on demand khi task mới thực sự cần ghi knowledge.
 
 Vì vậy repo đã apply hiện tại không cần sửa tay từng file knowledge trước khi chạy `/update-ai-dev-os`.
+
+
+## Docs layout versioning — từ 2.6.0
+
+AI-DEV-OS tách **framework version** và **docs layout version**.
+
+Source of truth:
+
+```text
+.ai-dev-os/layouts.json
+```
+
+Có hai layout:
+
+```text
+legacy-v1
+→ repo đã apply trước 2.6.0
+→ giữ nguyên docs/ai, docs/modules, docs/operations, docs/decisions, docs/work
+
+ordered-v2
+→ repo apply mới
+→ docs/00-overview
+→ docs/01-development
+→ docs/02-modules
+→ docs/03-knowledge
+→ docs/04-operations
+→ docs/05-decisions
+→ docs/06-work
+```
+
+### Rule bắt buộc của /update-ai-dev-os
+
+`/update-ai-dev-os` **không được tự đổi docs layout**.
+
+Repo cũ chưa có `.ai-dev-os/state.json` được nhận diện là `legacy-v1`.
+
+Sau update thành công, updater có thể tạo state marker:
+
+```json
+{
+  "docs_layout": "legacy-v1",
+  "docs_layout_version": 1
+}
+```
+
+nhưng không move/rename project docs.
+
+Repo `ordered-v2` phải tiếp tục update vào ordered path hiện tại thông qua mapping trong `layouts.json`.
+
+### Vì sao không auto-migrate repo cũ sang ordered-v2?
+
+Vì team có thể đang có branch task song song tham chiếu path cũ. Tự move hàng loạt docs trong `/update-ai-dev-os` sẽ tạo:
+
+- diff lớn không liên quan task;
+- rename/delete conflict với branch đang chạy;
+- broken reference trong task branch cũ;
+- khó review và khó rollback.
+
+Nếu sau này muốn đổi một repo cũ sang `ordered-v2`, đó phải là migration riêng có chủ đích, không nằm trong updater framework thông thường.
