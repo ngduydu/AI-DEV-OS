@@ -84,18 +84,18 @@ Không cần fill toàn bộ template.
 Điền tối thiểu những gì đã biết chắc:
 
 ```text
-docs/ai/01-PROJECT-CONTEXT.md
-docs/ai/02-PRODUCT.md
-docs/ai/03-ARCHITECTURE.md
-docs/ai/06-CODING-STANDARDS.md
+docs/00-overview/project-context.md
+docs/00-overview/product.md
+docs/00-overview/architecture.md
+docs/01-development/coding-standards.md
 ```
 
 Khi đã có project skeleton thì bổ sung:
 
 ```text
-docs/ai/04-CODEBASE-MAP.md
-docs/ai/07-COMMANDS.md
-docs/ai/08-TESTING.md
+docs/00-overview/codebase-map.md
+docs/01-development/commands.md
+docs/01-development/testing.md
 ```
 
 Business rule/module/operations/ADR được fill dần khi project thực sự có knowledge đó.
@@ -124,7 +124,7 @@ Hãy chạy test.
 Hãy update docs.
 ```
 
-Những việc đó là trách nhiệm của AI-DEV-OS và `docs/ai/16-TASK-EXECUTION.md`.
+Những việc đó là trách nhiệm của AI-DEV-OS và `docs/01-development/ai-development.md`.
 
 Agent phải tự làm:
 
@@ -169,10 +169,10 @@ Ví dụ:
 AI thường cần:
 
 ```text
-docs/ai/16-TASK-EXECUTION.md
-docs/modules/contracts/*
-docs/ai/05-BUSINESS-RULES.md       # nếu có global rule liên quan
-docs/ai/06-CODING-STANDARDS.md
+docs/01-development/ai-development.md
+docs/02-modules/contracts/*
+docs/03-knowledge/business-rules.md       # nếu có global rule liên quan
+docs/01-development/coding-standards.md
 relevant contract code/tests
 ```
 
@@ -181,8 +181,8 @@ relevant contract code/tests
 AI thường cần:
 
 ```text
-docs/ai/16-TASK-EXECUTION.md
-docs/ai/06-CODING-STANDARDS.md
+docs/01-development/ai-development.md
+docs/01-development/coding-standards.md
 module docs liên quan
 canonical API example trong 04-CODEBASE-MAP.md
 API implementation/tests liên quan
@@ -193,10 +193,10 @@ API implementation/tests liên quan
 AI thường cần:
 
 ```text
-docs/ai/06-CODING-STANDARDS.md
-docs/ai/07-COMMANDS.md
-docs/operations/* liên quan
-docs/modules/<module>/*
+docs/01-development/coding-standards.md
+docs/01-development/commands.md
+docs/04-operations/* liên quan
+docs/02-modules/<module>/*
 existing migrations/schema/query patterns
 ```
 
@@ -205,8 +205,8 @@ existing migrations/schema/query patterns
 AI thường cần:
 
 ```text
-docs/ai/09-SECURITY.md
-docs/ai/03-ARCHITECTURE.md
+docs/01-development/security.md
+docs/00-overview/architecture.md
 module/auth docs nếu có
 canonical implementation hiện tại
 security/auth tests
