@@ -95,8 +95,12 @@ def main() -> None:
         text = script.read_text(encoding="utf-8-sig")
         forbid(text, "Invoke-Expression", str(script))
 
-    for legacy in [
-        root / "docs" / "ai",
+    for doc in root.rglob("*.md"):
+        text = doc.read_text(encoding="utf-8-sig")
+        forbid(text, "| iex", str(doc))
+        forbid(text, "ScriptBlock]::Create((irm ", str(doc))
+
+    for legacy in [        root / "docs" / "ai",
         root / "docs" / "modules",
         root / "docs" / "knowledge",
         root / "docs" / "operations",
