@@ -46,3 +46,7 @@ jobs:
       - name: Verify ordered docs layout compatibility
         shell: powershell
         run: python .\tools\tests\verify-docs-layout.py .
+
+      - name: Run docs layout migration self-test
+        shell: powershell
+        run: .\tools\tests\test-migrate-docs-layout.ps1
