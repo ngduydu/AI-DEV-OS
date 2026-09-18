@@ -29,19 +29,21 @@ Routing mặc định:
 
 ```text
 business rule / behavior
-→ docs/knowledge/business-rules/<domain>-<rule>.md
+→ docs/knowledge/business-rules/entries/<entry-id>-<rule>.md
 
 pitfall / failure mode
-→ docs/knowledge/pitfalls/<domain>-<failure-mode>.md
+→ docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 
 module discovery
-→ docs/knowledge/modules/<module>-<topic>.md
+→ docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md
 
 operations discovery
-→ docs/knowledge/operations/<system>-<topic>.md
+→ docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
 ```
 
-Không có central index phải append sau mỗi task.
+Không có central index/summary/changelog phải append sau mỗi task.
+
+Trước khi ghi, chạy Conflict Surface Gate: nếu destination là shared file và change chỉ là append item/link/registry/sequence, tạo isolated entry thay vì sửa shared file. Ưu tiên task/issue/branch id; không dùng global counter.
 
 Tên file dùng lowercase kebab-case, mô tả domain/behavior và không dùng sequence toàn cục.
 
