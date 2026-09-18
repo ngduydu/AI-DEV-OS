@@ -47,9 +47,14 @@ Research
 
 ## Naming
 
+Ưu tiên task identifier/branch slug để mỗi task có folder riêng:
+
 ```text
-docs/work/2026-09-02-user-subscription/
+docs/work/hhm-123-user-subscription/
+docs/work/2026-09-18-user-subscription/
 ```
+
+Không dùng một shared work file cho nhiều task song song.
 
 Có thể copy từ `_template/`.
 
@@ -63,11 +68,13 @@ Có thể copy từ `_template/`.
 
 ## Sau khi task hoàn thành
 
-Kiến thức nào còn giá trị lâu dài phải được chuyển về:
+Knowledge còn giá trị lâu dài phải đi theo conflict-safe routing:
 
-- `docs/ai/`
-- ADR
-- Skill
-- Known Pitfalls
+- business/pitfall/module/operations discovery → `docs/knowledge/**/entries/`;
+- architecture/public-contract decision → `docs/decisions/entries/`;
+- recurring procedure ổn định → Skill;
+- canonical docs chỉ sửa khi task thật sự thay đổi canonical truth.
+
+Không append vào shared summary/index chỉ để đăng ký knowledge mới.
 
 Không bắt AI đọc tất cả work folder cũ cho mọi task.

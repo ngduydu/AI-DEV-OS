@@ -26,20 +26,21 @@ Task context        → chỉ nạp những gì liên quan
 | Product / behavior | `docs/ai/02-PRODUCT.md`, business rules liên quan |
 | Architecture | `docs/ai/03-ARCHITECTURE.md`, `docs/decisions/` |
 | Tìm code / reuse / tạo implementation mới | `docs/ai/04-CODEBASE-MAP.md`, module docs, code/test hiện có |
-| Business rule | `docs/ai/05-BUSINESS-RULES.md`, `docs/modules/<module>/` |
+| Business rule | canonical: `docs/ai/05-BUSINESS-RULES.md`; task discovery: `docs/knowledge/business-rules/` |
 | Coding convention / naming / error / validation / DB / API format | `docs/ai/06-CODING-STANDARDS.md` |
 | Build / run / test / lint / format | `docs/ai/07-COMMANDS.md`, `docs/ai/08-TESTING.md` |
 | Security | `docs/ai/09-SECURITY.md` |
 | Git / PR | `docs/ai/10-GIT-WORKFLOW.md` |
 | Ready / ambiguity | `docs/ai/11-DEFINITION-OF-READY.md` |
 | Done | `docs/ai/12-DEFINITION-OF-DONE.md` |
-| Gotcha / lỗi khó nhớ | `docs/ai/13-KNOWN-PITFALLS.md` |
+| Gotcha / lỗi khó nhớ | existing/canonical route: `docs/ai/13-KNOWN-PITFALLS.md`; task discovery: `docs/knowledge/pitfalls/` |
 | Knowledge maintenance | `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` |
 | Context/token-efficient retrieval | `docs/ai/17-CONTEXT-RETRIEVAL.md` |
 | Chọn/đánh giá tool | `docs/ai/18-TOOL-ADOPTION.md` |
 | Module cụ thể | `docs/modules/` |
 | Deploy / migration / rollback / monitoring | `docs/operations/` |
 | Quyết định có trade-off | `docs/decisions/` |
+| Knowledge bền vững phát hiện trong task | `docs/knowledge/` |
 | Context chỉ cho task hiện tại | `docs/work/` |
 
 ## Khi tạo code mới
@@ -62,7 +63,7 @@ Không dùng convention hoặc architecture từ trí nhớ của agent nếu pr
 - Ưu tiên source gần nhất với behavior đang sửa: module docs → code/test → global docs.
 - Nếu docs và code mâu thuẫn, không tự chọn ngẫu nhiên; xác minh và nêu mâu thuẫn.
 - Không dùng docs cũ làm lý do để bỏ qua evidence rõ ràng từ code/test/history.
-- Knowledge bền vững phát hiện trong task phải được đồng bộ về đúng nơi trước khi Done.
+- Knowledge bền vững phát hiện trong task phải được đồng bộ theo `docs/knowledge/README.md`; mặc định tạo file riêng để tránh conflict giữa branch.
 - Nếu cùng một rule xuất hiện ở nhiều file và mâu thuẫn, ưu tiên sửa source of truth thay vì thêm một bản sao mới.
 
 ## Bootstrap project

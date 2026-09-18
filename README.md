@@ -154,11 +154,13 @@ Nhìn tổng thể:
 │
 ├── docs/
 │   ├── README.md
-│   ├── ai/
-│   ├── modules/
-│   ├── operations/
-│   ├── decisions/
-│   └── work/
+│   ├── 00-overview/       # repo apply mới
+│   ├── 01-development/
+│   ├── 02-modules/
+│   ├── 03-knowledge/
+│   ├── 04-operations/
+│   ├── 05-decisions/
+│   └── 06-work/
 │
 ├── .claude/
 │   ├── skills/
@@ -283,11 +285,13 @@ Mục tiêu của repo là có core knowledge chung, còn adapter nào được 
 Knowledge được phân loại:
 
 ```text
-Project-wide knowledge   → docs/ai/
-Module/domain knowledge  → docs/modules/<module>/
-Operations knowledge     → docs/operations/
-Architecture decisions   → docs/decisions/
-Task-only context         → docs/work/
+Overview/canonical map   → docs/00-overview/
+Development rules        → docs/01-development/
+Module/domain knowledge  → docs/02-modules/
+Task discoveries         → docs/03-knowledge/
+Operations knowledge     → docs/04-operations/
+Architecture decisions   → docs/05-decisions/
+Task-only context         → docs/06-work/
 Recurring procedure      → Skill
 ```
 
@@ -557,3 +561,43 @@ claude | generic | both
 ~~~
 
 Sau đó chỉ copy đúng adapter của profile đã chọn.
+
+
+## Conflict-safe Knowledge Sync
+
+Từ 2.6.0, knowledge phát hiện trong task không mặc định append vào shared docs.
+
+~~~text
+task discovery
+→ docs/knowledge/<category>/<descriptive-file>.md
+
+canonical truth thay đổi
+→ shared canonical docs
+~~~
+
+Mục tiêu là để nhiều branch song song tạo knowledge độc lập mà không sinh conflict rác.
+
+Repo đã apply phiên bản cũ chỉ cần chạy:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater preserve knowledge cũ và không auto-split/move nội dung project.
+
+
+### Docs layout có version
+
+Repo **apply mới** dùng `ordered-v2` để tree có thứ tự rõ ràng giống tài liệu kỹ thuật chuyên nghiệp:
+
+```text
+00-overview
+01-development
+02-modules
+03-knowledge
+04-operations
+05-decisions
+06-work
+```
+
+Repo đã apply phiên bản cũ được `/update-ai-dev-os` tự migrate sang `ordered-v2` bằng inventory → collision preflight → `git mv` nguyên file → rewrite reference → verify content. Updater **không bootstrap lại project**, không suy đoán để split nội dung file cũ và chỉ ghi state/version sau khi bảo toàn dữ liệu đã pass.

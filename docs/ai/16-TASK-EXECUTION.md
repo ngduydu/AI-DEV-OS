@@ -207,22 +207,44 @@ Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năn
 
 ## 11. Knowledge Sync — bắt buộc
 
+### Conflict-safe Knowledge Sync
+
 Trước khi Done, kiểm tra knowledge vừa học có giá trị cho task sau không.
 
-| Knowledge | Nơi lưu |
-|---|---|
-| Rule áp dụng gần như mọi task | giữ tối thiểu trong entry point hoặc global docs |
-| Project knowledge chung | `docs/ai/` |
-| Knowledge/business rule của module | `docs/modules/<module>/` |
-| Deploy/migration/rollback/monitoring | `docs/operations/` |
-| Quyết định có trade-off đáng kể | `docs/decisions/` ADR |
-| Gotcha khó nhớ/lặp lại | `docs/ai/13-KNOWN-PITFALLS.md` |
-| Procedure ổn định dùng lặp lại | Skill |
-| Context chỉ có giá trị cho task này | `docs/work/` |
+**Rule mặc định: knowledge phát hiện trong task → mặc định tạo file riêng trong `docs/knowledge/`.**
 
-Nếu user đã giải thích một rule bền vững để gỡ ambiguity, không để câu trả lời đó chết trong chat.
+Không append vào shared canonical file chỉ để ghi lại discovery của task.
 
-Nếu không có durable knowledge mới, report ngắn gọn: `Knowledge Sync: no durable changes`.
+```text
+business rule discovery
+→ docs/knowledge/business-rules/entries/<entry-id>-<rule>.md
+
+pitfall discovery
+→ docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
+
+module discovery
+→ docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md
+
+operations discovery
+→ docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
+```
+
+Không có central index/summary/changelog phải update sau mỗi task. Trước khi ghi durable artifact, chạy Conflict Surface Gate trong `docs/knowledge/README.md`: nếu change chỉ là append item/link/registry vào shared file thì tạo entry riêng.
+
+Chỉ sửa shared canonical docs khi **canonical truth thực sự thay đổi**, ví dụ architecture, project-wide rule, coding convention, command chính thức hoặc canonical implementation thay đổi do chính task này.
+
+Nếu user giải thích một durable rule để gỡ ambiguity, persist rule đó theo conflict-safe routing thay vì mặc định append vào `05-BUSINESS-RULES.md` hoặc `13-KNOWN-PITFALLS.md`.
+
+Existing knowledge từ trước 2.6.0 tiếp tục được đọc; không di chuyển hoặc tách knowledge cũ tự động.
+
+Nếu không có durable knowledge mới, report ngắn gọn:
+
+```text
+Knowledge Sync: no durable changes
+```
+
+Policy đầy đủ: `docs/knowledge/README.md`.
+
 
 ## 12. Production Gate
 

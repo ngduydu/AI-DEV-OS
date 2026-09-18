@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "framework_version": "2.5.1",
+  "framework_version": "2.6.0",
   "managed_files": [
     {
       "path": "UPGRADE.md",
@@ -81,6 +81,66 @@
       "path": ".agents/skills/update-ai-dev-os/SKILL.md",
       "ownership": "framework",
       "scope": "generic"
+    },
+    {
+      "path": "docs/knowledge/README.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/13-KNOWN-PITFALLS.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/update-project-knowledge/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/update-project-knowledge/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": "docs/ai/00-SETUP-CHECKLIST.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/modules/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/operations/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/work/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/fix-bug/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/fix-bug/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".ai-dev-os/layouts.json",
+      "ownership": "framework",
+      "scope": "core"
     }
   ]
 }

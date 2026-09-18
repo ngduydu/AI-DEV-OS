@@ -211,3 +211,124 @@ Vì vậy:
 - CodeGraph không được cài trong 2.4.0 do overlap.
 
 Product repo đã lên 2.3.0 có thể chạy `/update-ai-dev-os` bình thường để nhận framework 2.4.0. Machine setup có thể chạy riêng trước hoặc sau, không cần chạy lại updater chỉ vì cài tool.
+
+
+## 2.6.0 — Conflict-safe Knowledge Sync
+
+### Mục tiêu
+
+Giảm conflict khi nhiều task/branch song song cùng Knowledge Sync.
+
+Từ 2.6.0:
+
+~~~text
+task discovery
+→ mặc định tạo file riêng trong docs/knowledge/
+
+shared canonical docs
+→ chỉ sửa khi canonical truth thực sự thay đổi
+~~~
+
+### Migration cho project đã dùng 2.5.x hoặc cũ hơn
+
+Chạy:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater phải:
+
+1. preserve toàn bộ project-specific knowledge hiện có;
+2. **không bootstrap lại project**;
+3. tự migrate nguyên file legacy sang ordered folder bằng deterministic mapping;
+4. không split/rewrite semantics bên trong knowledge cũ bằng suy đoán;
+5. thêm conflict-safe knowledge policy;
+6. cập nhật Task Execution / Knowledge Sync / fix-bug routing;
+7. update mọi active instruction còn hướng task mới vào shared append-only files;
+8. với task-generated artifact mới, dùng `entries/<entry-id>-<slug>.md` và không dùng global sequence;
+9. chỉ bump VERSION sau migration + verification PASS.
+
+Các entry cũ trong `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/05-BUSINESS-RULES.md`, module docs và operations docs tiếp tục hợp lệ.
+
+### Team đang có branch task chạy song song
+
+Không cần dừng task đang chạy chỉ để migration framework.
+
+Sau khi task hiện tại merge/working tree sạch, chạy `/update-ai-dev-os` trước task tiếp theo.
+
+Branch đã sửa shared knowledge file trước 2.6.0 vẫn có thể gặp conflict khi merge; updater không thể xóa một conflict đã được tạo trước migration mà không đoán semantics. Từ task chạy trên 2.6.0 trở đi, discovery mới mặc định đi file riêng.
+
+### Compatibility với repo đang chạy task
+
+Các file cũ như `13-KNOWN-PITFALLS.md`, business rules, module/operations docs và ADR numbering cũ **không bị mất nội dung**.
+
+Migration có thể đổi **path** của nguyên file để đưa về ordered layout, nhưng:
+
+- dùng `git mv` để giữ rename history;
+- giữ content nguyên vẹn trước bước rewrite reference;
+- không split một file cũ thành nhiều file bằng suy đoán;
+- không bootstrap lại project;
+- không yêu cầu AI đọc lại toàn bộ codebase để tái tạo knowledge.
+
+Repo đã apply hiện tại chỉ cần chạy `/update-ai-dev-os`; updater tự inventory, move, rewrite reference và verify.
+
+
+## Docs layout versioning — từ 2.6.0
+
+AI-DEV-OS tách **framework version** và **docs layout version**.
+
+Source of truth:
+
+```text
+.ai-dev-os/layouts.json
+```
+
+Layout đích chuẩn:
+
+```text
+ordered-v2
+→ docs/00-overview
+→ docs/01-development
+→ docs/02-modules
+→ docs/03-knowledge
+→ docs/04-operations
+→ docs/05-decisions
+→ docs/06-work
+```
+
+### Repo cũ được migrate thế nào?
+
+Repo chưa có `.ai-dev-os/state.json` hoặc đang ở `legacy-v1` được `/update-ai-dev-os` tự migrate sang `ordered-v2`.
+
+Migration **không bootstrap lại project** và không tái sinh knowledge.
+
+Flow bắt buộc:
+
+```text
+inventory toàn bộ docs legacy
+→ resolve destination bằng path_map/prefix_map
+→ collision preflight
+→ git mv giữ nguyên content
+→ rewrite docs references
+→ semantic merge framework rules
+→ verify file/content preservation
+→ ghi state ordered-v2
+→ bump VERSION cuối cùng
+```
+
+### Bảo toàn dữ liệu
+
+- exact canonical file dùng `path_map`;
+- file project-specific không biết trước vẫn được giữ bằng `prefix_map`;
+- không split nội dung bên trong file cũ bằng suy đoán;
+- destination khác nội dung → STOP trước mutation, không overwrite;
+- destination giống hệt → deduplicate có kiểm soát;
+- content hash được kiểm tra trước/sau bước move;
+- không chạy `bootstrap-project` trong upgrade.
+
+### Branch đang chạy
+
+Migration layout là thay đổi có chủ đích của framework. Git rename history phải được giữ bằng `git mv` để branch cũ có cơ hội merge rename-aware.
+
+Conflict đã được tạo từ trước khi migration (ví dụ một branch đang sửa cùng shared file legacy) không thể được xóa bằng cách đoán semantics. Nhưng sau migration, task mới không còn append discovery vào shared docs nên conflict rác không tiếp tục phát sinh.

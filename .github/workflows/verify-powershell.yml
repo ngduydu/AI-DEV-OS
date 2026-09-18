@@ -11,6 +11,8 @@ on:
 
 jobs:
   parse-windows-powershell:
+    env:
+      PYTHONUTF8: 1
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,3 +39,16 @@ jobs:
       - name: Verify apply agent selection contract
         shell: powershell
         run: python .\tools\tests\verify-apply-agent-selection.py .
+
+      - name: Verify conflict-safe knowledge sync contract
+        shell: powershell
+        run: python .\tools\tests\verify-conflict-safe-knowledge.py .
+
+
+      - name: Verify ordered docs layout compatibility
+        shell: powershell
+        run: python .\tools\tests\verify-docs-layout.py .
+
+      - name: Run docs layout migration self-test
+        shell: powershell
+        run: .\tools\tests\test-migrate-docs-layout.ps1

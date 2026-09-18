@@ -35,6 +35,7 @@ Trước khi sửa TARGET:
 3. Đọc:
    - `.ai-dev-os/VERSION`
    - `.ai-dev-os/manifest.json`
+   - `.ai-dev-os/layouts.json`
    - `UPGRADE.md`
 4. Xác nhận source working tree clean.
 5. Xác nhận source branch là `main`.
@@ -44,6 +45,7 @@ Trước khi sửa TARGET:
    ```
 7. Đọc lại VERSION + manifest sau pull.
 8. Xác nhận `manifest.framework_version == VERSION`.
+9. Xác nhận `layouts.json` có ít nhất `legacy-v1` và `ordered-v2`.
 
 Nếu bất kỳ check nào fail: STOP trước target mutation.
 
@@ -67,8 +69,13 @@ Trước mutation:
 6. Detect adapters:
    - Claude active nếu target có `CLAUDE.md` hoặc `.claude/`;
    - generic active nếu target có `.agents/`.
+7. Detect target docs layout:
+   - có `.ai-dev-os/state.json` → đọc `docs_layout`;
+   - không có state → coi là `legacy-v1`.
+8. Validate layout tồn tại trong source `.ai-dev-os/layouts.json`.
+9. Nếu target = `legacy-v1` và source có `ordered-v2`, **lập migration plan sang ordered-v2**. Không bootstrap lại project.
 
-Nếu target version bằng source version, vẫn verify manifest/migration state. Nếu không có gì cần sửa thì report no-op.
+Nếu target version bằng source version nhưng layout còn legacy, vẫn phải chạy layout migration.
 
 ## Phase 3 — Safe branch
 
@@ -115,9 +122,136 @@ thì:
 
 Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
 
-## Phase 5 — Apply managed files
+### Conflict-safe knowledge + ordered layout migration — 2.6.0
 
-Đọc `.ai-dev-os/manifest.json` từ SOURCE.
+Khi source version >= `2.6.0`:
+
+1. preserve toàn bộ project-specific content hiện có;
+2. **không bootstrap lại project**;
+3. chuyển legacy docs sang `ordered-v2` bằng deterministic path mapping trong `.ai-dev-os/layouts.json`;
+4. exact canonical files dùng `path_map`;
+5. file legacy chưa biết trước nhưng nằm dưới root đã biết dùng `prefix_map`, giữ nguyên relative filename/subfolder;
+6. không split nội dung bên trong một file cũ bằng suy đoán;
+7. cập nhật conflict-safe Knowledge Sync policy;
+8. từ sau migration, task discovery mới dùng entry-per-file;
+9. update mọi active skill/routing còn hướng append vào shared docs;
+10. verify không mất file, không mất content, không có duplicate legacy/ordered scaffold.
+
+Ví dụ:
+
+```text
+docs/ai/03-ARCHITECTURE.md
+→ docs/00-overview/architecture.md
+
+docs/ai/custom-project-note.md
+→ docs/01-development/project/custom-project-note.md
+
+docs/modules/sales/*
+→ docs/02-modules/sales/*
+
+docs/operations/*
+→ docs/04-operations/*
+
+docs/decisions/*
+→ docs/05-decisions/*
+```
+
+Không được dùng bootstrap để tái tạo knowledge vì sẽ tốn token và có nguy cơ khác nội dung cũ.
+
+
+## Phase 4.5 — Legacy → ordered-v2 migration
+
+Chỉ chạy khi target layout = `legacy-v1`.
+
+### A. Dùng deterministic migrator, không đọc/viết tay từng file
+
+Ưu tiên chạy script từ canonical SOURCE:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File <source>/tools/migrate-docs-layout.ps1 -TargetRoot <target>
+```
+
+Dry-run này tự:
+
+- inventory toàn bộ legacy docs;
+- resolve destination bằng exact `path_map` rồi longest `prefix_map`;
+- hash từng file;
+- phát hiện collision trước mutation;
+- liệt kê migration plan.
+
+Nếu dry-run fail: STOP, không tự xử lý bằng suy đoán.
+
+### B. Collision preflight
+
+Trước mutation, với mọi destination:
+
+- destination chưa tồn tại → OK;
+- destination tồn tại và content giống hệt → đánh dấu deduplicate;
+- destination tồn tại nhưng content khác → STOP toàn migration, report cả source/destination; không overwrite, không merge đoán.
+
+Không được bắt đầu move nếu còn collision chưa xử lý.
+
+### C. Apply bằng script
+
+Sau dry-run PASS:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File <source>/tools/migrate-docs-layout.ps1 -TargetRoot <target> -Apply
+```
+
+Script phải tự:
+
+1. yêu cầu target working tree clean;
+2. `git mv` nguyên file để giữ rename history;
+3. deduplicate chỉ khi source/destination hash giống hệt;
+4. verify hash ngay sau move;
+5. rewrite reference chỉ trong docs/instruction Markdown, không rewrite application source code;
+6. ghi `.ai-dev-os/state.json = ordered-v2 / 2`;
+7. rollback về HEAD nếu migration fail giữa chừng.
+
+Không bootstrap, không regenerate project knowledge, không yêu cầu agent đọc toàn bộ nội dung file để tự phân loại.
+
+## Phase 5 — Apply managed files theo target layout
+
+Đọc:
+
+- `.ai-dev-os/manifest.json`
+- `.ai-dev-os/layouts.json`
+
+từ SOURCE.
+
+### Resolve target path
+
+Manifest luôn dùng **canonical source path**.
+
+Với mỗi managed path:
+
+1. sau Phase 4.5, target layout phải là `ordered-v2`;
+2. nếu có exact mapping trong `path_map` → dùng mapped target path;
+3. nếu không exact match nhưng thuộc `prefix_map` → rewrite longest matching prefix;
+4. nếu không có mapping → giữ nguyên path.
+
+Ví dụ:
+
+```text
+source manifest:
+docs/ai/16-TASK-EXECUTION.md
+
+legacy-v1 target:
+docs/ai/16-TASK-EXECUTION.md
+
+ordered-v2 target:
+docs/01-development/ai-development.md
+```
+
+### Rewrite reference trong text
+
+Khi source text được apply vào target:
+
+1. rewrite exact source path theo `path_map`;
+2. rewrite folder prefix theo `prefix_map`;
+3. chỉ rewrite path/reference, không đổi project semantics;
+4. không tạo duplicate legacy + ordered path.
 
 Chỉ xét entry active theo target adapter:
 
@@ -127,31 +261,38 @@ Chỉ xét entry active theo target adapter:
 
 ### ownership = framework
 
-Update target path từ canonical source.
+Update **resolved target path** từ canonical source, sau khi render references theo target layout.
 
 Không dùng template/project file cũ làm source.
 
-Nếu target path không tồn tại, create.
+Nếu resolved target path không tồn tại, create.
 
 ### ownership = mixed
 
 Không copy đè.
 
-Thực hiện semantic merge:
+Thực hiện semantic merge trên **resolved target path**:
 
-1. đọc source canonical;
+1. đọc source canonical và render reference theo target layout;
 2. đọc target hiện tại;
 3. giữ toàn bộ project-specific knowledge/routing/rule còn đúng;
 4. thêm framework rule mới chưa có;
 5. loại duplicate rõ ràng;
 6. không thay project-specific content bằng placeholder/template source.
 
-Mixed files đặc biệt:
+Mixed files đặc biệt theo canonical source path:
 
 - `AGENTS.md`
 - `docs/README.md`
+- `docs/ai/00-SETUP-CHECKLIST.md`
 - `docs/ai/04-CODEBASE-MAP.md`
 - `docs/ai/14-AI-SYSTEM-MAINTENANCE.md`
+- `docs/decisions/README.md`
+- `docs/modules/README.md`
+- `docs/operations/README.md`
+- `docs/work/README.md`
+
+Khi target = `ordered-v2`, các path trên phải resolve sang folder số tương ứng trước khi merge.
 
 Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
 
@@ -179,14 +320,23 @@ Chỉ report optional tool state nếu liên quan migration.
 Trước khi write VERSION:
 
 1. source VERSION và manifest version khớp;
-2. tất cả active `framework` paths tồn tại ở target;
-3. mixed files vẫn chứa project-specific knowledge trước upgrade;
-4. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
-5. nếu target có team policy thì `docs/README.md` route đúng;
-6. optional tool không bị auto-enabled;
-7. target working tree chỉ chứa expected upgrade changes;
-8. migration-specific checks trong UPGRADE.md đã pass;
-9. không còn unresolved conflict.
+2. target docs layout = `ordered-v2`;
+3. inventory trước/sau có cùng số file logic, trừ duplicate-identical đã ghi nhận;
+4. mọi migrated file giữ nguyên content hash trước bước framework merge;
+5. tất cả active `framework` paths tồn tại ở **resolved target path**;
+6. mixed files vẫn chứa project-specific knowledge trước upgrade;
+7. không còn broken reference tới migrated legacy docs path;
+8. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
+9. nếu target có team policy thì route mới đúng;
+10. optional tool không bị auto-enabled;
+11. target working tree chỉ chứa expected upgrade + layout migration changes;
+12. migration-specific checks trong UPGRADE.md đã pass;
+13. không còn unresolved conflict;
+14. conflict-safe knowledge policy đã có;
+15. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
+16. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
+17. không còn duplicate scaffold ở legacy path và ordered path;
+18. không có bước bootstrap-project nào được chạy trong upgrade.
 
 Nếu verification fail: KHÔNG bump version.
 
@@ -194,10 +344,11 @@ Nếu verification fail: KHÔNG bump version.
 
 Chỉ sau khi Phase 7 pass:
 
-1. copy source `.ai-dev-os/manifest.json` sang target;
-2. write target `.ai-dev-os/VERSION` = source version;
-3. chạy verification lần cuối;
-4. show diff summary.
+1. copy source `.ai-dev-os/manifest.json` và `.ai-dev-os/layouts.json` sang target;
+2. xác nhận migrator đã ghi `.ai-dev-os/state.json = ordered-v2 / 2`;
+3. write target `.ai-dev-os/VERSION` = source version;
+4. chạy verification lần cuối;
+5. show diff summary.
 
 Không tự commit/push/PR trừ khi user yêu cầu.
 
@@ -212,6 +363,12 @@ Phiên bản trước:
 
 Phiên bản mới:
 - <source version>
+
+Docs layout:
+- trước: legacy-v1 / ordered-v2
+- sau: ordered-v2
+- migrated files: <n>
+- preserved content: PASS / FAIL
 
 Nhánh:
 - <branch>
