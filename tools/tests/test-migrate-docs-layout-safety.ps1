@@ -41,8 +41,16 @@ try {
     Invoke-GitCommand $collisionRepo @("add", ".")
     Invoke-GitCommand $collisionRepo @("commit", "-m", "collision fixture")
 
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $migrator -TargetRoot $collisionRepo -LayoutFile $layouts *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $previousEap = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $migrator -TargetRoot $collisionRepo -LayoutFile $layouts *> $null
+        $collisionExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousEap
+    }
+    if ($collisionExitCode -eq 0) {
         throw "Collision safety test expected failure."
     }
 
@@ -69,8 +77,16 @@ try {
     $layout.layouts.'ordered-v2'.prefix_map.'docs/ai/' = "../outside/"
     ($layout | ConvertTo-Json -Depth 20) | Set-Content -LiteralPath $maliciousLayout -Encoding UTF8
 
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $migrator -TargetRoot $escapeRepo -LayoutFile $maliciousLayout *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $previousEap = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $migrator -TargetRoot $escapeRepo -LayoutFile $maliciousLayout *> $null
+        $escapeExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousEap
+    }
+    if ($escapeExitCode -eq 0) {
         throw "Path-escape safety test expected failure."
     }
 
