@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 99
+Tổng số file: 102
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
@@ -68,10 +68,12 @@ docs/ai/17-CONTEXT-RETRIEVAL.md
 docs/ai/18-TOOL-ADOPTION.md
 docs/decisions/ADR-TEMPLATE.md
 docs/decisions/README.md
+docs/knowledge/README.md
 docs/modules/README.md
 docs/operations/README.md
 docs/superpowers/plans/2026-09-16-framework-lifecycle-context-retrieval.md
 docs/superpowers/plans/2026-09-18-ai-dev-machine-tooling-setup.md
+docs/superpowers/plans/2026-09-18-conflict-safe-knowledge-sync.md
 docs/superpowers/plans/2026-09-18-global-ai-dev-os-updater.md
 docs/superpowers/specs/2026-09-16-framework-lifecycle-context-retrieval-design.md
 docs/superpowers/specs/2026-09-18-global-ai-dev-os-updater-design.md
@@ -100,6 +102,7 @@ templates/mcp/claude-codebase-memory.json
 tools/install-personal-updater.ps1
 tools/setup-ai-dev-machine.ps1
 tools/tests/verify-apply-agent-selection.py
+tools/tests/verify-conflict-safe-knowledge.py
 tools/tests/verify-machine-setup.py
 tools/tests/verify-updater.py
 ~~~
