@@ -16,6 +16,7 @@ LEGACY_PREFIXES = (
 # These files intentionally describe migration FROM the legacy layout.
 ALLOW_LEGACY_REFERENCES = {
     ".claude/skills/update-ai-dev-os/SKILL.md",
+    ".claude/skills/apply-ai-dev-os/SKILL.md",
     ".agents/skills/update-ai-dev-os/SKILL.md",
     ".ai-dev-os/layouts.json",
     "UPGRADE.md",
