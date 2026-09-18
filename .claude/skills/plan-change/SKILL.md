@@ -14,4 +14,4 @@ description: Create a concrete implementation plan for a non-trivial feature, bu
 7. Include data migration, compatibility, rollback, security and observability where relevant.
 8. Explicitly list assumptions and risks.
 9. Avoid unrelated cleanup.
-10. For substantial work, use `docs/work/_template/PLAN.md`.
+10. For substantial work, use `docs/06-work/_template/PLAN.md`.
