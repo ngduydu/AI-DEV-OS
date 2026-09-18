@@ -1,0 +1,87 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+def fail(message: str) -> None:
+    print(f"FAIL: {message}")
+    raise SystemExit(1)
+
+
+def require(text: str, needle: str, label: str) -> None:
+    if needle not in text:
+        fail(f"{label}: missing {needle!r}")
+
+
+def forbid(text: str, needle: str, label: str) -> None:
+    if needle.lower() in text.lower():
+        fail(f"{label}: forbidden {needle!r}")
+
+
+def main() -> None:
+    root = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parents[2]
+
+    workflow = (root / ".github" / "workflows" / "verify-powershell.yml").read_text(encoding="utf-8")
+    require(workflow, "permissions:\n  contents: read", "workflow permissions")
+    require(
+        workflow,
+        "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "pinned checkout",
+    )
+    require(workflow, "persist-credentials: false", "checkout credentials")
+    require(workflow, "Verify security hardening contract", "security CI")
+
+    setup = (root / "tools" / "setup-ai-dev-machine.ps1").read_text(encoding="utf-8-sig")
+    require(
+        setup,
+        '$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"',
+        "third-party installer pin",
+    )
+    require(
+        setup,
+        "raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1",
+        "third-party installer URL",
+    )
+    forbid(
+        setup,
+        "raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1",
+        "floating third-party installer",
+    )
+
+    migrator = (root / "tools" / "migrate-docs-layout.ps1").read_text(encoding="utf-8")
+    for needle in [
+        "function Get-SafeFiles",
+        "Refusing reparse-point entry during docs migration",
+        "function Resolve-SafeDestinationFullPath",
+        "Destination escapes target repository",
+        "[string[]]$GitArgs",
+        "Target working tree must be clean before migration",
+        "reset --hard HEAD",
+        "clean -fd",
+    ]:
+        require(migrator, needle, "migration hardening")
+
+    forbid(migrator, "[string[]]$Args", "PowerShell automatic Args collision")
+
+    tools_dir = root / "tools"
+    for script in tools_dir.rglob("*.ps1"):
+        text = script.read_text(encoding="utf-8-sig")
+        forbid(text, "Invoke-Expression", str(script))
+
+    for legacy in [
+        root / "docs" / "ai",
+        root / "docs" / "modules",
+        root / "docs" / "knowledge",
+        root / "docs" / "operations",
+        root / "docs" / "decisions",
+        root / "docs" / "work",
+    ]:
+        if legacy.exists():
+            fail(f"legacy docs root still exists: {legacy.relative_to(root)}")
+
+    print("PASS: security hardening contract")
+
+
+if __name__ == "__main__":
+    main()
