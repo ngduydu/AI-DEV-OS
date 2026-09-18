@@ -245,7 +245,9 @@ Updater phải:
 4. preserve project-specific knowledge hiện có;
 5. **không di chuyển hoặc tách knowledge cũ tự động**;
 6. không tự tạo hàng loạt file knowledge từ nội dung cũ;
-7. chỉ bump VERSION sau verification.
+7. chỉ bump VERSION sau verification;
+8. update các active skill/routing docs còn hướng task mới vào shared append-only files;
+9. với task-generated artifact mới, dùng `entries/<entry-id>-<slug>.md` và không dùng global sequence.
 
 Các entry cũ trong `docs/ai/13-KNOWN-PITFALLS.md`, `docs/ai/05-BUSINESS-RULES.md`, module docs và operations docs tiếp tục hợp lệ.
 
@@ -256,3 +258,17 @@ Không cần dừng task đang chạy chỉ để migration framework.
 Sau khi task hiện tại merge/working tree sạch, chạy `/update-ai-dev-os` trước task tiếp theo.
 
 Branch đã sửa shared knowledge file trước 2.6.0 vẫn có thể gặp conflict khi merge; updater không thể xóa một conflict đã được tạo trước migration mà không đoán semantics. Từ task chạy trên 2.6.0 trở đi, discovery mới mặc định đi file riêng.
+
+### Compatibility với repo đang chạy task
+
+Updater **không auto-move/rename/xóa** knowledge cũ và không rewrite project-owned entries.
+
+Các file cũ như `13-KNOWN-PITFALLS.md`, business rules, module/operations docs, ADR numbering cũ vẫn tiếp tục được đọc.
+
+Migration chỉ:
+- thêm policy/routing mới;
+- cập nhật framework-owned skill/contract;
+- semantic-merge mixed routing docs và preserve project content;
+- tạo `entries/` on demand khi task mới thực sự cần ghi knowledge.
+
+Vì vậy repo đã apply hiện tại không cần sửa tay từng file knowledge trước khi chạy `/update-ai-dev-os`.
