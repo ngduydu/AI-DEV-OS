@@ -5,11 +5,11 @@ $migrator = Join-Path $repoRoot "tools/migrate-docs-layout.ps1"
 $layouts = Join-Path $repoRoot ".ai-dev-os/layouts.json"
 $temp = Join-Path ([IO.Path]::GetTempPath()) ("ai-dev-os-layout-test-" + [Guid]::NewGuid().ToString("N"))
 
-function Invoke-GitCommand([string]$Root, [string[]]$Args) {
+function Invoke-GitCommand([string]$Root, [string[]]$GitArgs) {
     $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
-    & $gitExe -C $Root @Args | Out-Null
+    & $gitExe -C $Root @GitArgs | Out-Null
     if ($LASTEXITCODE -ne 0) {
-        throw ("git failed: {0}" -f ($Args -join " "))
+        throw ("git failed: {0}" -f ($GitArgs -join " "))
     }
 }
 
