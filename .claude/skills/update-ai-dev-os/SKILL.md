@@ -5,6 +5,12 @@ description: Use when a repository already contains AI-DEV-OS files and needs to
 
 # Update AI-DEV-OS
 
+## Ngôn ngữ phản hồi
+
+Mọi phản hồi, báo cáo, cảnh báo, câu hỏi và kết quả cuối cùng gửi cho người dùng phải bằng **tiếng Việt**.
+
+Có thể giữ nguyên tên file, command, path, Git branch, technical identifier hoặc error message gốc khi cần chính xác, nhưng phần giải thích cho người dùng phải bằng tiếng Việt.
+
 Mục tiêu: nâng repository hiện tại lên AI-DEV-OS mới nhất từ canonical local source, preserve project knowledge và chỉ bump version sau verification.
 
 ## Source of truth
@@ -195,44 +201,44 @@ Chỉ sau khi Phase 7 pass:
 
 Không tự commit/push/PR trừ khi user yêu cầu.
 
-## Report
+## Báo cáo cuối
 
 ```text
-AI-DEV-OS source:
-- <absolute path>
+Nguồn AI-DEV-OS:
+- <đường dẫn tuyệt đối>
 
-From:
+Phiên bản trước:
 - <version | legacy-unversioned>
 
-To:
+Phiên bản mới:
 - <source version>
 
-Branch:
+Nhánh:
 - <branch>
 
-Updated framework-owned:
+File framework đã cập nhật:
 - ...
 
-Merged mixed:
+File mixed đã merge:
 - ...
 
-Migrated:
+Migration đã thực hiện:
 - ...
 
-Preserved project-owned:
+Project knowledge đã giữ nguyên:
 - ...
 
-Conflicts:
-- none / ...
+Conflict:
+- không có / ...
 
 Optional tools:
-- unchanged / ...
+- không đổi / ...
 
-Verification:
+Kiểm tra:
 - PASS / FAIL
 
 Version:
-- updated / not updated
+- đã cập nhật / chưa cập nhật
 ```
 
 Không claim success nếu VERSION chưa được write sau verification.
