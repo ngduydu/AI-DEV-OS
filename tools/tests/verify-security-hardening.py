@@ -43,6 +43,12 @@ def main() -> None:
         "raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1",
         "third-party installer URL",
     )
+    require(setup, '$CodebaseMemoryVersion = "v0.11.0"', "pinned codebase-memory release")
+    require(
+        setup,
+        "releases/download/$CodebaseMemoryVersion",
+        "pinned codebase-memory release URL",
+    )
     require(setup, "npm install -g repomix@1.18.0", "pinned Repomix package")
     forbid(
         setup,
