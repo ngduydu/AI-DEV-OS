@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Normalize-Rel([string]$Path) {
-    return ($Path -replace "\\", "/").TrimStart("./")
+    return ($Path -replace "\\", "/").TrimStart([char[]]@(".", "/"))
 }
 
 function Get-MapValue($Object, [string]$Name) {
