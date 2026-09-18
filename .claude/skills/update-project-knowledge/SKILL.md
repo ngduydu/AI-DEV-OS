@@ -19,45 +19,93 @@ Xem lại:
 - recurring failure/gotcha;
 - procedure có khả năng lặp lại.
 
-## 2. Route knowledge đúng chỗ
+## 2. Conflict-safe default
 
-- project-wide knowledge → `docs/ai/`;
-- module/domain knowledge → `docs/modules/<module>/`;
-- operations knowledge → `docs/operations/`;
-- architecture/public contract trade-off → `docs/decisions/` ADR;
-- recurring multi-step procedure → create/update Skill;
-- non-obvious recurring failure → `docs/ai/13-KNOWN-PITFALLS.md`;
-- task-only context → `docs/work/`.
+Knowledge phát hiện trong task **mặc định tạo file riêng** dưới `docs/knowledge/`.
 
-Giữ `AGENTS.md`/`CLAUDE.md` cực ngắn; không đẩy detailed knowledge vào always-on context.
+Không sửa shared canonical docs chỉ để lưu discovery của task.
 
-## 3. User clarification
+Routing mặc định:
+
+```text
+business rule / behavior
+→ docs/knowledge/business-rules/<domain>-<rule>.md
+
+pitfall / failure mode
+→ docs/knowledge/pitfalls/<domain>-<failure-mode>.md
+
+module discovery
+→ docs/knowledge/modules/<module>-<topic>.md
+
+operations discovery
+→ docs/knowledge/operations/<system>-<topic>.md
+```
+
+Không có central index phải append sau mỗi task.
+
+Tên file dùng lowercase kebab-case, mô tả domain/behavior và không dùng sequence toàn cục.
+
+## 3. Shared canonical docs chỉ sửa khi canonical truth đổi
+
+Không sửa shared canonical docs như:
+
+- `docs/ai/03-ARCHITECTURE.md`;
+- `docs/ai/04-CODEBASE-MAP.md`;
+- `docs/ai/05-BUSINESS-RULES.md`;
+- `docs/ai/13-KNOWN-PITFALLS.md`;
+- shared module/operations docs;
+
+chỉ để thêm một discovery của task.
+
+Chỉ sửa chúng khi task thực sự thay đổi canonical truth tương ứng.
+
+Nếu hai branch cùng thay canonical truth và conflict, đó là conflict có ý nghĩa cần review.
+
+## 4. User clarification
 
 Nếu user vừa trả lời một câu hỏi về business rule/behavior và câu trả lời có giá trị bền vững:
 
 ```text
 clarification
-→ persist knowledge
+→ tạo isolated knowledge file phù hợp
 → implement
 ```
 
-Không để task sau phải hỏi lại cùng một rule.
+Chỉ promote vào shared canonical docs nếu câu trả lời chính là thay đổi canonical contract.
 
-## 4. Hygiene
+## 5. Existing knowledge
 
-- Xóa/sửa guidance stale hoặc contradictory khi có evidence.
+Knowledge có từ trước 2.6.0 vẫn hợp lệ.
+
+Không di chuyển hoặc tách knowledge cũ tự động.
+
+Không rewrite `docs/ai/13-KNOWN-PITFALLS.md` hoặc các shared file chỉ để phù hợp layout mới.
+
+## 6. Hygiene
+
 - Không duplicate cùng một rule ở nhiều file.
 - Không biến assumption thành fact.
-- Không tạo docs/module/skill chỉ để đủ cấu trúc.
+- Không tạo knowledge file nếu không có durable knowledge thật.
+- Không tạo central index chỉ để liệt kê file.
+- Nếu isolated knowledge trở thành canonical source of truth, consolidate trong task maintenance riêng hoặc khi task thực sự thay đổi contract.
+- Giữ `AGENTS.md`/`CLAUDE.md` cực ngắn.
 
-## 5. Report
+Policy đầy đủ: `docs/knowledge/README.md`.
+
+## 7. Report
 
 Nếu có update:
 
 ```text
 Knowledge Sync:
-- Updated: <path>
-- Added: <path>
+- Added: docs/knowledge/<category>/<file>.md
+```
+
+Nếu canonical truth thật sự đổi:
+
+```text
+Knowledge Sync:
+- Updated canonical: <path>
 ```
 
 Nếu không có durable knowledge:
