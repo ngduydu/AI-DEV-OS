@@ -6,13 +6,13 @@ disable-model-invocation: true
 
 # Apply AI-DEV-OS
 
-Mục tiêu: apply AI-DEV-OS vào repository hiện tại bằng một lệnh, không copy tay và không mặc định sai agent.
+Mục tiêu: apply AI-DEV-OS vào repository hiện tại bằng một lệnh, với cấu trúc docs có thứ tự rõ ràng và không mặc định sai agent.
 
 Mọi phản hồi cho người dùng phải bằng tiếng Việt.
 
-## 1. Chọn agent profile trước khi sửa repository
+## 1. Chọn agent profile
 
-Nếu user chưa nói rõ agent profile trong cùng yêu cầu, **bắt buộc hỏi đúng một lần** trước khi apply:
+Nếu user chưa nói rõ agent profile trong cùng yêu cầu, hỏi đúng một lần:
 
 ```text
 Chọn agent profile để apply:
@@ -28,11 +28,7 @@ Giá trị hợp lệ:
 - `generic`
 - `both`
 
-Không được mặc định agent.
-
-Nếu user đã ghi rõ một trong ba giá trị trên thì dùng luôn, không hỏi lại.
-
-Không tự suy đoán agent từ việc skill này đang được gọi trong Claude Code.
+Không tự suy đoán agent.
 
 ## 2. Source
 
@@ -51,7 +47,9 @@ Trước khi sửa target:
 5. Đọc:
    - `.ai-dev-os/VERSION`
    - `.ai-dev-os/manifest.json`
-6. Nếu source preflight fail: dừng, không sửa target.
+   - `.ai-dev-os/layouts.json`
+6. Source version/manifest/layout schema phải hợp lệ.
+7. Nếu source preflight fail: dừng, không sửa target.
 
 ## 4. Preflight target
 
@@ -59,35 +57,113 @@ Trước khi sửa target:
 2. Target không được là chính AI-DEV-OS source.
 3. Target working tree phải clean.
 4. Nếu target đã có `.ai-dev-os/VERSION`: dừng và bảo dùng `/update-ai-dev-os`.
-5. Nếu target đã có AI-DEV-OS artifacts đáng kể như `docs/ai/16-TASK-EXECUTION.md`, `.claude/skills/bootstrap-project/SKILL.md`, `.agents/skills/bootstrap-project/SKILL.md` hoặc `UPGRADE.md`: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
+5. Nếu target đã có AI-DEV-OS artifacts đáng kể: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
 6. Nếu đang ở `main` hoặc `master`, tạo branch:
    `<git-user-slug>/apply-ai-dev-os-<version>`
    fallback: `ai-dev-os/apply-<version>`.
 
 Không tự commit/push/merge.
 
-## 5. Core luôn apply
+## 5. Docs layout mặc định cho repo apply mới
 
-Mọi profile đều copy:
+Repo apply mới dùng layout:
+
+```text
+docs/
+├── 00-overview/
+│   ├── project-context.md
+│   ├── product.md
+│   ├── architecture.md
+│   ├── codebase-map.md
+│   └── glossary.md
+│
+├── 01-development/
+│   ├── setup-checklist.md
+│   ├── coding-standards.md
+│   ├── commands.md
+│   ├── testing.md
+│   ├── security.md
+│   ├── git-workflow.md
+│   ├── definition-of-ready.md
+│   ├── definition-of-done.md
+│   ├── documentation-governance.md
+│   ├── ai-development.md
+│   ├── context-retrieval.md
+│   └── tool-adoption.md
+│
+├── 02-modules/
+├── 03-knowledge/
+├── 04-operations/
+├── 05-decisions/
+└── 06-work/
+```
+
+Tên folder có prefix số để:
+
+- nhìn tree biết ngay thứ tự đọc;
+- nhóm tài liệu theo purpose;
+- tránh folder ngang hàng lộn xộn;
+- giữ cấu trúc ổn định khi project lớn dần.
+
+Không tự nghĩ tên/path khác. Source of truth là `.ai-dev-os/layouts.json`, layout `ordered-v2`.
+
+## 6. Copy theo layout manifest
+
+Canonical source vẫn có thể lưu file ở path nội bộ của framework.
+
+Khi copy sang repo mới:
+
+1. lấy `ordered-v2.path_map` từ `.ai-dev-os/layouts.json`;
+2. source path có mapping → copy sang mapped target path;
+3. source path không có mapping → giữ nguyên target path;
+4. với text file đã copy, rewrite reference path theo:
+   - exact `path_map` trước;
+   - sau đó `prefix_map`;
+5. rewrite chỉ path/reference, không thay đổi project semantics.
+
+Ví dụ:
+
+```text
+source:
+docs/ai/03-ARCHITECTURE.md
+
+target:
+docs/00-overview/architecture.md
+```
+
+và:
+
+```text
+source reference:
+docs/knowledge/pitfalls/entries/
+
+target reference:
+docs/03-knowledge/pitfalls/entries/
+```
+
+Không để target vừa có ordered path vừa có bản duplicate ở legacy path.
+
+## 7. Core luôn apply
+
+Mọi profile đều copy/render:
 
 - `.ai-dev-os/VERSION`
 - `.ai-dev-os/manifest.json`
+- `.ai-dev-os/layouts.json`
 - `UPGRADE.md`
 - `AGENTS.md`
-
-### Project knowledge scaffold
-
-Mọi profile đều copy:
-
 - `docs/README.md`
-- `docs/knowledge/README.md`
-- toàn bộ `docs/ai/*.md`
-- `docs/modules/README.md`
-- `docs/operations/README.md`
-- `docs/decisions/README.md`
-- `docs/decisions/ADR-TEMPLATE.md`
-- `docs/work/README.md`
-- toàn bộ `docs/work/_template/*.md`
+
+Project docs được render theo `ordered-v2`:
+
+- toàn bộ mapped file từ `docs/ai/*.md`;
+- `docs/modules/README.md`;
+- `docs/knowledge/README.md`;
+- `docs/operations/README.md`;
+- `docs/decisions/README.md`;
+- `docs/decisions/ADR-TEMPLATE.md`;
+- `docs/work/README.md`;
+- toàn bộ `docs/work/_template/*.md`.
 
 Không copy:
 
@@ -104,25 +180,47 @@ Không copy:
 - `templates/`
 - machine setup scripts
 
-## 6. Adapter theo agent profile
+## 8. Target state
 
-### Profile: claude
+Sau khi render core thành công, tạo:
+
+```json
+{
+  "docs_layout": "ordered-v2",
+  "docs_layout_version": 2
+}
+```
+
+tại:
+
+```text
+.ai-dev-os/state.json
+```
+
+Đây là target-specific state.
+
+Không lấy `state.json` từ source.
+Không thêm project-specific state vào canonical manifest.
+
+## 9. Adapter theo agent profile
+
+### claude
 
 Copy thêm:
 
 - `CLAUDE.md`
-- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/`
+- toàn bộ `.claude/skills/` trừ `.claude/skills/apply-ai-dev-os/`
 - toàn bộ `.claude/agents/`
 
-Không copy:
+Text content phải được rewrite docs reference theo target layout.
 
-- `.agents/skills/`
+Không copy `.agents/skills/`.
 
-### Profile: generic
+### generic
 
-Copy thêm:
+Copy thêm toàn bộ `.agents/skills/`.
 
-- toàn bộ `.agents/skills/`
+Text content phải được rewrite docs reference theo target layout.
 
 Không copy:
 
@@ -130,94 +228,65 @@ Không copy:
 - `.claude/skills/`
 - `.claude/agents/`
 
-### Profile: both
+### both
 
-Copy thêm:
+Copy cả Claude adapter và generic adapter, nhưng bootstrap chỉ chạy một lần.
 
-- `CLAUDE.md`
-- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/`
-- toàn bộ `.claude/agents/`
-- toàn bộ `.agents/skills/`
-
-## 7. Collision rule
+## 10. Collision rule
 
 `/apply-ai-dev-os` chỉ dùng cho repo chưa apply framework.
 
-Chỉ kiểm tra collision trên các destination thuộc **core + profile đã chọn**.
+Nếu mapped destination quan trọng đã tồn tại với nội dung khác source/rendered content, dừng và báo collision thay vì overwrite.
 
-Nếu destination framework path quan trọng đã tồn tại với nội dung khác source, dừng và báo collision thay vì overwrite.
+Không tự xóa project docs hiện hữu.
 
-Không tự xóa knowledge/project docs hiện hữu.
+## 11. Bootstrap ngay sau apply
 
-## 8. Bootstrap ngay sau apply
+Sau khi copy thành công, chạy bootstrap một lần theo profile.
 
-Sau khi copy thành công, chạy bootstrap **một lần** theo profile:
-
-- `claude` → dùng `.claude/skills/bootstrap-project/SKILL.md`
-- `generic` → dùng `.agents/skills/bootstrap-project/SKILL.md`
-- `both` → dùng `.claude/skills/bootstrap-project/SKILL.md`; không chạy bootstrap lần hai
+Bootstrap phải làm việc với **target paths sau render**, không dùng source legacy path.
 
 Bootstrap phải:
 
 1. scan code/config/tests thật;
 2. cập nhật minimum reliable project knowledge;
 3. không tạo knowledge giả chỉ để fill template;
-4. kết thúc bằng `READY / PARTIAL / BLOCKED`.
+4. knowledge phát hiện theo conflict-safe entry-per-file;
+5. kết thúc bằng `READY / PARTIAL / BLOCKED`.
 
-## 9. Verification
+## 12. Verification
 
-Trước khi báo xong, verify chung:
+Trước khi báo xong, verify:
 
-- target có `.ai-dev-os/VERSION` và version khớp source;
-- target có `AGENTS.md`, `docs/README.md`;
-- không copy `docs/superpowers/`;
-- không copy machine setup scripts;
+- `.ai-dev-os/VERSION` khớp source;
+- `.ai-dev-os/state.json` = `ordered-v2 / 2`;
+- có đủ ordered roots:
+  - `docs/00-overview/`
+  - `docs/01-development/`
+  - `docs/02-modules/`
+  - `docs/03-knowledge/`
+  - `docs/04-operations/`
+  - `docs/05-decisions/`
+  - `docs/06-work/`;
+- không còn project scaffold duplicate dưới `docs/ai/`, `docs/modules/`, `docs/knowledge/`, `docs/operations/`, `docs/decisions/`, `docs/work/`;
+- rendered docs/skills không còn broken reference về legacy path;
+- không copy `docs/superpowers/` hoặc machine setup scripts;
 - bootstrap đã chạy hoặc báo rõ blocker;
 - chỉ có expected diff.
 
-Verify theo profile:
-
-### claude
-
-- có `CLAUDE.md`;
-- có `.claude/skills/bootstrap-project/SKILL.md`;
-- có `.claude/skills/update-ai-dev-os/SKILL.md`;
-- có `.claude/agents/`;
-- không có `.agents/skills/` do framework vừa copy.
-
-### generic
-
-- có `.agents/skills/bootstrap-project/SKILL.md`;
-- có `.agents/skills/update-ai-dev-os/SKILL.md`;
-- không có `CLAUDE.md` do framework vừa copy;
-- không có `.claude/` do framework vừa copy.
-
-### both
-
-- có toàn bộ điều kiện của Claude adapter;
-- có `.agents/skills/bootstrap-project/SKILL.md`;
-- có `.agents/skills/update-ai-dev-os/SKILL.md`.
-
-## 10. Báo cáo cuối
+## 13. Báo cáo cuối
 
 ```text
 AI-DEV-OS:
 - Applied version: <version>
 - Agent profile: claude / generic / both
+- Docs layout: ordered-v2
 
 Branch:
 - <branch>
 
-Applied:
-- core
-- project knowledge scaffold
-- <adapter đã chọn>
-
 Bootstrap:
 - READY / PARTIAL / BLOCKED
-
-Material unknowns:
-- ...
 
 Next:
 - giao task bình thường
