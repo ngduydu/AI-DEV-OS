@@ -58,9 +58,13 @@ Trước khi sửa target:
 3. Target working tree phải clean.
 4. Nếu target đã có `.ai-dev-os/VERSION`: dừng và bảo dùng `/update-ai-dev-os`.
 5. Nếu target đã có AI-DEV-OS artifacts đáng kể: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
-6. Nếu đang ở `main` hoặc `master`, tạo branch:
-   `<git-user-slug>/apply-ai-dev-os-<version>`
-   fallback: `ai-dev-os/apply-<version>`.
+6. Apply phải chạy trên branch riêng:
+   - nếu current branch là `main` hoặc `master`, tạo:
+     `<git-user-slug>/apply-ai-dev-os-<version>`
+     fallback: `ai-dev-os/apply-<version>`;
+   - nếu current branch đã đúng pattern apply cho version này thì tiếp tục;
+   - nếu current branch là feature/task branch khác: **STOP trước mutation** và yêu cầu chạy lại từ `main`/`master`.
+7. Nếu branch apply đích đã tồn tại nhưng HEAD khác HEAD của `main`/`master`: STOP, không reuse branch cũ bằng suy đoán.
 
 Không tự commit/push/merge.
 
@@ -206,8 +210,6 @@ Không copy `.agents/skills/`.
 ### generic
 
 Copy thêm toàn bộ `.agents/skills/`.
-
-Text content phải được rewrite docs reference theo target layout.
 
 Không copy:
 
