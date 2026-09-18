@@ -62,6 +62,7 @@ def main() -> None:
         "Refusing reparse-point entry during docs migration",
         "function Resolve-SafeDestinationFullPath",
         "Destination escapes target repository",
+        "Refusing reparse-point destination during docs migration",
         "[string[]]$GitArgs",
         "Target working tree must be clean before migration",
         "reset --hard HEAD",
@@ -71,6 +72,15 @@ def main() -> None:
 
     forbid(migrator, "[string[]]$Args", "PowerShell automatic Args collision")
     forbid(migrator, "clean -fd", "repository-wide destructive rollback cleanup")
+
+    updater = (root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
+    for needle in [
+        "ít nhất 2",
+        "AGENTS.md` hoặc `CLAUDE.md` **không đủ**",
+        "Không được chạy framework migration trực tiếp trên branch task",
+        "STOP trước mutation",
+    ]:
+        require(updater, needle, "updater safety")
 
     tools_dir = root / "tools"
     for script in tools_dir.rglob("*.ps1"):
