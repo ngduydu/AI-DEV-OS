@@ -72,10 +72,13 @@ def main() -> None:
     generic_updater = (root / ".agents" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     for needle in [
         "coi là \`legacy-v1\`",
-        "/update-ai-dev-os\` không tự đổi docs layout",
+        "lập migration plan sang ordered-v2",
+        "deterministic migrator",
+        "Collision preflight",
+        "git mv",
+        "không bootstrap",
         "resolved target path",
-        "preserve nguyên \`docs_layout\`",
-        "không đồng thời có duplicate scaffold ở legacy path và ordered path",
+        "không còn duplicate scaffold ở legacy path và ordered path",
     ]:
         require(updater, needle, "claude updater")
         require(generic_updater, needle, "generic updater")
@@ -87,6 +90,20 @@ def main() -> None:
     managed = {item["path"] for item in manifest.get("managed_files", [])}
     if ".ai-dev-os/layouts.json" not in managed:
         fail("manifest does not manage .ai-dev-os/layouts.json")
+
+    migrator = root / "tools" / "migrate-docs-layout.ps1"
+    if not migrator.exists():
+        fail("missing deterministic docs layout migrator")
+    migrator_text = migrator.read_text(encoding="utf-8")
+    for needle in [
+        "Legacy docs inventory",
+        "Collision preflight failed",
+        "Get-FileHash",
+        'git -C',
+        "docs_layout = \"ordered-v2\"",
+        "reset --hard HEAD",
+    ]:
+        require(migrator_text, needle, "layout migrator")
 
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for needle in [
