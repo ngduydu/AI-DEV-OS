@@ -71,7 +71,7 @@ def main() -> None:
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for text, label in [(updater, "updater"), (upgrade, "upgrade")]:
         require(text, "2.6.0", label)
-        require(text, "không di chuyển hoặc tách knowledge cũ tự động", label)
+        require(text, "không split/rewrite semantics", label)
 
     managed = {item["path"]: item for item in manifest["managed_files"]}
     for path in [
