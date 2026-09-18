@@ -22,7 +22,7 @@ docs/knowledge/README.md
 
 Các pitfall đã tồn tại từ trước 2.6.0 vẫn hợp lệ và phải được preserve khi upgrade.
 
-Không di chuyển hoặc tách knowledge cũ tự động.
+Không split/rewrite semantics của knowledge cũ bằng suy đoán. Layout migration có thể `git mv` nguyên file sang ordered path nhưng phải giữ nguyên content.
 
 Nếu project hiện có các entry bên dưới, updater phải giữ nguyên chúng khi semantic merge.
 
