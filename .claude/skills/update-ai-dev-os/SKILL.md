@@ -127,7 +127,9 @@ Khi source version >= `2.6.0`:
    - `docs/ai/05-BUSINESS-RULES.md`;
    - module/operations docs hiện hữu;
 5. không tạo hàng loạt isolated file bằng cách đoán boundary từ text cũ;
-6. từ sau upgrade, knowledge mới của task đi theo `docs/knowledge/README.md`.
+6. từ sau upgrade, knowledge mới của task đi theo `docs/knowledge/README.md`;
+7. update các framework/mixed routing file có thể còn chỉ dẫn append vào shared docs;
+8. verify không còn active skill/task contract nào route task discovery vào shared `KNOWN-PITFALLS`, shared module/operations list hoặc numbered ADR.
 
 Lý do: automatic split của knowledge cũ có rủi ro mất context/semantics và tạo diff lớn trong repo đang có branch chạy song song.
 
@@ -168,8 +170,13 @@ Mixed files đặc biệt:
 
 - `AGENTS.md`
 - `docs/README.md`
+- `docs/ai/00-SETUP-CHECKLIST.md`
 - `docs/ai/04-CODEBASE-MAP.md`
 - `docs/ai/14-AI-SYSTEM-MAINTENANCE.md`
+- `docs/decisions/README.md`
+- `docs/modules/README.md`
+- `docs/operations/README.md`
+- `docs/work/README.md`
 
 Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
 
@@ -205,7 +212,9 @@ Trước khi write VERSION:
 7. target working tree chỉ chứa expected upgrade changes;
 8. migration-specific checks trong UPGRADE.md đã pass;
 9. không còn unresolved conflict.
-10. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move.
+10. conflict-safe knowledge policy 2.6.0 đã có và existing knowledge không bị auto-split/move;
+11. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
+12. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence.
 
 Nếu verification fail: KHÔNG bump version.
 
