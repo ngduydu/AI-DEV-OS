@@ -81,3 +81,109 @@ Không bắt buộc:
 - cài MCP;
 - bootstrap lại toàn repo;
 - thay project knowledge bằng template mới.
+
+
+## 2.3.0 — Global one-repo updater
+
+### Mục tiêu
+
+Từ version này, không cần copy/merge thủ công từng file cho mỗi product repository.
+
+Cài personal updater **một lần trên máy** từ AI-DEV-OS local:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install-personal-updater.ps1
+```
+
+Sau đó restart Claude Code.
+
+Trong bất kỳ repository đã apply AI-DEV-OS nào:
+
+```text
+/update-ai-dev-os
+```
+
+Personal skill sẽ luôn đọc canonical updater từ repository AI-DEV-OS local nên không phụ thuộc project repo đã có updater skill mới hay chưa.
+
+### Source requirements
+
+Canonical AI-DEV-OS source phải:
+
+- là Git repository;
+- working tree clean;
+- đang ở branch `main`;
+- pull được bằng `git pull --ff-only`;
+- có `.ai-dev-os/VERSION`, `.ai-dev-os/manifest.json` và canonical updater skill.
+
+Nếu source repo đã bị move sang path khác, chạy lại:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install-personal-updater.ps1
+```
+
+### Target requirements
+
+Updater chỉ mutate target khi:
+
+- target là Git repository;
+- working tree clean;
+- nhận diện được AI-DEV-OS artifacts hiện có.
+
+Nếu target đang ở `main` hoặc `master`, updater phải tạo/switch sang branch update riêng trước khi sửa.
+
+### Managed file manifest
+
+`.ai-dev-os/manifest.json` là source of truth cho **framework-managed files**.
+
+- `framework`: được update theo canonical source.
+- `mixed`: phải merge, giữ project-specific knowledge.
+- file không có trong manifest: mặc định không được updater đụng.
+
+Scopes:
+
+- `core`: mọi project.
+- `claude`: chỉ project dùng Claude adapter.
+- `generic`: chỉ project đã dùng `.agents/`.
+
+### Migration team AI policy
+
+Một số repo cũ có:
+
+```text
+docs/ai/17-AI-USAGE-POLICY.md
+```
+
+Đây là team-specific policy và bị trùng namespace với framework 2.2+.
+
+Updater 2.3.0 phải tự move an toàn:
+
+```text
+docs/ai/17-AI-USAGE-POLICY.md
+→ docs/team/AI-USAGE-POLICY.md
+```
+
+Rule:
+
+- giữ nguyên nội dung;
+- ưu tiên `git mv`;
+- update references sang path mới;
+- merge route vào `docs/README.md`;
+- nếu destination đã tồn tại thì không overwrite, report conflict.
+
+### Upgrade legacy / 2.2.0 → 2.3.0
+
+Updater phải:
+
+1. preserve project-owned knowledge;
+2. chạy migration team AI policy nếu cần;
+3. apply framework-managed files từ manifest;
+4. semantic merge mixed files;
+5. không auto-install optional tools;
+6. verify;
+7. copy/update target manifest;
+8. chỉ cuối cùng mới ghi:
+   ```text
+   .ai-dev-os/VERSION = 2.3.0
+   ```
+
+Nếu có conflict có nguy cơ làm mất project rule, **không bump VERSION**.

@@ -477,3 +477,42 @@ Khi AI-DEV-OS thay đổi, không copy đè toàn bộ `docs/`.
 Repo đã apply trước 2.2.0 nhưng chưa có VERSION được coi là legacy/unversioned install và có thể nâng bằng skill `update-ai-dev-os`.
 
 Chi tiết: `UPGRADE.md`.
+
+## Update AI-DEV-OS cho nhiều product repo mà không copy tay
+
+Từ 2.3.0, Claude Code có thể dùng **personal updater skill** cài một lần trên máy.
+
+Tại repository AI-DEV-OS local, chạy:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\install-personal-updater.ps1
+~~~
+
+Sau đó restart Claude Code.
+
+Từ bất kỳ product repository đã apply AI-DEV-OS nào:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Updater sẽ:
+
+~~~text
+AI-DEV-OS local source
+→ pull --ff-only
+→ đọc VERSION + manifest + UPGRADE
+→ detect target version
+→ tạo update branch nếu đang main/master
+→ chạy migration
+→ update framework-owned
+→ merge mixed, preserve project knowledge
+→ verify
+→ bump VERSION cuối cùng
+~~~
+
+Project cũ **không cần có sẵn updater skill mới nhất**, vì personal launcher luôn đọc canonical skill trực tiếp từ AI-DEV-OS local.
+
+Nếu bạn move folder AI-DEV-OS sang path khác, chạy installer lại.
+
+Updater không tự cài/bật MCP, codebase-memory-mcp, ast-grep hoặc Repomix.

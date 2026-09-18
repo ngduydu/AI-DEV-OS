@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "framework_version": "2.3.0",
+  "managed_files": [
+    {
+      "path": "UPGRADE.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "AGENTS.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/README.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/04-CODEBASE-MAP.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/14-AI-SYSTEM-MAINTENANCE.md",
+      "ownership": "mixed",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/16-TASK-EXECUTION.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/17-CONTEXT-RETRIEVAL.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "docs/ai/18-TOOL-ADOPTION.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": ".ai-dev-os/manifest.json",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "CLAUDE.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/bootstrap-project/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/update-ai-dev-os/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/agents/change-reviewer.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/agents/production-reviewer.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/bootstrap-project/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/update-ai-dev-os/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    }
+  ]
+}

@@ -1,134 +1,238 @@
 ---
 name: update-ai-dev-os
-description: Use when a repository already contains AI-DEV-OS files and needs to adopt a newer framework baseline, migrate an unversioned install, or reconcile framework changes without losing project-specific knowledge.
+description: Use when a repository already contains AI-DEV-OS files and needs to upgrade from the canonical local AI-DEV-OS source without manually copying or merging framework files.
 ---
 
 # Update AI-DEV-OS
 
-Mục tiêu: nâng framework **an toàn**, không copy đè project knowledge.
+Mục tiêu: nâng repository hiện tại lên AI-DEV-OS mới nhất từ canonical local source, preserve project knowledge và chỉ bump version sau verification.
 
-## Khi dùng
+## Source of truth
 
-Dùng khi:
+Nếu skill này được gọi qua personal launcher, launcher phải cung cấp absolute AI-DEV-OS source path.
 
-- repo đã apply AI-DEV-OS và framework source có version mới;
-- repo cũ chưa có `.ai-dev-os/VERSION`;
-- cần nhận execution/context/skill changes mới.
+Nếu không có launcher-provided source path:
 
-Không dùng để bootstrap project knowledge lần đầu.
+1. dùng biến môi trường `AI_DEV_OS_HOME` nếu tồn tại;
+2. nếu current repository chính là AI-DEV-OS source thì dùng repo root;
+3. nếu vẫn không xác định được thì dừng và yêu cầu chạy installer từ AI-DEV-OS source:
+   `tools/install-personal-updater.ps1`.
 
-## Upgrade flow
+Không lấy project-level updater skill cũ làm canonical source khi personal launcher đã cung cấp source path.
 
-~~~text
-Read current VERSION
-↓
-Read target UPGRADE.md
-↓
-Inventory current AI-DEV-OS files
-↓
-Classify ownership
-├─ framework-owned → update có kiểm soát
-├─ project-owned   → preserve
-└─ mixed           → merge + review conflict
-↓
-Verify
-↓
-Update VERSION cuối cùng
-~~~
+## Phase 1 — Source preflight
 
-## Ownership rule
+Trước khi sửa TARGET:
 
-Project-owned knowledge không được overwrite tự động:
+1. Resolve source root.
+2. Xác nhận source là Git repository.
+3. Đọc:
+   - `.ai-dev-os/VERSION`
+   - `.ai-dev-os/manifest.json`
+   - `UPGRADE.md`
+4. Xác nhận source working tree clean.
+5. Xác nhận source branch là `main`.
+6. Chạy:
+   ```text
+   git -C <source> pull --ff-only
+   ```
+7. Đọc lại VERSION + manifest sau pull.
+8. Xác nhận `manifest.framework_version == VERSION`.
 
-- project context/product;
-- architecture decisions;
-- CODEBASE-MAP content;
-- business rules;
-- project coding conventions;
-- commands/testing;
-- module/operations docs;
-- ADRs;
-- project custom skills.
+Nếu bất kỳ check nào fail: STOP trước target mutation.
 
-Framework-owned thường gồm execution contract, context/tool policy, generic adapter/skills/agents và framework templates.
+## Phase 2 — Target preflight
 
-Mixed file phải diff/merge.
+TARGET là repository đang mở/current working repository.
 
-## Legacy / unversioned
+Trước mutation:
 
-Nếu `.ai-dev-os/VERSION` chưa tồn tại:
+1. Xác nhận target là Git repository.
+2. Xác nhận target không phải source repository.
+3. Xác nhận target working tree clean.
+4. Detect current target version:
+   - có `.ai-dev-os/VERSION` → đọc version;
+   - không có → `legacy-unversioned`.
+5. Xác nhận target có AI-DEV-OS artifacts, tối thiểu một trong:
+   - `AGENTS.md`
+   - `CLAUDE.md`
+   - `docs/ai/16-TASK-EXECUTION.md`
+   - `.claude/skills/bootstrap-project/SKILL.md`.
+6. Detect adapters:
+   - Claude active nếu target có `CLAUDE.md` hoặc `.claude/`;
+   - generic active nếu target có `.agents/`.
 
-1. coi repo là legacy install;
-2. detect những AI-DEV-OS artifacts đã có;
-3. preserve project-owned content;
-4. áp migration hướng dẫn trong `UPGRADE.md`;
-5. không bootstrap full lại chỉ vì thiếu version marker;
-6. chỉ tạo VERSION sau verification.
+Nếu target version bằng source version, vẫn verify manifest/migration state. Nếu không có gì cần sửa thì report no-op.
 
-## Optional tools
+## Phase 3 — Safe branch
+
+Nếu target đang ở `main` hoặc `master`:
+
+1. lấy `git config user.name`;
+2. chuyển thành slug lowercase, ký tự không hợp lệ → `-`;
+3. branch:
+   `<slug>/update-ai-dev-os-<source-version>`;
+4. nếu không có user.name, dùng:
+   `ai-dev-os/update-<source-version>`;
+5. tạo và switch branch.
+
+Nếu branch đã tồn tại:
+- chỉ switch nếu working tree clean và branch dùng cho cùng target version;
+- nếu không chắc, STOP và report.
+
+Nếu target đã ở branch khác, tiếp tục trên branch hiện tại.
+
+Không commit/merge/push tự động trừ khi user yêu cầu.
+
+## Phase 4 — Special migrations
+
+Chạy migration theo `UPGRADE.md` cho mọi version từ current → source.
+
+### Team AI policy namespace
+
+Nếu tồn tại:
+
+`docs/ai/17-AI-USAGE-POLICY.md`
+
+và chưa tồn tại:
+
+`docs/team/AI-USAGE-POLICY.md`
+
+thì:
+
+1. tạo `docs/team/` nếu cần;
+2. dùng `git mv` để move file;
+3. giữ nguyên nội dung;
+4. search toàn repo các reference path cũ;
+5. update sang `docs/team/AI-USAGE-POLICY.md`;
+6. đảm bảo `docs/README.md` có route team policy.
+
+Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
+
+## Phase 5 — Apply managed files
+
+Đọc `.ai-dev-os/manifest.json` từ SOURCE.
+
+Chỉ xét entry active theo target adapter:
+
+- `core`: luôn active;
+- `claude`: active khi target dùng Claude;
+- `generic`: active khi target đã có `.agents/`.
+
+### ownership = framework
+
+Update target path từ canonical source.
+
+Không dùng template/project file cũ làm source.
+
+Nếu target path không tồn tại, create.
+
+### ownership = mixed
+
+Không copy đè.
+
+Thực hiện semantic merge:
+
+1. đọc source canonical;
+2. đọc target hiện tại;
+3. giữ toàn bộ project-specific knowledge/routing/rule còn đúng;
+4. thêm framework rule mới chưa có;
+5. loại duplicate rõ ràng;
+6. không thay project-specific content bằng placeholder/template source.
+
+Mixed files đặc biệt:
+
+- `AGENTS.md`
+- `docs/README.md`
+- `docs/ai/04-CODEBASE-MAP.md`
+- `docs/ai/14-AI-SYSTEM-MAINTENANCE.md`
+
+Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
+
+### Unmanaged files
+
+File không có trong manifest mặc định là project-owned.
+
+Không sửa chỉ vì source AI-DEV-OS có file cùng loại.
+
+## Phase 6 — Optional tools
 
 Không tự:
 
-- cài codebase-memory-mcp;
-- cài ast-grep;
-- cài Repomix;
-- sửa global agent config;
+- cài `codebase-memory-mcp`;
+- cài `ast-grep`;
+- cài `Repomix`;
 - bật MCP;
-- overwrite `.mcp.json`.
+- sửa global MCP config;
+- overwrite target `.mcp.json`.
 
-Nếu target version giới thiệu optional tool, report nó như lựa chọn riêng.
+Chỉ report optional tool state nếu liên quan migration.
 
-## Conflict
+## Phase 7 — Verification
 
-Nếu project đã customize framework-owned/mixed file và merge không rõ:
+Trước khi write VERSION:
 
-~~~text
-CONFLICT
-Path: ...
-Framework change: ...
-Project customization: ...
-Decision needed: ...
-~~~
+1. source VERSION và manifest version khớp;
+2. tất cả active `framework` paths tồn tại ở target;
+3. mixed files vẫn chứa project-specific knowledge trước upgrade;
+4. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
+5. nếu target có team policy thì `docs/README.md` route đúng;
+6. optional tool không bị auto-enabled;
+7. target working tree chỉ chứa expected upgrade changes;
+8. migration-specific checks trong UPGRADE.md đã pass;
+9. không còn unresolved conflict.
 
-Dừng phần conflict đó; không đoán và không copy đè.
+Nếu verification fail: KHÔNG bump version.
 
-## Verification
+## Phase 8 — Finalize version
 
-Trước khi bump VERSION:
+Chỉ sau khi Phase 7 pass:
 
-- expected framework files tồn tại;
-- project-owned knowledge còn nguyên;
-- mixed conflicts đã resolve hoặc report;
-- optional tool không bị auto-enabled;
-- docs không yêu cầu capability project chưa có;
-- migration-specific checks trong UPGRADE.md đã pass.
+1. copy source `.ai-dev-os/manifest.json` sang target;
+2. write target `.ai-dev-os/VERSION` = source version;
+3. chạy verification lần cuối;
+4. show diff summary.
 
-Chỉ sau đó cập nhật `.ai-dev-os/VERSION`.
+Không tự commit/push/PR trừ khi user yêu cầu.
 
 ## Report
 
-~~~text
+```text
+AI-DEV-OS source:
+- <absolute path>
+
 From:
 - <version | legacy-unversioned>
 
 To:
-- <target version>
+- <source version>
 
-Updated:
+Branch:
+- <branch>
+
+Updated framework-owned:
 - ...
 
-Preserved:
+Merged mixed:
+- ...
+
+Migrated:
+- ...
+
+Preserved project-owned:
 - ...
 
 Conflicts:
-- ...
+- none / ...
 
 Optional tools:
-- enabled / unchanged / not installed
+- unchanged / ...
 
 Verification:
-- ...
+- PASS / FAIL
 
 Version:
 - updated / not updated
-~~~
+```
+
+Không claim success nếu VERSION chưa được write sau verification.

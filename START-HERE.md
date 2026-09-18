@@ -601,3 +601,22 @@ Sau khi project đủ lớn mới cân nhắc:
 Xem `docs/ai/17-CONTEXT-RETRIEVAL.md` và `docs/ai/18-TOOL-ADOPTION.md`.
 
 Project đã apply bản cũ thì **không làm onboarding lại từ đầu**; xem `UPGRADE.md`.
+
+## Update framework sau này
+
+Nếu máy đã clone AI-DEV-OS, cài updater một lần:
+
+~~~powershell
+cd <AI-DEV-OS>
+powershell -ExecutionPolicy Bypass -File .\tools\install-personal-updater.ps1
+~~~
+
+Restart Claude Code.
+
+Sau đó mỗi product repo chỉ cần:
+
+~~~text
+/update-ai-dev-os
+~~~
+
+Không copy file framework thủ công và không bootstrap-project lại chỉ vì AI-DEV-OS tăng version.
