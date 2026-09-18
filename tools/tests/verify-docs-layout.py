@@ -71,7 +71,7 @@ def main() -> None:
     updater = (root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     generic_updater = (root / ".agents" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     for needle in [
-        "coi là \`legacy-v1\`",
+        "coi là `legacy-v1`",
         "lập migration plan sang ordered-v2",
         "deterministic migrator",
         "Collision preflight",
@@ -108,7 +108,7 @@ def main() -> None:
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for needle in [
         "Docs layout versioning",
-        "tự migrate sang \`ordered-v2\`",
+        "tự migrate sang `ordered-v2`",
         "không bootstrap lại project",
         "content hash",
     ]:
