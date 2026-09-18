@@ -58,3 +58,7 @@ jobs:
       - name: Verify security hardening contract
         shell: powershell
         run: python .\tools\tests\verify-security-hardening.py .
+
+      - name: Verify active ordered references
+        shell: powershell
+        run: python .\tools\tests\verify-active-ordered-references.py .
