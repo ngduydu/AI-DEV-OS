@@ -6,6 +6,17 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.5.1 — Agent-aware apply
+
+### Changed
+
+- `/apply-ai-dev-os` bắt buộc chọn `claude`, `generic` hoặc `both` nếu user chưa chỉ rõ.
+- Không còn mặc định Claude chỉ vì skill đang chạy trong Claude Code.
+- Apply chỉ copy adapter đúng với profile đã chọn và bootstrap một lần.
+- Thêm regression test cho agent-selection contract.
+
+
+
 ## 2.5.0 — One-command apply
 
 ### Added

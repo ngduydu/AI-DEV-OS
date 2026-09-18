@@ -509,3 +509,31 @@ Nếu repo đã có AI-DEV-OS thì không dùng lệnh này; dùng:
 ~~~text
 /update-ai-dev-os
 ~~~
+
+
+## 11. Chọn agent khi apply
+
+`/apply-ai-dev-os` không mặc định Claude.
+
+Nếu chưa chỉ rõ agent, skill phải hỏi:
+
+~~~text
+1. claude  - Claude Code
+2. generic - agent dùng AGENTS.md + .agents/skills
+3. both    - dùng cả hai adapter
+~~~
+
+Mapping:
+
+~~~text
+claude
+→ core + CLAUDE.md + .claude/skills + .claude/agents
+
+generic
+→ core + .agents/skills
+
+both
+→ core + Claude adapter + generic adapter
+~~~
+
+Nếu user đã nói rõ `claude`, `generic` hoặc `both` trong yêu cầu thì dùng luôn, không hỏi lại.

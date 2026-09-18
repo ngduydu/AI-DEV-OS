@@ -1,22 +1,46 @@
 ---
 name: apply-ai-dev-os
-description: Use when the current repository does not yet contain AI-DEV-OS and should be initialized from the canonical local AI-DEV-OS source for Claude Code without manual file copying.
+description: Use when the current repository does not yet contain AI-DEV-OS and should be initialized from the canonical local AI-DEV-OS source without manual file copying. Supports Claude, generic, or both agent adapters.
 disable-model-invocation: true
 ---
 
 # Apply AI-DEV-OS
 
-Mục tiêu: apply AI-DEV-OS vào repository hiện tại bằng một lệnh, không copy tay.
+Mục tiêu: apply AI-DEV-OS vào repository hiện tại bằng một lệnh, không copy tay và không mặc định sai agent.
 
 Mọi phản hồi cho người dùng phải bằng tiếng Việt.
 
-## Source
+## 1. Chọn agent profile trước khi sửa repository
+
+Nếu user chưa nói rõ agent profile trong cùng yêu cầu, **bắt buộc hỏi đúng một lần** trước khi apply:
+
+```text
+Chọn agent profile để apply:
+
+1. claude  - Claude Code
+2. generic - agent dùng AGENTS.md + .agents/skills
+3. both    - dùng cả Claude Code và generic agent
+```
+
+Giá trị hợp lệ:
+
+- `claude`
+- `generic`
+- `both`
+
+Không được mặc định agent.
+
+Nếu user đã ghi rõ một trong ba giá trị trên thì dùng luôn, không hỏi lại.
+
+Không tự suy đoán agent từ việc skill này đang được gọi trong Claude Code.
+
+## 2. Source
 
 Personal launcher phải cung cấp absolute path của canonical AI-DEV-OS source.
 
 Nếu không có source path hợp lệ: dừng và yêu cầu chạy lại machine setup từ AI-DEV-OS.
 
-## Preflight source
+## 3. Preflight source
 
 Trước khi sửa target:
 
@@ -29,32 +53,31 @@ Trước khi sửa target:
    - `.ai-dev-os/manifest.json`
 6. Nếu source preflight fail: dừng, không sửa target.
 
-## Preflight target
+## 4. Preflight target
 
 1. Current working directory phải là Git repository.
 2. Target không được là chính AI-DEV-OS source.
 3. Target working tree phải clean.
 4. Nếu target đã có `.ai-dev-os/VERSION`: dừng và bảo dùng `/update-ai-dev-os`.
-5. Nếu target đã có AI-DEV-OS artifacts đáng kể như `docs/ai/16-TASK-EXECUTION.md`, `.claude/skills/bootstrap-project/SKILL.md` hoặc `UPGRADE.md`: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
+5. Nếu target đã có AI-DEV-OS artifacts đáng kể như `docs/ai/16-TASK-EXECUTION.md`, `.claude/skills/bootstrap-project/SKILL.md`, `.agents/skills/bootstrap-project/SKILL.md` hoặc `UPGRADE.md`: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
 6. Nếu đang ở `main` hoặc `master`, tạo branch:
    `<git-user-slug>/apply-ai-dev-os-<version>`
    fallback: `ai-dev-os/apply-<version>`.
 
 Không tự commit/push/merge.
 
-## Apply cho Claude Code
+## 5. Core luôn apply
 
-Copy từ canonical source vào target đúng các nhóm sau.
-
-### Core
+Mọi profile đều copy:
 
 - `.ai-dev-os/VERSION`
 - `.ai-dev-os/manifest.json`
 - `UPGRADE.md`
 - `AGENTS.md`
-- `CLAUDE.md`
 
 ### Project knowledge scaffold
+
+Mọi profile đều copy:
 
 - `docs/README.md`
 - toàn bộ `docs/ai/*.md`
@@ -78,62 +101,116 @@ Không copy:
 - repo issue/PR metadata
 - `prompts/`
 - `templates/`
-- `.agents/` khi target chỉ dùng Claude Code
+- machine setup scripts
 
-### Claude adapter
+## 6. Adapter theo agent profile
 
-Copy:
+### Profile: claude
 
-- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/` vì apply là personal machine skill, không cần nằm trong product repo;
-- toàn bộ `.claude/agents/`.
+Copy thêm:
 
-Không copy machine setup scripts hoặc personal apply launcher vào product repo.
+- `CLAUDE.md`
+- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/`
+- toàn bộ `.claude/agents/`
 
-## Collision rule
+Không copy:
+
+- `.agents/skills/`
+
+### Profile: generic
+
+Copy thêm:
+
+- toàn bộ `.agents/skills/`
+
+Không copy:
+
+- `CLAUDE.md`
+- `.claude/skills/`
+- `.claude/agents/`
+
+### Profile: both
+
+Copy thêm:
+
+- `CLAUDE.md`
+- toàn bộ `.claude/skills/` **trừ** `.claude/skills/apply-ai-dev-os/`
+- toàn bộ `.claude/agents/`
+- toàn bộ `.agents/skills/`
+
+## 7. Collision rule
 
 `/apply-ai-dev-os` chỉ dùng cho repo chưa apply framework.
 
-Nếu bất kỳ destination framework path quan trọng nào đã tồn tại với nội dung khác source, dừng và báo collision thay vì overwrite. Không tự xóa knowledge/project docs hiện hữu.
+Chỉ kiểm tra collision trên các destination thuộc **core + profile đã chọn**.
 
-## Bootstrap ngay sau apply
+Nếu destination framework path quan trọng đã tồn tại với nội dung khác source, dừng và báo collision thay vì overwrite.
 
-Sau khi copy thành công:
+Không tự xóa knowledge/project docs hiện hữu.
 
-1. Đọc canonical workflow vừa được copy tại:
-   `.claude/skills/bootstrap-project/SKILL.md`
-2. Tiếp tục thực hiện bootstrap project trong cùng invocation.
-3. Bootstrap phải scan code/config/tests thật và cập nhật minimum reliable project knowledge.
-4. Không tạo knowledge giả chỉ để fill template.
-5. Kết thúc bằng `READY / PARTIAL / BLOCKED`.
+## 8. Bootstrap ngay sau apply
 
-## Verification
+Sau khi copy thành công, chạy bootstrap **một lần** theo profile:
 
-Trước khi báo xong, verify:
+- `claude` → dùng `.claude/skills/bootstrap-project/SKILL.md`
+- `generic` → dùng `.agents/skills/bootstrap-project/SKILL.md`
+- `both` → dùng `.claude/skills/bootstrap-project/SKILL.md`; không chạy bootstrap lần hai
+
+Bootstrap phải:
+
+1. scan code/config/tests thật;
+2. cập nhật minimum reliable project knowledge;
+3. không tạo knowledge giả chỉ để fill template;
+4. kết thúc bằng `READY / PARTIAL / BLOCKED`.
+
+## 9. Verification
+
+Trước khi báo xong, verify chung:
 
 - target có `.ai-dev-os/VERSION` và version khớp source;
-- target có `AGENTS.md`, `CLAUDE.md`, `docs/README.md`;
-- target có `.claude/skills/bootstrap-project/SKILL.md`;
-- target có `.claude/skills/update-ai-dev-os/SKILL.md`;
-- target có `.claude/agents/`;
+- target có `AGENTS.md`, `docs/README.md`;
 - không copy `docs/superpowers/`;
 - không copy machine setup scripts;
 - bootstrap đã chạy hoặc báo rõ blocker;
 - chỉ có expected diff.
 
-## Báo cáo cuối
+Verify theo profile:
+
+### claude
+
+- có `CLAUDE.md`;
+- có `.claude/skills/bootstrap-project/SKILL.md`;
+- có `.claude/skills/update-ai-dev-os/SKILL.md`;
+- có `.claude/agents/`;
+- không có `.agents/skills/` do framework vừa copy.
+
+### generic
+
+- có `.agents/skills/bootstrap-project/SKILL.md`;
+- có `.agents/skills/update-ai-dev-os/SKILL.md`;
+- không có `CLAUDE.md` do framework vừa copy;
+- không có `.claude/` do framework vừa copy.
+
+### both
+
+- có toàn bộ điều kiện của Claude adapter;
+- có `.agents/skills/bootstrap-project/SKILL.md`;
+- có `.agents/skills/update-ai-dev-os/SKILL.md`.
+
+## 10. Báo cáo cuối
 
 ```text
 AI-DEV-OS:
 - Applied version: <version>
+- Agent profile: claude / generic / both
 
 Branch:
 - <branch>
 
 Applied:
 - core
-- Claude skills
-- Claude agents
 - project knowledge scaffold
+- <adapter đã chọn>
 
 Bootstrap:
 - READY / PARTIAL / BLOCKED
