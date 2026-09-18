@@ -125,7 +125,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $installer stable
 Remove-Item -LiteralPath $installer -Force
 ```
 
-Không dùng `irm ... | iex` hoặc `ScriptBlock::Create` với nội dung tải trực tiếp từ mạng trong hướng dẫn team. Với môi trường doanh nghiệp, áp dụng review/signature-policy nội bộ trước khi chạy installer.
+Không pipe installer tải trực tiếp từ mạng vào `Invoke-Expression` và không dùng `ScriptBlock::Create` với nội dung remote trong hướng dẫn team. Với môi trường doanh nghiệp, áp dụng review/signature-policy nội bộ trước khi chạy installer.
 
 Kiểm tra sau cài:
 
