@@ -6,22 +6,40 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
-## 2.6.0 — Conflict-safe Knowledge Sync
+## 2.6.0 — Conflict-safe Knowledge Sync + Ordered Docs Migration
 
 ### Added
 
-- `docs/knowledge/README.md` với mô hình mỗi knowledge item một file riêng.
-- Migration updater cho repo 2.5.x/cũ hơn mà không auto-split knowledge cũ.
-- Regression test cho branch-safe Knowledge Sync.
+- Conflict-safe knowledge model: task discovery dùng entry-per-file thay vì append vào shared docs.
+- Ordered docs layout cho repo apply mới:
+  - `00-overview`
+  - `01-development`
+  - `02-modules`
+  - `03-knowledge`
+  - `04-operations`
+  - `05-decisions`
+  - `06-work`
+- `.ai-dev-os/layouts.json` làm source of truth cho path mapping.
+- `tools/migrate-docs-layout.ps1` để migrate repo cũ bằng inventory, collision preflight, `git mv`, hash verification và reference rewrite.
+- Regression tests cho conflict-safe routing, ordered layout và deterministic migration.
 
 ### Changed
 
-- Task discovery không còn mặc định append vào shared canonical docs.
-- `13-KNOWN-PITFALLS.md` trở thành legacy/canonical router; knowledge cũ vẫn được preserve.
-- Knowledge Sync skills của Claude và generic adapter dùng isolated files mặc định.
-- Shared canonical docs chỉ đổi khi canonical truth thực sự đổi.
+- `/update-ai-dev-os` không bootstrap lại repo khi upgrade.
+- Repo legacy được tự migrate nguyên file sang ordered layout; project knowledge hiện có được preserve.
+- Unknown project-specific docs dưới legacy roots vẫn được giữ bằng prefix mapping thay vì bị bỏ quên.
+- Fix-bug, Knowledge Sync, module, operations, work và ADR routing không còn hướng task bình thường vào shared append-only files.
+- ADR mới không dùng global sequence; task-generated decisions dùng entry-per-file.
+- Shared canonical docs trở thành read-mostly và chỉ đổi khi canonical truth thật sự đổi.
+- Version/state chỉ được ghi sau migration + verification PASS.
 
+### Safety
 
+- Destination khác nội dung → STOP trước mutation, không overwrite.
+- Destination giống hệt → deduplicate có kiểm soát.
+- Migration fail giữa chừng → rollback về clean pre-migration state.
+- Không split/rewrite semantics của knowledge cũ bằng suy đoán.
+- Không yêu cầu AI đọc lại toàn codebase để tái tạo docs, giảm token và tránh làm mất knowledge.
 
 ## 2.5.1 — Agent-aware apply
 
