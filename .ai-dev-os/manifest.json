@@ -136,6 +136,11 @@
       "path": ".agents/skills/fix-bug/SKILL.md",
       "ownership": "framework",
       "scope": "generic"
+    },
+    {
+      "path": ".ai-dev-os/layouts.json",
+      "ownership": "framework",
+      "scope": "core"
     }
   ]
 }
