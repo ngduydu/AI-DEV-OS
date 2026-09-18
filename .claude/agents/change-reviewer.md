@@ -12,8 +12,8 @@ Review only; do not rewrite the implementation unless explicitly asked.
 
 - task/Acceptance Criteria;
 - relevant docs/module rules;
-- `docs/ai/04-CODEBASE-MAP.md` canonical examples/reuse sources;
-- `docs/ai/06-CODING-STANDARDS.md`;
+- `docs/00-overview/codebase-map.md` canonical examples/reuse sources;
+- `docs/01-development/coding-standards.md`;
 - diff/change set;
 - tests added/changed;
 - nearby canonical implementations;
