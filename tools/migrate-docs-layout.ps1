@@ -83,6 +83,21 @@ function Resolve-SafeDestinationFullPath([string]$Root, [string]$Destination) {
         throw "Destination escapes target repository: $Destination"
     }
 
+    $relative = $candidate.Substring($prefix.Length)
+    $segments = @($relative.Split([IO.Path]::DirectorySeparatorChar))
+    $current = $rootFull
+
+    foreach ($segment in $segments) {
+        if ([string]::IsNullOrWhiteSpace($segment)) { continue }
+        $current = Join-Path $current $segment
+        if (Test-Path -LiteralPath $current) {
+            $item = Get-Item -LiteralPath $current -Force
+            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing reparse-point destination during docs migration: $current"
+            }
+        }
+    }
+
     return $candidate
 }
 
