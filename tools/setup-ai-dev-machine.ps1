@@ -12,6 +12,13 @@ if ($env:OS -ne "Windows_NT") {
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Results = New-Object System.Collections.Generic.List[object]
 
+# Pin third-party installer source to an immutable reviewed commit.
+# The upstream installer then performs mandatory SHA-256 verification for the release binary.
+$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"
+$CodebaseMemoryVersion = "v0.11.0"
+$CodebaseMemoryInstallerUrl = "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1"
+$CodebaseMemoryReleaseUrl = "https://github.com/DeusData/codebase-memory-mcp/releases/download/$CodebaseMemoryVersion"
+
 function Add-Result {
     param([string]$Name, [string]$Status, [string]$Detail)
     $Results.Add([PSCustomObject]@{ Name = $Name; Status = $Status; Detail = $Detail }) | Out-Null
@@ -109,9 +116,9 @@ function Ensure-Repomix {
     }
 
     Write-Host "Đang cài Repomix..." -ForegroundColor Cyan
-    & npm install -g repomix
+    & npm install -g repomix@1.18.0
     if ($LASTEXITCODE -ne 0) {
-        Add-Result "Repomix" "FAIL" "npm install -g repomix thất bại với mã $LASTEXITCODE."
+        Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
         return
     }
 
@@ -152,12 +159,24 @@ function Ensure-CodebaseMemory {
 
     try {
         Write-Host "Đang tải installer chính thức của codebase-memory-mcp..." -ForegroundColor Cyan
-        Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1" -OutFile $installer
+        Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer
         Unblock-File $installer -ErrorAction SilentlyContinue
 
-        Write-Host "Đang cài codebase-memory-mcp (binary only, không cho tool tự sửa agent config)..." -ForegroundColor Cyan
-        $installOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config 2>&1
-        $installExitCode = $LASTEXITCODE
+        Write-Host "Đang cài codebase-memory-mcp $CodebaseMemoryVersion (binary only, không cho tool tự sửa agent config)..." -ForegroundColor Cyan
+        $previousDownloadUrl = $env:CBM_DOWNLOAD_URL
+        try {
+            $env:CBM_DOWNLOAD_URL = $CodebaseMemoryReleaseUrl
+            $installOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config 2>&1
+            $installExitCode = $LASTEXITCODE
+        }
+        finally {
+            if ($null -eq $previousDownloadUrl) {
+                Remove-Item Env:CBM_DOWNLOAD_URL -ErrorAction SilentlyContinue
+            }
+            else {
+                $env:CBM_DOWNLOAD_URL = $previousDownloadUrl
+            }
+        }
         $installOutput | ForEach-Object { Write-Host $_ }
 
         if ($installExitCode -ne 0) {
@@ -264,6 +283,10 @@ if ($SelfTest) {
 
     $required = @(
         '$installOutput = & powershell',
+        '$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"',
+        '$CodebaseMemoryVersion = "v0.11.0"',
+        '$env:CBM_DOWNLOAD_URL = $CodebaseMemoryReleaseUrl',
+        'Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer',
         'claude mcp remove --scope user codebase-memory-mcp',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',

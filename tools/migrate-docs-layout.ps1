@@ -42,11 +42,70 @@ function File-Hash([string]$Path) {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
 }
 
-function Invoke-GitCommand([string]$Root, [string[]]$Args) {
+function Get-SafeFiles([string]$Directory) {
+    $result = @()
+    $stack = New-Object 'System.Collections.Generic.Stack[System.IO.DirectoryInfo]'
+    $rootItem = Get-Item -LiteralPath $Directory -Force
+
+    if ($rootItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+        throw "Refusing reparse-point directory during docs migration: $Directory"
+    }
+
+    $stack.Push($rootItem)
+
+    while ($stack.Count -gt 0) {
+        $current = $stack.Pop()
+        foreach ($item in (Get-ChildItem -LiteralPath $current.FullName -Force)) {
+            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing reparse-point entry during docs migration: $($item.FullName)"
+            }
+
+            if ($item.PSIsContainer) {
+                $stack.Push([System.IO.DirectoryInfo]$item)
+            }
+            else {
+                $result += $item
+            }
+        }
+    }
+
+    return @($result)
+}
+
+function Resolve-SafeDestinationFullPath([string]$Root, [string]$Destination) {
+    $rootFull = [System.IO.Path]::GetFullPath($Root).TrimEnd("\", "/")
+    $candidate = [System.IO.Path]::GetFullPath(
+        (Join-Path $rootFull ($Destination -replace "/", [IO.Path]::DirectorySeparatorChar))
+    )
+    $prefix = $rootFull + [IO.Path]::DirectorySeparatorChar
+
+    if (-not $candidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Destination escapes target repository: $Destination"
+    }
+
+    $relative = $candidate.Substring($prefix.Length)
+    $segments = @($relative.Split([IO.Path]::DirectorySeparatorChar))
+    $current = $rootFull
+
+    foreach ($segment in $segments) {
+        if ([string]::IsNullOrWhiteSpace($segment)) { continue }
+        $current = Join-Path $current $segment
+        if (Test-Path -LiteralPath $current) {
+            $item = Get-Item -LiteralPath $current -Force
+            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing reparse-point destination during docs migration: $current"
+            }
+        }
+    }
+
+    return $candidate
+}
+
+function Invoke-GitCommand([string]$Root, [string[]]$GitArgs) {
     $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
-    & $gitExe -C $Root @Args
+    & $gitExe -C $Root @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        throw ("Git command failed in {0}: git {1}" -f $Root, ($Args -join " "))
+        throw ("Git command failed in {0}: git {1}" -f $Root, ($GitArgs -join " "))
     }
 }
 
@@ -80,7 +139,7 @@ function Build-Plan([string]$Root, $Layout) {
         $fullRoot = Join-Path $Root ($legacyRoot -replace "/", [IO.Path]::DirectorySeparatorChar)
         if (-not (Test-Path -LiteralPath $fullRoot -PathType Container)) { continue }
 
-        Get-ChildItem -LiteralPath $fullRoot -File -Recurse | ForEach-Object {
+        Get-SafeFiles -Directory $fullRoot | ForEach-Object {
             $source = Normalize-Rel ($_.FullName.Substring($Root.Length).TrimStart("\", "/"))
             $destination = Resolve-Destination $source $Layout
 
@@ -88,11 +147,13 @@ function Build-Plan([string]$Root, $Layout) {
                 throw "No ordered-v2 mapping for legacy file: $source"
             }
 
+            $destinationFull = Resolve-SafeDestinationFullPath -Root $Root -Destination $destination
+
             $plan += [PSCustomObject]@{
                 Source = $source
                 Destination = $destination
                 SourceFull = $_.FullName
-                DestinationFull = Join-Path $Root ($destination -replace "/", [IO.Path]::DirectorySeparatorChar)
+                DestinationFull = $destinationFull
                 Hash = File-Hash $_.FullName
                 Action = "Move"
             }
@@ -161,14 +222,18 @@ function Rewrite-References([string]$Root, $Layout) {
     foreach ($rootFile in @("AGENTS.md", "CLAUDE.md")) {
         $p = Join-Path $Root $rootFile
         if (Test-Path -LiteralPath $p -PathType Leaf) {
-            $files += Get-Item -LiteralPath $p
+            $rootFileItem = Get-Item -LiteralPath $p -Force
+            if ($rootFileItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing reparse-point instruction file during docs migration: $p"
+            }
+            $files += $rootFileItem
         }
     }
 
     foreach ($folder in @("docs", ".claude", ".agents")) {
         $p = Join-Path $Root $folder
         if (Test-Path -LiteralPath $p -PathType Container) {
-            $files += Get-ChildItem -LiteralPath $p -File -Recurse -Filter *.md
+            $files += @(Get-SafeFiles -Directory $p | Where-Object { $_.Extension -eq ".md" })
         }
     }
 
@@ -237,6 +302,9 @@ if (-not [string]::IsNullOrWhiteSpace(($status -join [Environment]::NewLine))) {
     throw "Target working tree must be clean before migration."
 }
 
+$statePath = Join-Path $root ".ai-dev-os\state.json"
+$stateExistedBefore = Test-Path -LiteralPath $statePath
+
 try {
     foreach ($item in $plan) {
         $destinationDir = Split-Path -Parent $item.DestinationFull
@@ -271,6 +339,10 @@ catch {
     Write-Host "Migration failed. Restoring clean pre-migration state."
     $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
     & $gitExe -C $root reset --hard HEAD | Out-Null
-    & $gitExe -C $root clean -fd | Out-Null
+
+    if (-not $stateExistedBefore -and (Test-Path -LiteralPath $statePath -PathType Leaf)) {
+        Remove-Item -LiteralPath $statePath -Force -ErrorAction SilentlyContinue
+    }
+
     throw
 }

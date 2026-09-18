@@ -21,8 +21,8 @@ def main() -> None:
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
 
-    if version != "2.6.0":
-        fail(f"expected VERSION 2.6.0, got {version!r}")
+    if version != "2.6.1":
+        fail(f"expected VERSION 2.6.1, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
