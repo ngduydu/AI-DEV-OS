@@ -79,7 +79,7 @@ Chỉ promote vào shared canonical docs nếu câu trả lời chính là thay 
 
 Knowledge có từ trước 2.6.0 vẫn hợp lệ.
 
-Không di chuyển hoặc tách knowledge cũ tự động.
+Không split/rewrite semantics của knowledge cũ bằng suy đoán. Layout migration có thể `git mv` nguyên file sang ordered path nhưng phải giữ nguyên content.
 
 Không rewrite `docs/ai/13-KNOWN-PITFALLS.md` hoặc các shared file chỉ để phù hợp layout mới.
 
