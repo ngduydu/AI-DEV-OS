@@ -156,9 +156,12 @@ function Ensure-CodebaseMemory {
         Unblock-File $installer -ErrorAction SilentlyContinue
 
         Write-Host "Đang cài codebase-memory-mcp (binary only, không cho tool tự sửa agent config)..." -ForegroundColor Cyan
-        & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config
-        if ($LASTEXITCODE -ne 0) {
-            Add-Result "codebase-memory-mcp" "FAIL" "Installer thất bại với mã $LASTEXITCODE."
+        $installOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $installer --skip-config 2>&1
+        $installExitCode = $LASTEXITCODE
+        $installOutput | ForEach-Object { Write-Host $_ }
+
+        if ($installExitCode -ne 0) {
+            Add-Result "codebase-memory-mcp" "FAIL" "Installer thất bại với mã $installExitCode."
             return $null
         }
 
@@ -221,6 +224,28 @@ function Normalize-McpCommandPath {
     }
 }
 
+function Test-IsPollutedCbmCommand {
+    param(
+        [string]$ExistingCommand,
+        [string]$ExpectedExe
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ExistingCommand) -or [string]::IsNullOrWhiteSpace($ExpectedExe)) {
+        return $false
+    }
+
+    $existingFlat = ($ExistingCommand -replace '\\', '/').ToLowerInvariant()
+    $expectedFlat = ($ExpectedExe -replace '\\', '/').ToLowerInvariant()
+
+    $containsExpected = $existingFlat.Contains($expectedFlat)
+    $hasInstallerMarker =
+        $existingFlat.Contains("codebase-memory-mcp installer") -or
+        $existingFlat.Contains("installed binary ->") -or
+        $existingFlat.Contains("skipping agent configuration (--skip-config)")
+
+    return ($containsExpected -and $hasInstallerMarker)
+}
+
 function Ensure-ClaudeMcp {
     param([string]$CbmExe)
 
@@ -244,15 +269,43 @@ function Ensure-ClaudeMcp {
         $expectedNormalized = Normalize-McpCommandPath $CbmExe
 
         if ($existingNormalized -and $expectedNormalized -and ($existingNormalized -ine $expectedNormalized)) {
-            Add-Result "Claude MCP" "BLOCKED" "User-scope MCP 'codebase-memory-mcp' đã tồn tại nhưng command khác với binary vừa phát hiện. Existing='$existingCommand'. Expected='$CbmExe'. Không tự overwrite config đang có."
-            return
+            if (Test-IsPollutedCbmCommand -ExistingCommand $existingCommand -ExpectedExe $CbmExe) {
+                Write-Host "Phát hiện MCP config bị hỏng do installer output từ bản setup cũ. Đang tự sửa..." -ForegroundColor Yellow
+
+                $removeOutput = & claude mcp remove --scope user codebase-memory-mcp 2>&1
+                $removeExitCode = $LASTEXITCODE
+                $removeOutput | ForEach-Object { Write-Host $_ }
+
+                if ($removeExitCode -ne 0) {
+                    Add-Result "Claude MCP" "FAIL" "Không xóa được user-scope MCP hỏng để sửa lại."
+                    return
+                }
+
+                $addOutput = & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe 2>&1
+                $addExitCode = $LASTEXITCODE
+                $addOutput | ForEach-Object { Write-Host $_ }
+
+                if ($addExitCode -ne 0) {
+                    Add-Result "Claude MCP" "FAIL" "Đã xóa config hỏng nhưng đăng ký lại MCP thất bại."
+                    return
+                }
+
+                Add-Result "Claude MCP" "PASS" "Đã tự sửa user-scope MCP bị hỏng và đăng ký lại bằng đúng executable."
+            } else {
+                Add-Result "Claude MCP" "BLOCKED" "User-scope MCP 'codebase-memory-mcp' đã tồn tại nhưng command khác với binary vừa phát hiện. Existing='$existingCommand'. Expected='$CbmExe'. Không tự overwrite config không rõ nguồn gốc."
+                return
+            }
+        } else {
+            Add-Result "Claude MCP" "PASS" "User-scope MCP đã tồn tại."
         }
-        Add-Result "Claude MCP" "PASS" "User-scope MCP đã tồn tại."
     } else {
         Write-Host "Đang đăng ký codebase-memory-mcp cho Claude Code ở user scope..." -ForegroundColor Cyan
-        & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe
-        if ($LASTEXITCODE -ne 0) {
-            Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $LASTEXITCODE."
+        $addOutput = & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe 2>&1
+        $addExitCode = $LASTEXITCODE
+        $addOutput | ForEach-Object { Write-Host $_ }
+
+        if ($addExitCode -ne 0) {
+            Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $addExitCode."
             return
         }
         Add-Result "Claude MCP" "PASS" "Đã đăng ký user-scope cho mọi project trên máy."
