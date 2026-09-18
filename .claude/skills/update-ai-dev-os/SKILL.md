@@ -163,22 +163,23 @@ Không được dùng bootstrap để tái tạo knowledge vì sẽ tốn token 
 
 Chỉ chạy khi target layout = `legacy-v1`.
 
-### A. Inventory trước mutation
+### A. Dùng deterministic migrator, không đọc/viết tay từng file
 
-1. Liệt kê toàn bộ file dưới:
-   - `docs/ai/`
-   - `docs/team/`
-   - `docs/modules/`
-   - `docs/knowledge/`
-   - `docs/operations/`
-   - `docs/decisions/`
-   - `docs/work/`
-2. Với mỗi file, tính:
-   - source path;
-   - destination path theo exact `path_map` hoặc longest matching `prefix_map`;
-   - content hash trước migration.
-3. Không bỏ qua file chỉ vì framework không biết tên file đó.
-4. Tạo migration plan đầy đủ trước khi move file đầu tiên.
+Ưu tiên chạy script từ canonical SOURCE:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File <source>/tools/migrate-docs-layout.ps1 -TargetRoot <target>
+```
+
+Dry-run này tự:
+
+- inventory toàn bộ legacy docs;
+- resolve destination bằng exact `path_map` rồi longest `prefix_map`;
+- hash từng file;
+- phát hiện collision trước mutation;
+- liệt kê migration plan.
+
+Nếu dry-run fail: STOP, không tự xử lý bằng suy đoán.
 
 ### B. Collision preflight
 
@@ -190,38 +191,25 @@ Trước mutation, với mọi destination:
 
 Không được bắt đầu move nếu còn collision chưa xử lý.
 
-### C. Move preserving content
+### C. Apply bằng script
 
-1. Tạo destination folder khi cần.
-2. Dùng `git mv` cho từng file để Git giữ rename history.
-3. Với duplicate-identical, giữ một bản và xóa path legacy bằng Git.
-4. Không sửa nội dung trong bước move.
-5. Không bootstrap, không regenerate project docs.
+Sau dry-run PASS:
 
-### D. Rewrite references
-
-Sau khi move xong:
-
-1. search toàn repo các legacy path;
-2. rewrite exact path trước, prefix sau;
-3. áp dụng cho Markdown, skill, config/instruction text;
-4. không rewrite source code string nếu path đó là runtime value trừ khi evidence xác nhận đó là docs reference;
-5. search lại và yêu cầu không còn broken legacy reference thuộc migrated docs.
-
-### E. State
-
-Chỉ sau khi move + reference rewrite + verification pass:
-
-```json
-{
-  "docs_layout": "ordered-v2",
-  "docs_layout_version": 2
-}
+```powershell
+powershell -ExecutionPolicy Bypass -File <source>/tools/migrate-docs-layout.ps1 -TargetRoot <target> -Apply
 ```
 
-ghi vào `.ai-dev-os/state.json`.
+Script phải tự:
 
-Nếu fail ở bất kỳ bước nào: không ghi state ordered-v2 và không bump VERSION.
+1. yêu cầu target working tree clean;
+2. `git mv` nguyên file để giữ rename history;
+3. deduplicate chỉ khi source/destination hash giống hệt;
+4. verify hash ngay sau move;
+5. rewrite reference chỉ trong docs/instruction Markdown, không rewrite application source code;
+6. ghi `.ai-dev-os/state.json = ordered-v2 / 2`;
+7. rollback về HEAD nếu migration fail giữa chừng.
+
+Không bootstrap, không regenerate project knowledge, không yêu cầu agent đọc toàn bộ nội dung file để tự phân loại.
 
 ## Phase 5 — Apply managed files theo target layout
 
@@ -357,7 +345,7 @@ Nếu verification fail: KHÔNG bump version.
 Chỉ sau khi Phase 7 pass:
 
 1. copy source `.ai-dev-os/manifest.json` và `.ai-dev-os/layouts.json` sang target;
-2. write/update `.ai-dev-os/state.json` = `ordered-v2 / 2`;
+2. xác nhận migrator đã ghi `.ai-dev-os/state.json = ordered-v2 / 2`;
 3. write target `.ai-dev-os/VERSION` = source version;
 4. chạy verification lần cuối;
 5. show diff summary.
