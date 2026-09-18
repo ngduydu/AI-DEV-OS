@@ -207,6 +207,8 @@ Phần chưa biết quan trọng thì Claude phải hỏi; phần chưa cần th
 Copy vào root repository:
 
 ```text
+.ai-dev-os/VERSION
+UPGRADE.md
 AGENTS.md
 CLAUDE.md
 docs/
@@ -225,6 +227,9 @@ Cấu trúc mong muốn:
 ```text
 MyProduct/
 ├── .git/
+├── .ai-dev-os/
+│   └── VERSION
+├── UPGRADE.md
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── .claude/
@@ -530,6 +535,8 @@ Chi tiết: `CLAUDE-CODE-GUIDE.md`.
 [ ] Claude Code Extension đã cài và sign in
 [ ] Claude CLI nếu cần đã hoạt động
 [ ] Project toolchain đúng version đã có hoặc blocker đã ghi rõ
+[ ] .ai-dev-os/VERSION tồn tại
+[ ] UPGRADE.md tồn tại
 [ ] AGENTS.md ở repo root
 [ ] CLAUDE.md ở repo root
 [ ] docs/ tồn tại
@@ -570,3 +577,27 @@ docs/ai/16-TASK-EXECUTION.md
 ```
 
 Từ đây, mỗi task bình thường chỉ cần mô tả yêu cầu. Không cần nhắc Claude đọc từng file.
+
+
+## 16. Tối ưu context — optional nhưng khuyến nghị
+
+Không cần cài một đống tool trước task đầu tiên.
+
+Bắt đầu bằng STANDARD profile:
+
+~~~text
+CODEBASE-MAP
+→ direct read
+→ targeted search
+→ source/test
+~~~
+
+Sau khi project đủ lớn mới cân nhắc:
+
+- ast-grep cho structural search;
+- Repomix cho bootstrap/snapshot;
+- codebase-memory-mcp cho graph/dependency/impact.
+
+Xem `docs/ai/17-CONTEXT-RETRIEVAL.md` và `docs/ai/18-TOOL-ADOPTION.md`.
+
+Project đã apply bản cũ thì **không làm onboarding lại từ đầu**; xem `UPGRADE.md`.

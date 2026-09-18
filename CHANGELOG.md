@@ -6,6 +6,29 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.2.0 — Context efficiency + framework lifecycle
+
+### Added
+
+- `.ai-dev-os/VERSION` để product repo biết baseline AI-DEV-OS đang dùng.
+- `UPGRADE.md` và skill `update-ai-dev-os` cho migration an toàn, không overwrite project knowledge.
+- `docs/ai/17-CONTEXT-RETRIEVAL.md` với Context Budget, retrieval escalation và session hygiene.
+- `docs/ai/18-TOOL-ADOPTION.md` với Tool Adoption Gate.
+- Optional tool profile: ripgrep, ast-grep, Repomix và codebase-memory-mcp.
+- MCP template `templates/mcp/claude-codebase-memory.json`.
+- Spec/implementation plan cho framework lifecycle và context efficiency.
+
+### Changed
+
+- Task Execution không scan toàn repository hoặc Git history theo mặc định.
+- CODEBASE-MAP được xác định rõ là durable navigation map, không thay source/test/config.
+- bootstrap-project phân biệt initial broad discovery với targeted refresh.
+- Claude guide bổ sung `/clear`, `/compact`, subagent isolation và optional retrieval tools.
+- README, START-HERE và APPLY-TO-PROJECT bổ sung versioned apply/upgrade workflow.
+- Tool mới không được vào default stack chỉ vì popularity hoặc marketing claim.
+
+
+
 ### Added
 
 - `START-HERE.md` làm cửa vào duy nhất cho người mới: kiểm tra/cài Git, VS Code, Claude Code, project toolchain, copy AI-DEV-OS core, verify context, bootstrap và xử lý `READY / PARTIAL / BLOCKED` trước task đầu tiên.

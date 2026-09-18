@@ -1,6 +1,6 @@
 # Codebase Map
 
-> Mục tiêu: giúp người mới và AI tìm đúng chỗ nhanh, reuse đúng và không phải nghiên cứu lại toàn bộ repository cho mỗi task.
+> Mục tiêu: đây là **durable navigation map / compressed project knowledge** giúp người mới và AI tìm đúng chỗ nhanh, reuse đúng và không phải nghiên cứu lại toàn bộ repository cho mỗi task. File này không thay source code/test/config hiện tại.
 
 ## Repository tree mức cao
 
@@ -129,3 +129,17 @@ Skill `bootstrap-project` phải fill file này từ evidence thật bằng các
 - đánh dấu conflict/unknown thay vì chọn ngẫu nhiên.
 
 Không lấy một file bất thường hoặc legacy làm chuẩn chỉ vì tìm thấy đầu tiên.
+
+## Retrieval rule
+
+Task bình thường phải dùng map này trước khi search rộng.
+
+Nếu map mâu thuẫn source hiện tại:
+
+~~~text
+source/test/config hiện tại
+→ thắng
+→ cập nhật CODEBASE-MAP
+~~~
+
+Chi tiết escalation và optional tools: `docs/ai/17-CONTEXT-RETRIEVAL.md`.

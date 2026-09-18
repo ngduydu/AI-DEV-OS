@@ -93,3 +93,25 @@ Work docs               = context của một task
 Nguyên tắc:
 
 > Context thường trực càng ít càng tốt; project knowledge càng đúng và dễ tìm càng tốt.
+
+## Framework lifecycle
+
+Project đã apply AI-DEV-OS từ baseline 2.2.0 có version marker tại `.ai-dev-os/VERSION`.
+
+Khi nâng framework:
+
+1. đọc `UPGRADE.md`;
+2. phân loại file thành framework-owned, project-owned hoặc mixed;
+3. không overwrite project knowledge đã bootstrap;
+4. merge mixed file bằng diff/evidence;
+5. verify trước khi bump version.
+
+Optional tool không được tự cài chỉ vì framework có integration.
+
+Chi tiết ownership và migration: `UPGRADE.md`.
+
+## Context efficiency
+
+Sau bootstrap, task bình thường phải reuse `04-CODEBASE-MAP.md` và đi theo `17-CONTEXT-RETRIEVAL.md` thay vì scan lại repository.
+
+Khi task độc lập hoàn tất và durable knowledge đã sync vào repo, với Claude Code nên dùng `/clear` trước task độc lập tiếp theo. Với cùng task nhưng context đã lớn, dùng `/compact`.

@@ -9,7 +9,29 @@ Mục tiêu: tạo **minimum reliable project knowledge** từ evidence thật c
 
 Không viết documentation cho đẹp. Không bịa convention. Không hỏi user những gì repository có thể tự chứng minh.
 
-## 1. Scan evidence trước khi hỏi
+## 1. Chọn mức discovery trước khi scan
+
+Nếu project chưa bootstrap hoặc knowledge gần như trống:
+
+~~~text
+Initial bootstrap
+→ được phép broad discovery có kiểm soát
+→ tạo minimum reliable knowledge + CODEBASE-MAP
+~~~
+
+Nếu project đã có knowledge và chỉ refresh:
+
+~~~text
+Refresh
+→ đọc CODEBASE-MAP + docs hiện có trước
+→ xác định area stale
+→ targeted refresh
+→ không scan lại toàn repository theo mặc định
+~~~
+
+Optional retrieval tool đã được project bật có thể dùng để tăng tốc navigation, nhưng không phải requirement để bootstrap đạt READY.
+
+## 2. Scan evidence trước khi hỏi
 
 Ưu tiên đọc/search theo thứ tự:
 
@@ -20,7 +42,7 @@ Không viết documentation cho đẹp. Không bịa convention. Không hỏi us
 5. Application entry points và project/module structure.
 6. Representative implementation ở nhiều khu vực, không lấy một file bất thường làm chuẩn.
 7. Tests, migrations, schema, scripts, config mẫu.
-8. Git/history chỉ khi cần giải thích convention/decision mà snapshot hiện tại chưa đủ.
+8. Git/history chỉ khi cần giải thích convention/decision có tính lịch sử mà snapshot hiện tại chưa đủ; không đọc history rộng theo mặc định.
 
 Phải tìm được bằng chứng cho:
 
@@ -38,7 +60,7 @@ Phải tìm được bằng chứng cho:
 - deployment/operations artifacts;
 - sensitive/generated/vendor areas.
 
-## 2. Detect convention từ pattern lặp lại
+## 3. Detect convention từ pattern lặp lại
 
 Không suy ra convention từ một file duy nhất nếu repository có nhiều implementation để đối chiếu.
 
@@ -52,7 +74,7 @@ Một convention được coi là **Confirmed** khi có ít nhất một trong c
 
 Nếu codebase không nhất quán, ghi conflict thay vì tự chọn một style ngẫu nhiên.
 
-## 3. Fill minimum docs
+## 4. Fill minimum docs
 
 Cập nhật trước các file có ích ngay:
 
@@ -68,7 +90,7 @@ Bổ sung `05-BUSINESS-RULES.md`, `09-SECURITY.md`, `docs/modules/`, `docs/opera
 
 Không bắt buộc mọi template field phải đầy trước task đầu tiên.
 
-## 4. Populate Codebase Map để phục vụ Reuse Gate
+## 5. Populate Codebase Map để phục vụ Reuse Gate
 
 `04-CODEBASE-MAP.md` phải có nếu repository cho phép xác định:
 
@@ -82,11 +104,11 @@ Không bắt buộc mọi template field phải đầy trước task đầu tiê
 - reusable services/helpers/components/validators/mappers/infrastructure;
 - sensitive/generated/vendor areas.
 
-Mục tiêu là để agent task sau **search và reuse trước khi tạo mới**.
+Mục tiêu là để agent task sau **search và reuse trước khi tạo mới**, đồng thời không phải rediscover toàn repository. CODEBASE-MAP là navigation knowledge; source/test/config hiện tại vẫn là ground truth.
 
 Nếu chưa có canonical example cho một pattern, để trống hoặc ghi `Not established`; không chọn bừa.
 
-## 5. Populate Coding Standards từ evidence
+## 6. Populate Coding Standards từ evidence
 
 `06-CODING-STANDARDS.md` phải phân biệt:
 
@@ -112,7 +134,7 @@ Cố gắng fill khi có evidence:
 
 Không copy convention từ project/template khác chỉ vì cùng technology stack.
 
-## 6. Verify commands
+## 7. Verify commands
 
 Đọc scripts/CI/config trước.
 
@@ -131,7 +153,7 @@ Không tự chạy:
 - secret rotation;
 - irreversible external action.
 
-## 7. Xử lý Unknown
+## 8. Xử lý Unknown
 
 Phân loại:
 
@@ -146,7 +168,7 @@ Có thể thay đổi behavior, data, public contract, architecture, security, d
 
 Agent phải search đủ trước khi hỏi. Không hỏi user chỉ để họ chép lại codebase cho agent.
 
-## 8. Preserve existing knowledge
+## 9. Preserve existing knowledge
 
 Nếu project đã có docs:
 
@@ -157,7 +179,7 @@ Nếu project đã có docs:
 - tránh duplicate cùng một rule ở nhiều file;
 - không biến inference yếu thành source of truth.
 
-## 9. Module và Operations docs theo nhu cầu
+## 10. Module và Operations docs theo nhu cầu
 
 Không scaffold hàng chục folder rỗng.
 
@@ -165,7 +187,7 @@ Chỉ tạo `docs/modules/<module>/` khi module có business rule/workflow/data/
 
 Chỉ tạo `docs/operations/` content khi có deploy/migration/rollback/monitoring/troubleshooting knowledge thật.
 
-## 10. Project Readiness Gate
+## 11. Project Readiness Gate
 
 Trước khi báo bootstrap xong, tự kiểm tra:
 
@@ -188,7 +210,7 @@ Thiếu material knowledge khiến agent có nguy cơ đoán sai ngay cả với
 
 Không dùng `READY` chỉ vì đã fill nhiều file.
 
-## 11. Report
+## 12. Report
 
 Báo ngắn gọn:
 
@@ -212,3 +234,16 @@ Next usage:
 ```
 
 Sau bootstrap, **không chạy bootstrap lại mỗi task**. Mọi task tiếp tục theo `docs/ai/16-TASK-EXECUTION.md`.
+
+## 13. Context efficiency
+
+Sau bootstrap:
+
+- không chạy bootstrap lại mỗi task;
+- task thường đi theo `docs/ai/17-CONTEXT-RETRIEVAL.md`;
+- CODEBASE-MAP phải đủ hữu ích để route task về đúng area;
+- optional MCP/tool chỉ dùng nếu project đã chủ động bật;
+- không tự cài tool để làm bootstrap;
+- nếu graph/index mâu thuẫn source thì source thắng.
+
+Bootstrap là chi phí discovery có chủ đích; task sau phải thu lợi từ knowledge đã tạo.

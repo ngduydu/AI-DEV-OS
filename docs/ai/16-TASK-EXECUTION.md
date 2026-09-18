@@ -71,12 +71,15 @@ Dùng `docs/work/` khi artifacts giúp giữ context, review hoặc handoff.
 Trước khi sửa code:
 
 1. Đọc `docs/README.md`.
-2. Xác định module/khu vực bị ảnh hưởng.
-3. Đọc docs liên quan, không load toàn bộ docs.
-4. Đọc `04-CODEBASE-MAP.md` nếu cần tìm canonical implementation/reusable building block.
-5. Đọc `06-CODING-STANDARDS.md` khi task tạo/sửa code.
-6. Đọc code và test hiện có trước khi đề xuất implementation.
-7. Search các implementation/pattern tương tự.
+2. Đọc `04-CODEBASE-MAP.md` để xác định area/canonical/reuse source trước khi search rộng.
+3. Đọc module docs và standards/commands/testing liên quan, không load toàn bộ docs.
+4. Nếu đã biết file/path thì đọc trực tiếp.
+5. Nếu chưa biết, search có mục tiêu theo `17-CONTEXT-RETRIEVAL.md`: text search → structural search → graph/MCP nếu phù hợp → broaden search khi evidence chưa đủ.
+6. Đọc source và test hiện có trước khi đề xuất implementation.
+
+Task bình thường sau bootstrap **không scan lại toàn repository theo mặc định**.
+
+Git history không nằm trong default retrieval path.
 
 Không đưa ra kết luận về code chưa đọc hoặc behavior repository chưa chứng minh.
 
@@ -87,7 +90,7 @@ Không đưa ra kết luận về code chưa đọc hoặc behavior repository c
 Khi gặp điểm chưa rõ:
 
 ```text
-Tự tìm trong docs/code/test/history trước
+Tự tìm trong docs/code/test theo retrieval policy trước; chỉ dùng history khi câu hỏi thật sự cần historical evidence
 ↓
 Có bằng chứng đủ mạnh?
 ├── Có → tiếp tục
@@ -275,3 +278,19 @@ Không game test để lấy màu xanh.
 Knowledge mới → không để chết trong chat.
 Risk production chưa xử lý → không gọi Production Ready.
 ```
+
+## 14. Context Efficiency Gate
+
+Trước khi mở rộng investigation:
+
+- câu hỏi hiện tại có thể trả lời bằng file/path đã biết không?
+- CODEBASE-MAP có route đúng area không?
+- targeted search đã đủ chưa?
+- structural/graph tool có thật sự cần không?
+- context vừa load có phục vụ task hiện tại không?
+
+Khi task độc lập hoàn tất và durable knowledge đã Knowledge Sync, với Claude Code nên dùng `/clear` trước task độc lập tiếp theo. Nếu vẫn cùng task nhưng context đã lớn, dùng `/compact`.
+
+Investigation lớn có thể dùng subagent context riêng khi việc đó giúp giữ main context nhỏ.
+
+Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.

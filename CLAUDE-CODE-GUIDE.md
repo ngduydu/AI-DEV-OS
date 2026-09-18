@@ -701,3 +701,112 @@ Merge
 - Hooks: https://code.claude.com/docs/en/hooks
 
 Nếu Claude Code thay đổi UI/command theo phiên bản mới, ưu tiên tài liệu Anthropic ở trên làm nguồn cập nhật.
+
+
+## 28. Tối ưu context và quota
+
+AI-DEV-OS không mặc định đọc cả repository cho mỗi task.
+
+Flow ưu tiên:
+
+~~~text
+CODEBASE-MAP
+→ đọc file trực tiếp nếu biết path
+→ ripgrep targeted search
+→ ast-grep nếu cần structural search
+→ codebase-memory-mcp nếu project lớn và đã bật
+→ source/test thật
+→ broaden search/history chỉ khi cần
+~~~
+
+Chi tiết: `docs/ai/17-CONTEXT-RETRIEVAL.md`.
+
+### Session hygiene
+
+Sau khi hoàn tất một task độc lập và đã Knowledge Sync:
+
+~~~text
+/clear
+~~~
+
+Nếu vẫn cùng task nhưng context đã dài:
+
+~~~text
+/compact
+~~~
+
+Investigation lớn có thể dùng subagent để giữ transcript nghiên cứu khỏi main context.
+
+Giữ Tool Search mặc định của Claude Code; không cố load mọi MCP/tool schema upfront.
+
+### ripgrep
+
+Ưu tiên text search nhanh khi đã biết domain term/symbol/string.
+
+Kiểm tra:
+
+~~~powershell
+rg --version
+~~~
+
+Nếu chưa có, có thể dùng search built-in của môi trường; AI-DEV-OS không phụ thuộc bắt buộc vào ripgrep executable.
+
+### ast-grep
+
+Optional cho structural search khi text search không đủ.
+
+Chỉ cài khi project thực sự có nhu cầu pattern/refactor theo syntax.
+
+### Repomix
+
+Optional cho bootstrap/snapshot/handoff codebase.
+
+Không pack toàn repo rồi đưa vào context mỗi task.
+
+### codebase-memory-mcp
+
+Optional pilot cho codebase lớn/legacy/monorepo khi cần graph, caller/callee, dependency hoặc impact analysis.
+
+Project config mẫu:
+
+~~~text
+templates/mcp/claude-codebase-memory.json
+~~~
+
+Nếu repo đã có `.mcp.json`, **merge** entry vào file hiện tại, không overwrite.
+
+Tool cài riêng theo hướng dẫn chính thức của project `DeusData/codebase-memory-mcp`. Trên Windows, ưu tiên tải/review installer chính thức hoặc release binary trước khi chạy.
+
+Sau khi cài và config, restart Claude Code rồi kiểm tra:
+
+~~~text
+/mcp
+~~~
+
+Nếu server không Connected:
+
+~~~text
+CODEBASE-MAP
+→ targeted search
+→ source
+~~~
+
+Core workflow vẫn hoạt động.
+
+### SQL/XML legacy
+
+Không giả định code graph hiểu toàn bộ business semantics của SQL stored procedure hoặc XML metadata.
+
+Với area này vẫn ưu tiên:
+
+~~~text
+CODEBASE-MAP
+→ rg/targeted search
+→ đọc SQL/XML thật
+~~~
+
+### Tool nào được phép thêm?
+
+Xem `docs/ai/18-TOOL-ADOPTION.md`.
+
+Không thêm tool vào team default chỉ vì nhiều sao hoặc claim tiết kiệm token. Phải qua community, maintenance, maturity, security, Windows/platform, evidence, overlap và fallback.

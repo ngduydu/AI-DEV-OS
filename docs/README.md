@@ -35,6 +35,8 @@ Task context        → chỉ nạp những gì liên quan
 | Done | `docs/ai/12-DEFINITION-OF-DONE.md` |
 | Gotcha / lỗi khó nhớ | `docs/ai/13-KNOWN-PITFALLS.md` |
 | Knowledge maintenance | `docs/ai/14-AI-SYSTEM-MAINTENANCE.md` |
+| Context/token-efficient retrieval | `docs/ai/17-CONTEXT-RETRIEVAL.md` |
+| Chọn/đánh giá tool | `docs/ai/18-TOOL-ADOPTION.md` |
 | Module cụ thể | `docs/modules/` |
 | Deploy / migration / rollback / monitoring | `docs/operations/` |
 | Quyết định có trade-off | `docs/decisions/` |
@@ -75,3 +77,18 @@ Khi áp dụng AI-DEV-OS cho repository mới hoặc repository cũ chưa có do
 ## Nguyên tắc
 
 > Docs là bản đồ và nguồn knowledge bền vững, không phải ceremony. Tài liệu chỉ có giá trị khi giúp agent hiểu đúng, reuse đúng và thay đổi an toàn hơn.
+
+## Context retrieval mặc định
+
+Sau bootstrap, không scan lại toàn repo cho mỗi task.
+
+~~~text
+CODEBASE-MAP
+→ direct read nếu biết path
+→ targeted text search
+→ structural/graph tool khi thật sự cần
+→ source/test
+→ broaden/history chỉ khi evidence chưa đủ
+~~~
+
+Xem `docs/ai/17-CONTEXT-RETRIEVAL.md`.

@@ -26,6 +26,8 @@ Trước tiên xác định project sẽ dùng agent nào.
 Hai thành phần này dùng cho mọi agent:
 
 ```text
+.ai-dev-os/VERSION
+UPGRADE.md
 AGENTS.md
 docs/
 ```
@@ -34,6 +36,8 @@ Tác dụng:
 
 | Thành phần | Dùng để làm gì? |
 |---|---|
+| `.ai-dev-os/VERSION` | Ghi baseline framework để sau này biết cần upgrade từ version nào. |
+| `UPGRADE.md` | Hướng dẫn nâng framework mà không overwrite project knowledge. |
 | `AGENTS.md` | Entry point ngắn chứa các rule chung cho AI: phải đọc documentation map, tuân Task Execution Contract, không đoán requirement quan trọng, reuse trước khi tạo mới và phải verify trước khi báo Done. |
 | `docs/` | Knowledge lâu dài của project: project context, product, architecture, codebase map, coding convention, command, testing, business rule, module knowledge, operations, ADR và task artifacts khi cần. |
 
@@ -56,6 +60,9 @@ Cấu trúc tối thiểu:
 
 ```text
 MyProject/
+├── .ai-dev-os/
+│   └── VERSION
+├── UPGRADE.md
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── docs/
@@ -426,3 +433,50 @@ Setup đủ khi AI có thể trả lời đáng tin cậy:
 Nguyên tắc cuối cùng:
 
 > Bootstrap vừa đủ để bắt đầu. Mỗi task làm project hiểu chính nó tốt hơn.
+
+
+## 9. Project đã apply AI-DEV-OS rồi thì update thế nào?
+
+Không copy lại toàn bộ framework.
+
+Nếu project chưa có `.ai-dev-os/VERSION`, coi là **legacy / unversioned**.
+
+Flow:
+
+~~~text
+preserve project knowledge
+→ lấy UPGRADE.md + framework files của target version
+→ chạy /update-ai-dev-os hoặc làm theo UPGRADE.md
+→ resolve conflict nếu có
+→ verify
+→ cập nhật VERSION
+~~~
+
+Không bootstrap full lại chỉ vì framework đổi version.
+
+### Project-owned tuyệt đối không copy đè
+
+Ví dụ:
+
+- project context/product;
+- architecture decisions;
+- CODEBASE-MAP đã bootstrap;
+- business rules;
+- commands/testing;
+- module/operations docs;
+- ADR;
+- custom skills.
+
+### Tool tối ưu context có bắt buộc không?
+
+Không.
+
+Core vẫn chạy bằng:
+
+~~~text
+CODEBASE-MAP
+→ targeted search
+→ source/test
+~~~
+
+Với codebase lớn có thể chọn profile trong `docs/ai/17-CONTEXT-RETRIEVAL.md`: ripgrep mặc định, ast-grep/Repomix/codebase-memory-mcp khi thật sự có lợi.
