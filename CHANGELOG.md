@@ -6,6 +6,23 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.4.0 — Machine tooling setup
+
+### Added
+
+- `tools/setup-ai-dev-machine.ps1` để setup một lần trên Windows.
+- Machine stack: ripgrep, ast-grep, Repomix, codebase-memory-mcp.
+- Claude Code MCP user-scope cho codebase-memory-mcp.
+- Static machine-setup verifier.
+
+### Changed
+
+- Context retrieval biết phân biệt tool đã cài với tool cần dùng cho task.
+- CodeGraph vẫn không cài để tránh overlap với codebase-memory-mcp.
+- Framework version nâng lên `2.4.0`.
+
+
+
 ## 2.3.0 — Global one-repo updater
 
 ### Added

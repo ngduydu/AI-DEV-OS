@@ -516,3 +516,16 @@ Project cũ **không cần có sẵn updater skill mới nhất**, vì personal 
 Nếu bạn move folder AI-DEV-OS sang path khác, chạy installer lại.
 
 Updater không tự cài/bật MCP, codebase-memory-mcp, ast-grep hoặc Repomix.
+
+
+## Setup tool cho máy dev
+
+Tool stack dùng chung của AI-DEV-OS được cài **một lần trên mỗi máy**, từ repository AI-DEV-OS local:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Script này không được copy sang product repo. Nó cài/verify `ripgrep`, `ast-grep`, `Repomix`, `codebase-memory-mcp`, đăng ký Claude MCP ở user scope và cài personal `/update-ai-dev-os`.
+
+Sau setup, tool có sẵn trên máy nhưng Claude vẫn chỉ dùng theo retrieval policy, không gọi bừa cho mọi task.

@@ -848,3 +848,33 @@ Updater tự kiểm tra source/target Git state, tạo branch update nếu cần
 Nếu AI-DEV-OS local được move sang thư mục khác, chạy installer lại.
 
 Hiện tại updater xử lý **một repository mỗi lần**. Update-all nhiều repository chỉ làm sau khi one-repo updater đã được kiểm nghiệm ổn định.
+
+
+## 30. Setup machine tooling cho team
+
+Mỗi developer clone/pull AI-DEV-OS và chạy một lần:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Script cài/verify:
+
+- ripgrep;
+- ast-grep;
+- Repomix;
+- codebase-memory-mcp;
+- Claude MCP user-scope;
+- personal updater.
+
+Script **không sửa `.mcp.json` của product repo** và không cài CodeGraph.
+
+Nếu Node.js thấp hơn yêu cầu của Repomix, script báo BLOCKED thay vì tự nâng Node vì có thể ảnh hưởng project khác.
+
+Sau khi setup, restart Claude Code rồi dùng:
+
+~~~text
+/mcp
+~~~
+
+để kiểm tra MCP.

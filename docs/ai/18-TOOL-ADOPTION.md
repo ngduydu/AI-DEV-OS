@@ -15,17 +15,17 @@ Trước khi thêm tool vào recommended/default:
 7. **Overlap** — không thêm tool mới nếu tool hiện có đã làm đủ tốt.
 8. **Exit path** — optional tool phải có fallback, không lock project vào tool.
 
-## Stack 2.2.0
+## Stack 2.4.0
 
 | Tool | Vai trò | Trạng thái |
 |---|---|---|
 | ripgrep | text search nhanh | Recommended/default search |
-| ast-grep | structural/syntax-aware search | Optional |
-| Repomix | bootstrap/snapshot/handoff | Optional |
-| codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Optional pilot |
+| ast-grep | structural/syntax-aware search | Machine tool, dùng khi cần |
+| Repomix | bootstrap/snapshot/handoff | Machine tool, dùng khi cần |
+| codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Machine tool + MCP user-scope, dùng khi cần |
 | Sourcegraph MCP | enterprise code intelligence khi tổ chức đã có Sourcegraph | Enterprise alternative |
 
-Không đưa vào default ở 2.2.0:
+Không đưa vào machine stack ở 2.4.0:
 
 - CodeGraph;
 - grepai;
@@ -53,3 +53,31 @@ Sau milestone hoặc khi tool ecosystem thay đổi:
 - bỏ tool nếu maintenance cost > lợi ích.
 
 Default stack phải nhỏ, dễ hiểu và có lý do rõ.
+
+
+## Machine setup
+
+AI-DEV-OS cung cấp một setup command cho Windows:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Chạy từ repository AI-DEV-OS local. Mỗi developer chạy một lần trên máy, không chạy theo từng product repo.
+
+Script:
+
+- cài/verify `ripgrep`;
+- cài/verify `ast-grep`;
+- cài/verify `Repomix`;
+- cài binary `codebase-memory-mcp` với `--skip-config`;
+- đăng ký `codebase-memory-mcp` vào Claude Code bằng MCP `--scope user`;
+- cài/refresh personal `/update-ai-dev-os` launcher.
+
+Không sửa `.mcp.json` của product repo.
+
+### CodeGraph
+
+Không cài CodeGraph song song ở 2.4.0 vì overlap với graph/memory capability của `codebase-memory-mcp`.
+
+Nếu thực tế chứng minh `codebase-memory-mcp` thiếu capability quan trọng, đánh giá lại CodeGraph qua Tool Adoption Gate thay vì cài trùng từ đầu.
