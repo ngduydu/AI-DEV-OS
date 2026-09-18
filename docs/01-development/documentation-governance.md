@@ -24,7 +24,7 @@ Không có central index/summary/changelog phải append sau mỗi task. Với t
 
 ### Shared canonical docs
 
-Chỉ sửa shared canonical docs như `docs/ai/`, `docs/02-modules/`, `docs/04-operations/` khi canonical truth thực sự thay đổi.
+Chỉ sửa shared canonical docs như `docs/00-overview/`, `docs/01-development/`, `docs/02-modules/`, `docs/04-operations/` khi canonical truth thực sự thay đổi.
 
 Ví dụ:
 
@@ -132,6 +132,6 @@ Chi tiết ownership và migration: `UPGRADE.md`.
 
 ## Context efficiency
 
-Sau bootstrap, task bình thường phải reuse `04-CODEBASE-MAP.md` và đi theo `17-CONTEXT-RETRIEVAL.md` thay vì scan lại repository.
+Sau bootstrap, task bình thường phải reuse `docs/00-overview/codebase-map.md` và đi theo `docs/01-development/context-retrieval.md` thay vì scan lại repository.
 
 Khi task độc lập hoàn tất và durable knowledge đã sync vào repo, với Claude Code nên dùng `/clear` trước task độc lập tiếp theo. Với cùng task nhưng context đã lớn, dùng `/compact`.
