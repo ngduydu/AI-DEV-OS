@@ -20,11 +20,11 @@ Business rule và security rule nào đã rõ thì ghi ngay; phần chưa biết
 
 Chỉ bổ sung khi có bằng chứng hoặc task bắt đầu chạm tới:
 
-- [ ] `05-BUSINESS-RULES.md` và `docs/modules/<module>/`.
+- [ ] `05-BUSINESS-RULES.md` và `docs/02-modules/<module>/`.
 - [ ] `09-SECURITY.md`.
-- [ ] `docs/operations/` cho deploy/migration/rollback/monitoring/troubleshooting.
-- [ ] Pitfall/gotcha mới → `docs/knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `13-KNOWN-PITFALLS.md` trong task bình thường.
-- [ ] ADR mới → `docs/decisions/entries/<entry-id>-<slug>.md`; không dùng global sequence.
+- [ ] `docs/04-operations/` cho deploy/migration/rollback/monitoring/troubleshooting.
+- [ ] Pitfall/gotcha mới → `docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `13-KNOWN-PITFALLS.md` trong task bình thường.
+- [ ] ADR mới → `docs/05-decisions/entries/<entry-id>-<slug>.md`; không dùng global sequence.
 - [ ] Skill cho procedure đã lặp lại và ổn định.
 
 ## Với repository đã có code
