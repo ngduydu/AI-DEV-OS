@@ -29,3 +29,7 @@ jobs:
             }
           }
           if ($failed) { exit 1 }
+
+      - name: Run machine setup self-test
+        shell: powershell
+        run: .\tools\setup-ai-dev-machine.ps1 -SelfTest
