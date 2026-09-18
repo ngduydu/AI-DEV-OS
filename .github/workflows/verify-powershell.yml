@@ -3,7 +3,7 @@ name: Verify PowerShell
 on:
   push:
     branches:
-      - "ngduydu/fix-powershell-machine-setup-parser"
+      - "**"
   pull_request:
     paths:
       - "tools/**/*.ps1"
@@ -29,3 +29,7 @@ jobs:
             }
           }
           if ($failed) { exit 1 }
+
+      - name: Run machine setup self-test
+        shell: powershell
+        run: .\tools\setup-ai-dev-machine.ps1 -SelfTest

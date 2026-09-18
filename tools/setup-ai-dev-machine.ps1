@@ -1,5 +1,6 @@
 ﻿param(
-    [switch]$SkipMcp
+    [switch]$SkipMcp,
+    [switch]$SelfTest
 )
 
 $ErrorActionPreference = "Stop"
@@ -197,6 +198,29 @@ function Get-UserMcpEntry {
     return $null
 }
 
+function Normalize-McpCommandPath {
+    param([string]$Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return $null
+    }
+
+    $candidate = $Value.Trim()
+
+    if (
+        ($candidate.StartsWith('"') -and $candidate.EndsWith('"')) -or
+        ($candidate.StartsWith("'") -and $candidate.EndsWith("'"))
+    ) {
+        $candidate = $candidate.Substring(1, $candidate.Length - 2).Trim()
+    }
+
+    try {
+        return [System.IO.Path]::GetFullPath($candidate)
+    } catch {
+        return $candidate
+    }
+}
+
 function Ensure-ClaudeMcp {
     param([string]$CbmExe)
 
@@ -216,8 +240,11 @@ function Ensure-ClaudeMcp {
     $existing = Get-UserMcpEntry "codebase-memory-mcp"
     if ($existing) {
         $existingCommand = [string]$existing.command
-        if ($existingCommand -and ([System.IO.Path]::GetFullPath($existingCommand) -ne [System.IO.Path]::GetFullPath($CbmExe))) {
-            Add-Result "Claude MCP" "BLOCKED" "User-scope MCP 'codebase-memory-mcp' đã tồn tại nhưng trỏ tới '$existingCommand'. Không tự overwrite config đang có."
+        $existingNormalized = Normalize-McpCommandPath $existingCommand
+        $expectedNormalized = Normalize-McpCommandPath $CbmExe
+
+        if ($existingNormalized -and $expectedNormalized -and ($existingNormalized -ine $expectedNormalized)) {
+            Add-Result "Claude MCP" "BLOCKED" "User-scope MCP 'codebase-memory-mcp' đã tồn tại nhưng command khác với binary vừa phát hiện. Existing='$existingCommand'. Expected='$CbmExe'. Không tự overwrite config đang có."
             return
         }
         Add-Result "Claude MCP" "PASS" "User-scope MCP đã tồn tại."
@@ -260,6 +287,25 @@ function Ensure-PersonalUpdater {
     } catch {
         Add-Result "Personal updater" "FAIL" $_.Exception.Message
     }
+}
+
+if ($SelfTest) {
+    $quoted = '"C:\Program Files\codebase-memory-mcp\codebase-memory-mcp.exe"'
+    $expected = [System.IO.Path]::GetFullPath("C:\Program Files\codebase-memory-mcp\codebase-memory-mcp.exe")
+    $actual = Normalize-McpCommandPath $quoted
+
+    if ($actual -ne $expected) {
+        throw "SELF-TEST FAIL: quoted MCP command path normalization."
+    }
+
+    $nonPath = 'cmd /c codebase-memory-mcp'
+    $fallback = Normalize-McpCommandPath $nonPath
+    if ([string]::IsNullOrWhiteSpace($fallback)) {
+        throw "SELF-TEST FAIL: non-path MCP command fallback."
+    }
+
+    Write-Host "SELF-TEST PASS: MCP command normalization."
+    exit 0
 }
 
 Write-Host ""
