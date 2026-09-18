@@ -4,20 +4,40 @@ Mục tiêu: hệ thống AI càng dùng càng hiểu project tốt hơn, nhưng
 
 ## Knowledge routing
 
-Khi có knowledge mới, phân loại trước khi ghi:
+Khi có knowledge mới, phân loại trước khi ghi.
 
-| Knowledge | Nơi lưu |
+### Conflict-safe default
+
+Knowledge **phát hiện trong task** mặc định tạo file riêng dưới `docs/knowledge/` để tránh nhiều branch cùng append vào shared file.
+
+| Knowledge phát hiện trong task | Nơi lưu mặc định |
 |---|---|
-| Rule cực ngắn áp dụng gần như mọi task | entry point/global docs, giữ tối thiểu |
-| Project knowledge chung | `docs/ai/` |
-| Knowledge/business rule riêng module | `docs/modules/<module>/` |
-| Deploy/migration/rollback/monitoring/troubleshooting | `docs/operations/` |
+| Business rule / behavior bền vững | `docs/knowledge/business-rules/<domain>-<rule>.md` |
+| Gotcha / failure mode khó nhớ | `docs/knowledge/pitfalls/<domain>-<failure-mode>.md` |
+| Module discovery | `docs/knowledge/modules/<module>-<topic>.md` |
+| Deploy/migration/rollback/monitoring discovery | `docs/knowledge/operations/<system>-<topic>.md` |
+| Context chỉ phục vụ task hiện tại | `docs/work/` |
 | Quyết định architecture/public contract có trade-off | `docs/decisions/` ADR |
 | Procedure nhiều bước đã lặp lại, tương đối ổn định | Skill |
-| Gotcha/failure mode khó nhớ | `docs/ai/13-KNOWN-PITFALLS.md` |
-| Context chỉ phục vụ task hiện tại | `docs/work/` |
 
-Không copy cùng một rule vào nhiều nơi nếu không có lý do adapter/tool-specific.
+Không có central index phải append sau mỗi task.
+
+### Shared canonical docs
+
+Chỉ sửa shared canonical docs như `docs/ai/`, `docs/modules/`, `docs/operations/` khi canonical truth thực sự thay đổi.
+
+Ví dụ:
+
+- architecture hiện hành đổi;
+- command build/test chính thức đổi;
+- coding convention chính thức đổi;
+- public/project-wide contract đổi;
+- canonical implementation/route trong CODEBASE-MAP đổi.
+
+Không sửa shared canonical file chỉ để lưu một discovery của task.
+
+Chi tiết: `docs/knowledge/README.md`.
+
 
 ## User correction phải trở thành knowledge khi phù hợp
 
