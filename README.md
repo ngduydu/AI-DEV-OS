@@ -529,3 +529,20 @@ powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
 Script này không được copy sang product repo. Nó cài/verify `ripgrep`, `ast-grep`, `Repomix`, `codebase-memory-mcp`, đăng ký Claude MCP ở user scope và cài personal `/update-ai-dev-os`.
 
 Sau setup, tool có sẵn trên máy nhưng Claude vẫn chỉ dùng theo retrieval policy, không gọi bừa cho mọi task.
+
+
+## Apply AI-DEV-OS vào repo mới bằng một lệnh
+
+Sau machine setup, mở repo cần apply bằng Claude Code rồi chạy:
+
+~~~text
+/apply-ai-dev-os
+~~~
+
+Không cần copy tay. Skill tự lấy canonical source từ AI-DEV-OS local, apply đúng core + Claude adapter, rồi chạy bootstrap project.
+
+Repo đã có AI-DEV-OS thì dùng:
+
+~~~text
+/update-ai-dev-os
+~~~
