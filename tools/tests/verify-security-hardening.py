@@ -65,11 +65,12 @@ def main() -> None:
         "[string[]]$GitArgs",
         "Target working tree must be clean before migration",
         "reset --hard HEAD",
-        "clean -fd",
+        "$stateExistedBefore",
     ]:
         require(migrator, needle, "migration hardening")
 
     forbid(migrator, "[string[]]$Args", "PowerShell automatic Args collision")
+    forbid(migrator, "clean -fd", "repository-wide destructive rollback cleanup")
 
     tools_dir = root / "tools"
     for script in tools_dir.rglob("*.ps1"):
