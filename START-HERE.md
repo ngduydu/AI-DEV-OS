@@ -620,3 +620,35 @@ Sau đó mỗi product repo chỉ cần:
 ~~~
 
 Không copy file framework thủ công và không bootstrap-project lại chỉ vì AI-DEV-OS tăng version.
+
+
+## 28. Setup tool dùng chung cho máy dev
+
+Team member chỉ cần clone/pull repository AI-DEV-OS rồi chạy một lần:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+~~~
+
+Không copy script này vào product repo.
+
+Sau khi chạy xong:
+
+~~~text
+ripgrep
+ast-grep
+Repomix
+codebase-memory-mcp
+Claude MCP user-scope
+/update-ai-dev-os
+~~~
+
+sẽ được cài/verify ở mức máy/user tùy capability hiện có.
+
+Restart Claude Code rồi chạy:
+
+~~~text
+/mcp
+~~~
+
+để xác nhận `codebase-memory-mcp` Connected.
