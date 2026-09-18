@@ -80,6 +80,7 @@ Mọi profile đều copy:
 Mọi profile đều copy:
 
 - `docs/README.md`
+- `docs/knowledge/README.md`
 - toàn bộ `docs/ai/*.md`
 - `docs/modules/README.md`
 - `docs/operations/README.md`
