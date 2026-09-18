@@ -9,13 +9,13 @@ File này tồn tại để giữ compatibility với knowledge cũ và làm rou
 Pitfall mới mặc định tạo file riêng tại:
 
 ```text
-docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
+docs/03-knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 ```
 
 Xem policy đầy đủ tại:
 
 ```text
-docs/knowledge/README.md
+docs/03-knowledge/README.md
 ```
 
 ## Existing entries
