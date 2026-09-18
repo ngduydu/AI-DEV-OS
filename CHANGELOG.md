@@ -6,6 +6,24 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.3.0 — Global one-repo updater
+
+### Added
+
+- Personal Claude Code updater installer: `tools/install-personal-updater.ps1`.
+- Managed-file ownership manifest: `.ai-dev-os/manifest.json`.
+- Static updater verifier: `tools/tests/verify-updater.py`.
+- Global launcher pattern: install once in `~/.claude/skills/`, use from every product repo.
+- Automatic migration for `docs/ai/17-AI-USAGE-POLICY.md` → `docs/team/AI-USAGE-POLICY.md`.
+
+### Changed
+
+- `update-ai-dev-os` now pulls canonical local AI-DEV-OS source, creates a safe update branch, applies framework-owned files, semantically merges mixed files, verifies, then bumps VERSION.
+- Framework version is now `2.3.0`.
+- Product repositories no longer need manual file copying for normal framework upgrades.
+
+
+
 ## 2.2.0 — Context efficiency + framework lifecycle
 
 ### Added
