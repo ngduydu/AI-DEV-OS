@@ -304,7 +304,14 @@ if ($SelfTest) {
         throw "SELF-TEST FAIL: non-path MCP command fallback."
     }
 
-    Write-Host "SELF-TEST PASS: MCP command normalization."
+    $expectedExe = "C:\Users\dev\AppData\Local\Programs\codebase-memory-mcp\codebase-memory-mcp.exe"
+    $pollutedCommand = "codebase-memory-mcp installer (Windows) Downloading... Installed binary -> C:/Users/dev/AppData/Local/Programs/codebase-memory-mcp/codebase-memory-mcp.exe Done! $expectedExe"
+
+    if (-not (Test-IsPollutedCbmCommand -ExistingCommand $pollutedCommand -ExpectedExe $expectedExe)) {
+        throw "SELF-TEST FAIL: polluted installer output was not detected."
+    }
+
+    Write-Host "SELF-TEST PASS: MCP command normalization and pollution detection."
     exit 0
 }
 
