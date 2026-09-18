@@ -55,6 +55,10 @@ jobs:
         shell: powershell
         run: .\tools\tests\test-migrate-docs-layout.ps1
 
+      - name: Run docs layout migration safety tests
+        shell: powershell
+        run: .\tools\tests\test-migrate-docs-layout-safety.ps1
+
       - name: Verify security hardening contract
         shell: powershell
         run: python .\tools\tests\verify-security-hardening.py .
