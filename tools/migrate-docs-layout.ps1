@@ -287,6 +287,9 @@ if (-not [string]::IsNullOrWhiteSpace(($status -join [Environment]::NewLine))) {
     throw "Target working tree must be clean before migration."
 }
 
+$statePath = Join-Path $root ".ai-dev-os\state.json"
+$stateExistedBefore = Test-Path -LiteralPath $statePath
+
 try {
     foreach ($item in $plan) {
         $destinationDir = Split-Path -Parent $item.DestinationFull
@@ -321,6 +324,10 @@ catch {
     Write-Host "Migration failed. Restoring clean pre-migration state."
     $gitExe = (Get-Command git.exe -ErrorAction Stop).Source
     & $gitExe -C $root reset --hard HEAD | Out-Null
-    & $gitExe -C $root clean -fd | Out-Null
+
+    if (-not $stateExistedBefore -and (Test-Path -LiteralPath $statePath -PathType Leaf)) {
+        Remove-Item -LiteralPath $statePath -Force -ErrorAction SilentlyContinue
+    }
+
     throw
 }
