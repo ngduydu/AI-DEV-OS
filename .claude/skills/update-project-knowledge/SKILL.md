@@ -21,7 +21,7 @@ Xem lại:
 
 ## 2. Conflict-safe default
 
-Knowledge phát hiện trong task **mặc định tạo file riêng** dưới `docs/knowledge/`.
+Knowledge phát hiện trong task **mặc định tạo file riêng** dưới `docs/03-knowledge/`.
 
 Không sửa shared canonical docs chỉ để lưu discovery của task.
 
@@ -29,16 +29,16 @@ Routing mặc định:
 
 ```text
 business rule / behavior
-→ docs/knowledge/business-rules/entries/<entry-id>-<rule>.md
+→ docs/03-knowledge/business-rules/entries/<entry-id>-<rule>.md
 
 pitfall / failure mode
-→ docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
+→ docs/03-knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md
 
 module discovery
-→ docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md
+→ docs/03-knowledge/modules/<module>/entries/<entry-id>-<topic>.md
 
 operations discovery
-→ docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md
+→ docs/03-knowledge/operations/<system>/entries/<entry-id>-<topic>.md
 ```
 
 Không có central index/summary/changelog phải append sau mỗi task.
@@ -51,10 +51,10 @@ Tên file dùng lowercase kebab-case, mô tả domain/behavior và không dùng 
 
 Không sửa shared canonical docs như:
 
-- `docs/ai/03-ARCHITECTURE.md`;
-- `docs/ai/04-CODEBASE-MAP.md`;
-- `docs/ai/05-BUSINESS-RULES.md`;
-- `docs/ai/13-KNOWN-PITFALLS.md`;
+- `docs/00-overview/architecture.md`;
+- `docs/00-overview/codebase-map.md`;
+- `docs/03-knowledge/business-rules.md`;
+- `docs/03-knowledge/known-pitfalls.md`;
 - shared module/operations docs;
 
 chỉ để thêm một discovery của task.
@@ -81,7 +81,7 @@ Knowledge có từ trước 2.6.0 vẫn hợp lệ.
 
 Không split/rewrite semantics của knowledge cũ bằng suy đoán. Layout migration có thể `git mv` nguyên file sang ordered path nhưng phải giữ nguyên content.
 
-Không rewrite `docs/ai/13-KNOWN-PITFALLS.md` hoặc các shared file chỉ để phù hợp layout mới.
+Không rewrite `docs/03-knowledge/known-pitfalls.md` hoặc các shared file chỉ để phù hợp layout mới.
 
 ## 6. Hygiene
 
@@ -92,7 +92,7 @@ Không rewrite `docs/ai/13-KNOWN-PITFALLS.md` hoặc các shared file chỉ đ�
 - Nếu isolated knowledge trở thành canonical source of truth, consolidate trong task maintenance riêng hoặc khi task thực sự thay đổi contract.
 - Giữ `AGENTS.md`/`CLAUDE.md` cực ngắn.
 
-Policy đầy đủ: `docs/knowledge/README.md`.
+Policy đầy đủ: `docs/03-knowledge/README.md`.
 
 ## 7. Report
 
@@ -100,7 +100,7 @@ Nếu có update:
 
 ```text
 Knowledge Sync:
-- Added: docs/knowledge/<category>/<file>.md
+- Added: docs/03-knowledge/<category>/<file>.md
 ```
 
 Nếu canonical truth thật sự đổi:
