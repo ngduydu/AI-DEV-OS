@@ -128,7 +128,7 @@ Không biến task transcript thành documentation.
 
 ## Existing knowledge trước 2.6.0
 
-Không di chuyển hoặc tách knowledge cũ tự động.
+Không split/rewrite semantics của knowledge cũ bằng suy đoán. Layout migration có thể `git mv` nguyên file sang ordered path nhưng phải giữ nguyên content.
 
 Các entry/nội dung cũ trong:
 
