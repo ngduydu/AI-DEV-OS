@@ -69,9 +69,12 @@ def main() -> None:
 
     updater = (root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
-    for text, label in [(updater, "updater"), (upgrade, "upgrade")]:
-        require(text, "2.6.0", label)
-        require(text, "không split/rewrite semantics", label)
+    require(updater, "2.6.0", "updater")
+    require(updater, "không split nội dung", "updater")
+    require(updater, "không bootstrap lại project", "updater")
+    require(upgrade, "2.6.0", "upgrade")
+    require(upgrade, "không split/rewrite semantics", "upgrade")
+    require(upgrade, "không bootstrap lại project", "upgrade")
 
     managed = {item["path"]: item for item in manifest["managed_files"]}
     for path in [
