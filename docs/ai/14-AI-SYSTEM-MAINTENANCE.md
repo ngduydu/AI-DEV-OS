@@ -12,15 +12,15 @@ Knowledge **phát hiện trong task** mặc định tạo file riêng dưới `d
 
 | Knowledge phát hiện trong task | Nơi lưu mặc định |
 |---|---|
-| Business rule / behavior bền vững | `docs/knowledge/business-rules/<domain>-<rule>.md` |
-| Gotcha / failure mode khó nhớ | `docs/knowledge/pitfalls/<domain>-<failure-mode>.md` |
-| Module discovery | `docs/knowledge/modules/<module>-<topic>.md` |
-| Deploy/migration/rollback/monitoring discovery | `docs/knowledge/operations/<system>-<topic>.md` |
+| Business rule / behavior bền vững | `docs/knowledge/business-rules/entries/<entry-id>-<rule>.md` |
+| Gotcha / failure mode khó nhớ | `docs/knowledge/pitfalls/entries/<entry-id>-<failure-mode>.md` |
+| Module discovery | `docs/knowledge/modules/<module>/entries/<entry-id>-<topic>.md` |
+| Deploy/migration/rollback/monitoring discovery | `docs/knowledge/operations/<system>/entries/<entry-id>-<topic>.md` |
 | Context chỉ phục vụ task hiện tại | `docs/work/` |
 | Quyết định architecture/public contract có trade-off | `docs/decisions/` ADR |
 | Procedure nhiều bước đã lặp lại, tương đối ổn định | Skill |
 
-Không có central index phải append sau mỗi task.
+Không có central index/summary/changelog phải append sau mỗi task. Với task-generated artifact, ưu tiên `entries/<entry-id>-<slug>.md`; không dùng global sequence.
 
 ### Shared canonical docs
 
