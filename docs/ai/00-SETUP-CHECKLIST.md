@@ -23,8 +23,8 @@ Chỉ bổ sung khi có bằng chứng hoặc task bắt đầu chạm tới:
 - [ ] `05-BUSINESS-RULES.md` và `docs/modules/<module>/`.
 - [ ] `09-SECURITY.md`.
 - [ ] `docs/operations/` cho deploy/migration/rollback/monitoring/troubleshooting.
-- [ ] `13-KNOWN-PITFALLS.md` từ lỗi/gotcha thật.
-- [ ] ADR cho quyết định có trade-off đáng kể.
+- [ ] Pitfall/gotcha mới → `docs/knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `13-KNOWN-PITFALLS.md` trong task bình thường.
+- [ ] ADR mới → `docs/decisions/entries/<entry-id>-<slug>.md`; không dùng global sequence.
 - [ ] Skill cho procedure đã lặp lại và ổn định.
 
 ## Với repository đã có code
