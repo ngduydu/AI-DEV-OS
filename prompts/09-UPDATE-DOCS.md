@@ -4,13 +4,13 @@
 
 Mặc định với knowledge phát hiện trong task:
 
-- business rule/behavior → `docs/knowledge/business-rules/entries/<entry-id>-<slug>.md`;
-- pitfall/gotcha → `docs/knowledge/pitfalls/entries/<entry-id>-<slug>.md`;
-- module discovery → `docs/knowledge/modules/<module>/entries/<entry-id>-<slug>.md`;
-- operations discovery → `docs/knowledge/operations/<system>/entries/<entry-id>-<slug>.md`;
-- architectural/public-contract decision → `docs/decisions/entries/<entry-id>-<slug>.md`;
+- business rule/behavior → `docs/03-knowledge/business-rules/entries/<entry-id>-<slug>.md`;
+- pitfall/gotcha → `docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md`;
+- module discovery → `docs/03-knowledge/modules/<module>/entries/<entry-id>-<slug>.md`;
+- operations discovery → `docs/03-knowledge/operations/<system>/entries/<entry-id>-<slug>.md`;
+- architectural/public-contract decision → `docs/05-decisions/entries/<entry-id>-<slug>.md`;
 - recurring procedure → Skill;
-- chỉ thuộc task hiện tại → giữ trong `docs/work/<task-id>/`.
+- chỉ thuộc task hiện tại → giữ trong `docs/06-work/<task-id>/`.
 
 Không append vào shared summary/index/changelog/list chỉ để persist discovery.
 Không dùng global sequence cho file mới.
