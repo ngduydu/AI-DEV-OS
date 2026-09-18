@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 93
+Tổng số file: 96
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
@@ -69,6 +69,7 @@ docs/decisions/README.md
 docs/modules/README.md
 docs/operations/README.md
 docs/superpowers/plans/2026-09-16-framework-lifecycle-context-retrieval.md
+docs/superpowers/plans/2026-09-18-ai-dev-machine-tooling-setup.md
 docs/superpowers/plans/2026-09-18-global-ai-dev-os-updater.md
 docs/superpowers/specs/2026-09-16-framework-lifecycle-context-retrieval-design.md
 docs/superpowers/specs/2026-09-18-global-ai-dev-os-updater-design.md
@@ -95,5 +96,7 @@ templates/PR-DESCRIPTION.md
 templates/RELEASE-CHECKLIST.md
 templates/mcp/claude-codebase-memory.json
 tools/install-personal-updater.ps1
+tools/setup-ai-dev-machine.ps1
+tools/tests/verify-machine-setup.py
 tools/tests/verify-updater.py
 ~~~
