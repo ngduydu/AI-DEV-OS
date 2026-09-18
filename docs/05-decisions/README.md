@@ -7,14 +7,14 @@ ADR lưu **lý do của quyết định**, không chỉ kết quả.
 Quyết định mới tạo file riêng tại:
 
 ```text
-docs/decisions/entries/<entry-id>-<decision-slug>.md
+docs/05-decisions/entries/<entry-id>-<decision-slug>.md
 ```
 
 Ví dụ:
 
 ```text
-docs/decisions/entries/hhm-123-use-outbox-for-order-events.md
-docs/decisions/entries/2026-09-18-payment-retry-use-idempotency-key.md
+docs/05-decisions/entries/hhm-123-use-outbox-for-order-events.md
+docs/05-decisions/entries/2026-09-18-payment-retry-use-idempotency-key.md
 ```
 
 Không dùng sequence toàn cục kiểu `0001`, `0002` cho ADR mới vì hai branch song song có thể chọn cùng số.
