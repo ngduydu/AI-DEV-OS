@@ -64,6 +64,7 @@ def main() -> None:
         "Canonical updater skill not found",
         "/update-ai-dev-os",
         "$HOME",
+        "disable-model-invocation: true",
     ]:
         if needle not in installer:
             fail(f"installer missing expected contract: {needle}")
