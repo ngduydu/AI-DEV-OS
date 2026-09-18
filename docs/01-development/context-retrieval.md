@@ -9,7 +9,7 @@ Mục tiêu: giúp agent lấy **đúng context, đủ context, ít context th�
 ~~~text
 docs/README.md
 ↓
-docs/ai/04-CODEBASE-MAP.md
+docs/00-overview/codebase-map.md
 ↓
 module/domain docs liên quan
 ↓
