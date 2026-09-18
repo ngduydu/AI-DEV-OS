@@ -93,17 +93,22 @@ claude --version
 
 Nếu thiếu nhưng chỉ dùng Extension → chưa phải blocker.
 
-Nếu muốn cài CLI:
+Nếu muốn cài CLI, ưu tiên WinGet để tránh pipe remote script trực tiếp vào PowerShell:
 
 ```powershell
-irm https://claude.ai/install.ps1 | iex
+winget install --id Anthropic.ClaudeCode -e
 ```
 
-Hoặc stable channel:
+Nếu môi trường không có WinGet, tải installer về file trước rồi mới chạy:
 
 ```powershell
-& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) stable
+$installer = Join-Path $env:TEMP "claude-install.ps1"
+Invoke-WebRequest -UseBasicParsing -Uri "https://claude.ai/install.ps1" -OutFile $installer
+powershell -NoProfile -ExecutionPolicy Bypass -File $installer stable
+Remove-Item -LiteralPath $installer -Force
 ```
+
+Trong môi trường doanh nghiệp, review/signature-policy của installer phải được áp dụng theo policy nội bộ trước khi chạy.
 
 Kiểm tra:
 
