@@ -332,3 +332,50 @@ inventory toàn bộ docs legacy
 Migration layout là thay đổi có chủ đích của framework. Git rename history phải được giữ bằng `git mv` để branch cũ có cơ hội merge rename-aware.
 
 Conflict đã được tạo từ trước khi migration (ví dụ một branch đang sửa cùng shared file legacy) không thể được xóa bằng cách đoán semantics. Nhưng sau migration, task mới không còn append discovery vào shared docs nên conflict rác không tiếp tục phát sinh.
+
+
+## 2.7.0 — AI engineering stack integration
+
+Repo đang ở 2.6.x chạy bình thường:
+
+```text
+/update-ai-dev-os
+```
+
+Updater chỉ thêm/cập nhật framework-owned artifacts; **không bootstrap lại project** và không overwrite project-owned knowledge.
+
+### Framework-owned additions
+
+- `docs/01-development/context-compression.md`;
+- `docs/01-development/sql-server-mcp.md`;
+- TDD skill;
+- domain-modeling skill;
+- merge-conflict resolution skill;
+- Claude MCP reference templates cho Headroom và SQL Server DAB;
+- Simplicity Gate + review/planning hardening.
+
+### Optional tools
+
+Không tự cài/bật khi update:
+
+- Headroom;
+- SQL Server MCP/DAB;
+- codebase-memory-mcp;
+- ast-grep;
+- Repomix.
+
+Nếu muốn SQL Server MCP machine capability:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1 -WithSqlServerMcp
+```
+
+Lệnh chỉ cài/verify DAB CLI. Database connection/entity/permission vẫn là project-specific và phải least-privilege.
+
+Headroom dùng profile trong `docs/01-development/context-compression.md`; không bật proxy toàn cục mặc định.
+
+### Compatibility
+
+- Project knowledge/entries cũ giữ nguyên.
+- Không tạo lại shared append-only knowledge.
+- Skills mới không thay project-specific custom skill trùng tên bằng suy đoán; nếu target đã customize cùng managed path, updater phải review theo ownership contract trước merge.

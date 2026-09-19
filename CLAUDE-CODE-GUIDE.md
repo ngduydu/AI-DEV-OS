@@ -281,6 +281,7 @@ Load context
 → inspect code/tests
 → Understanding Gate
 → Reuse Gate
+→ Simplicity Gate
 → Dependency Gate
 → plan nếu cần
 → implement
@@ -877,3 +878,37 @@ Sau khi setup, restart Claude Code rồi dùng:
 ~~~
 
 để kiểm tra MCP.
+
+
+## Optional profiles: context compression và SQL Server MCP
+
+### Headroom
+
+Nếu task thường xuyên trả log/tool/RAG output rất lớn, có thể bật Headroom MCP on-demand để compress rồi retrieve original khi cần evidence.
+
+Không bật proxy/wrap toàn cục mặc định.
+
+Xem:
+
+```text
+docs/01-development/context-compression.md
+```
+
+### SQL Server MCP
+
+Project SQL Server có thể dùng Microsoft Data API builder làm MCP server cho runtime diagnostics.
+
+Default:
+
+```text
+test/dev
+→ read-only / least privilege
+→ allowlist entity
+→ no production write / no DDL
+```
+
+Xem:
+
+```text
+docs/01-development/sql-server-mcp.md
+```

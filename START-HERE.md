@@ -221,6 +221,8 @@ CLAUDE.md
 docs/
 .claude/skills/
 .claude/agents/
+templates/mcp/claude-headroom.json          # optional reference
+templates/mcp/claude-sql-server-dab.json    # optional reference
 ```
 
 Nếu muốn compatibility với agent khác, copy thêm:
@@ -658,6 +660,16 @@ Claude MCP user-scope
 
 sẽ được cài/verify ở mức máy/user tùy capability hiện có.
 
+Optional nếu project dùng SQL Server runtime diagnostics:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1 -WithSqlServerMcp
+~~~
+
+Lệnh này chỉ cài/verify Microsoft Data API builder; không tự kết nối database.
+
+Nếu task thường xuyên có log/tool/RAG output lớn, xem `docs/01-development/context-compression.md` để pilot Headroom MCP on-demand. Không bật proxy toàn cục mặc định.
+
 Restart Claude Code rồi chạy:
 
 ~~~text
@@ -665,3 +677,36 @@ Restart Claude Code rồi chạy:
 ~~~
 
 để xác nhận `codebase-memory-mcp` Connected.
+
+
+## Optional power-user profiles
+
+### Code graph cho AI và developer
+
+Sau khi codebase-memory-mcp đã cài:
+
+```powershell
+codebase-memory-mcp --ui=true --port=9749
+```
+
+Mở `http://localhost:9749` để xem graph. Resource/index policy: `docs/01-development/codebase-intelligence.md`.
+
+### Headroom cho Claude Code
+
+Sau khi cài Headroom:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\start-claude-headroom.ps1
+```
+
+Mode này route Claude CLI qua local Headroom proxy để tự động tối ưu context. Chi tiết: `docs/01-development/context-compression.md`.
+
+### Task còn mơ hồ
+
+Không cần viết prompt dài. Chạy:
+
+```text
+/shape-task
+```
+
+rồi mô tả task ngắn. Agent tự tìm facts, hỏi bạn các decision còn mở, chốt spec/plan rồi mới chuyển sang implement.

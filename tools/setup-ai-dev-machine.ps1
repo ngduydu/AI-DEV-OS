@@ -1,5 +1,6 @@
 ﻿param(
     [switch]$SkipMcp,
+    [switch]$WithSqlServerMcp,
     [switch]$SelfTest
 )
 
@@ -35,7 +36,8 @@ function Refresh-ProcessPath {
     $extra = @(
         (Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"),
         (Join-Path $env:LOCALAPPDATA "Programs\codebase-memory-mcp"),
-        (Join-Path $env:APPDATA "npm")
+        (Join-Path $env:APPDATA "npm"),
+        (Join-Path $HOME ".dotnet\tools")
     ) | Where-Object { $_ -and (Test-Path $_) }
 
     $env:Path = (($machine, $user) + $extra | Where-Object { $_ } | Select-Object -Unique) -join ";"
@@ -259,6 +261,71 @@ function Ensure-ClaudeMcp {
     }
 }
 
+function Ensure-SqlServerMcp {
+    if (-not $WithSqlServerMcp) {
+        Add-Result "SQL Server MCP" "SKIP" "Không bật -WithSqlServerMcp."
+        return
+    }
+
+    Refresh-ProcessPath
+
+    if (Test-Command "dab") {
+        try {
+            $versionText = (& dab --version 2>&1 | Select-Object -First 1)
+            $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
+            if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
+                Add-Result "SQL Server MCP" "PASS" "Đã có DAB đủ MCP profile: $versionText"
+                return
+            }
+            Write-Host "DAB hiện có chưa đạt baseline 2.0; sẽ update lên 2.0.12..." -ForegroundColor Cyan
+            & dotnet tool update --global Microsoft.DataApiBuilder --version 2.0.12
+            if ($LASTEXITCODE -ne 0) {
+                Add-Result "SQL Server MCP" "FAIL" "dotnet tool update Microsoft.DataApiBuilder 2.0.12 thất bại với mã $LASTEXITCODE."
+                return
+            }
+            Refresh-ProcessPath
+            $updatedVersion = (& dab --version 2>&1 | Select-Object -First 1)
+            Add-Result "SQL Server MCP" "PASS" "Đã update DAB: $updatedVersion. Chưa cấu hình database/project."
+            return
+        } catch {
+            Add-Result "SQL Server MCP" "BLOCKED" "Có command dab nhưng không xác minh được version: $($_.Exception.Message)"
+            return
+        }
+    }
+
+    if (-not (Test-Command "dotnet")) {
+        Add-Result "SQL Server MCP" "BLOCKED" "Thiếu .NET SDK. DAB yêu cầu .NET 8+."
+        return
+    }
+
+    try {
+        $dotnetVersion = (& dotnet --version 2>&1 | Select-Object -First 1)
+        $major = [int]($dotnetVersion.Split('.')[0])
+        if ($major -lt 8) {
+            Add-Result "SQL Server MCP" "BLOCKED" "dotnet hiện tại là $dotnetVersion; DAB yêu cầu .NET 8+."
+            return
+        }
+    } catch {
+        Add-Result "SQL Server MCP" "BLOCKED" "Không xác định được dotnet version."
+        return
+    }
+
+    Write-Host "Đang cài Microsoft Data API builder 2.0.12 cho SQL MCP..." -ForegroundColor Cyan
+    & dotnet tool install --global Microsoft.DataApiBuilder --version 2.0.12
+    if ($LASTEXITCODE -ne 0) {
+        Add-Result "SQL Server MCP" "FAIL" "dotnet tool install Microsoft.DataApiBuilder 2.0.12 thất bại với mã $LASTEXITCODE."
+        return
+    }
+
+    Refresh-ProcessPath
+    if (Test-Command "dab") {
+        $version = (& dab --version 2>&1 | Select-Object -First 1)
+        Add-Result "SQL Server MCP" "PASS" "Đã cài DAB: $version. Chưa cấu hình database/project."
+    } else {
+        Add-Result "SQL Server MCP" "BLOCKED" "Đã cài DAB nhưng terminal hiện tại chưa thấy command dab. Mở terminal mới rồi chạy lại."
+    }
+}
+
 function Ensure-PersonalUpdater {
     $installer = Join-Path $RepoRoot "tools\install-personal-updater.ps1"
     if (-not (Test-Path $installer)) {
@@ -290,7 +357,10 @@ if ($SelfTest) {
         'claude mcp remove --scope user codebase-memory-mcp',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',
-        'claude mcp list'
+        'claude mcp list',
+        '[switch]$WithSqlServerMcp',
+        'Microsoft.DataApiBuilder --version 2.0.12',
+        'Đã cài DAB'
     )
 
     foreach ($needle in $required) {
@@ -317,6 +387,7 @@ Ensure-WingetPackage -DisplayName "ast-grep" -CommandName "ast-grep" -PackageId 
 Ensure-Repomix
 $cbmExe = Ensure-CodebaseMemory
 Ensure-ClaudeMcp -CbmExe $cbmExe
+Ensure-SqlServerMcp
 Ensure-PersonalUpdater
 
 Write-Host ""
@@ -350,3 +421,4 @@ Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng." -ForegroundColor Green
 Write-Host "Restart Claude Code rồi dùng /mcp để xác nhận codebase-memory-mcp Connected." -ForegroundColor Green
 Write-Host ""
 Write-Host "Lưu ý: tool đã cài sẵn không có nghĩa task nào cũng dùng. AI-DEV-OS vẫn ưu tiên CODEBASE-MAP -> direct read -> ripgrep -> ast-grep -> codebase-memory-mcp khi thật sự cần." -ForegroundColor DarkGray
+Write-Host "SQL Server MCP chỉ được cài khi dùng -WithSqlServerMcp và vẫn cần project config + least-privilege DB role riêng." -ForegroundColor DarkGray

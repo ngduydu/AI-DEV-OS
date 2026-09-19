@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "framework_version": "2.6.1",
+  "framework_version": "2.7.0",
   "managed_files": [
     {
       "path": "UPGRADE.md",
@@ -131,6 +131,121 @@
       "path": ".ai-dev-os/layouts.json",
       "ownership": "framework",
       "scope": "core"
+    },
+    {
+      "path": "docs/01-development/context-compression.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": "docs/01-development/sql-server-mcp.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/tdd/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/tdd/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".claude/skills/resolve-merge-conflicts/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/resolve-merge-conflicts/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".claude/skills/domain-modeling/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/domain-modeling/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": "templates/mcp/claude-headroom.json",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": "templates/mcp/claude-sql-server-dab.json",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/implement-plan/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/plan-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/research-codebase/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/review-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/verify-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/implement-plan/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/plan-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/research-codebase/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/review-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/verify-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": "docs/01-development/codebase-intelligence.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/shape-task/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/shape-task/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
     }
   ]
 }

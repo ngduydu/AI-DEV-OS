@@ -97,6 +97,8 @@ docs/
 │   ├── documentation-governance.md
 │   ├── ai-development.md
 │   ├── context-retrieval.md
+│   ├── context-compression.md
+│   ├── sql-server-mcp.md
 │   └── tool-adoption.md
 │
 ├── 02-modules/
@@ -174,7 +176,7 @@ Không copy:
 - `LICENSE`
 - repo issue/PR metadata
 - `prompts/`
-- `templates/`
+- `templates/` nói chung (trừ hai MCP reference template được allowlist ở Claude profile)
 - machine setup scripts
 
 ## 8. Target state
@@ -208,6 +210,8 @@ Copy thêm:
 - `CLAUDE.md`
 - toàn bộ `.claude/skills/` trừ `.claude/skills/apply-ai-dev-os/`
 - toàn bộ `.claude/agents/`
+- `templates/mcp/claude-headroom.json`
+- `templates/mcp/claude-sql-server-dab.json`
 
 Không copy `.agents/skills/`.
 

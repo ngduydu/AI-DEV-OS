@@ -28,6 +28,9 @@ def main() -> None:
         "personal updater": "install-personal-updater.ps1",
         "Vietnamese output": "TÓM TẮT THIẾT LẬP",
         "no project MCP mutation": "Không sửa .mcp.json của project",
+        "optional SQL MCP flag": "[switch]$WithSqlServerMcp",
+        "Microsoft SQL MCP": "Microsoft.DataApiBuilder --version 2.0.12",
+        "SQL MCP remains project-specific": "Chưa cấu hình database/project",
     }
 
     for name, needle in required.items():

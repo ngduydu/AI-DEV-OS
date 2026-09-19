@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sql-server": {
+      "command": "dab",
+      "args": [
+        "start",
+        "--mcp-stdio",
+        "role:ai-readonly",
+        "--config",
+        "dab-config.json"
+      ]
+    }
+  }
+}

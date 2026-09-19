@@ -233,6 +233,8 @@ Nguyên tắc chính:
 
 ### Cách viết comment
 
+- Comment mới hoặc comment được sửa phải viết bằng **tiếng Việt** để team đọc/review nhanh; code, identifier và thuật ngữ kỹ thuật vẫn giữ theo convention của project.
+- Không đổi hàng loạt comment tiếng Anh cũ ngoài scope chỉ để dịch.
 - Ưu tiên giải thích **WHY** hơn **WHAT**.
 - Viết ngắn, cụ thể và đúng với behavior hiện tại.
 - Nếu cần comment dài để giải thích cả workflow/business rule, đưa knowledge bền vững vào docs/module docs và để comment chỉ giữ lý do gần code.

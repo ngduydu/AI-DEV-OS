@@ -33,7 +33,9 @@ Review only; do not rewrite the implementation unless explicitly asked.
 9. Overengineering/future-proofing without current requirement.
 10. New dependency/package without clear need while project already has a suitable building block.
 11. Project convention/canonical pattern violations that affect maintainability.
-12. Cleanup issues: dead code, commented-out code, temp scripts, debug logs, stale TODO/comment/docs.
+12. Code that could have been deleted/avoided by reuse, standard library, platform capability or an existing dependency.
+13. Abstraction/wrapper/factory added before a real repeated need or stable seam exists.
+14. Cleanup issues: dead code, commented-out code, temp scripts, debug logs, stale TODO/comment/docs.
 
 Do not spend review budget on personal style preferences already handled by formatter/linter.
 

@@ -213,3 +213,78 @@ Bộ khung chọn các nguyên tắc sau:
 8. **Recurring correction → durable knowledge**, recurring procedure → Skill.
 9. **Rules are guidance, tooling is enforcement** cho security/format/test bắt buộc.
 10. **Một nguồn sự thật**, adapter cho từng AI phải càng mỏng càng tốt.
+
+
+## 2026-09-19 — AI engineering stack review
+
+### Microsoft SQL MCP Server / Data API builder
+
+- SQL MCP Server overview: https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/overview
+- stdio transport: https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/stdio-transport
+- DAB CLI install: https://learn.microsoft.com/en-us/azure/data-api-builder/command-line/install
+
+Điểm lấy vào bộ khung:
+
+- dùng DAB làm SQL Server MCP profile thay vì custom NL2SQL server;
+- local stdio cho coding agent;
+- entity allowlist + role/permission;
+- test/dev + read-only/least privilege mặc định;
+- source/migration/SP trong Git vẫn là implementation ground truth.
+
+### headroomlabs-ai/headroom
+
+https://github.com/headroomlabs-ai/headroom
+
+Điểm lấy vào bộ khung:
+
+- compress tool output/log/RAG/file context khi output lớn/noisy;
+- retrieve original khi cần exact evidence;
+- MCP on-demand là integration mặc định của AI-DEV-OS;
+- không bật proxy/wrap toàn cục mặc định;
+- durable knowledge vẫn đi qua AI-DEV-OS Knowledge Sync.
+
+### DeusData/codebase-memory-mcp
+
+https://github.com/DeusData/codebase-memory-mcp
+
+Đã có từ machine tooling trước 2.7:
+
+- symbol/caller/callee/dependency/impact cho codebase lớn;
+- MCP user-scope;
+- pin installer/release + security verification;
+- fallback về CODEBASE-MAP/search/source.
+
+2.7 giữ lại tool này, không thêm graph tool overlap.
+
+### DietrichGebert/ponytail
+
+https://github.com/DietrichGebert/ponytail
+
+Không cài plugin nguyên bộ. Hấp thụ pattern có giá trị vào Task Execution Contract:
+
+```text
+no-code/config
+→ reuse
+→ stdlib/platform
+→ existing dependency
+→ minimum new code
+```
+
+Mục tiêu: giảm code phải sở hữu, abstraction thừa và maintenance surface.
+
+### mattpocock/skills
+
+https://github.com/mattpocock/skills
+
+Không cài nguyên bộ vì AI-DEV-OS đã có skill/knowledge architecture riêng.
+
+Pattern lấy vào:
+
+- test seam trước implementation;
+- TDD theo small red-green slice;
+- implementation chạy focused check thường xuyên + broad check cuối;
+- domain terminology/decision phải persist;
+- merge conflict resolve theo intent, không chọn ours/theirs mù;
+- review ngắn, tập trung correctness và unnecessary code.
+
+AI-DEV-OS bổ sung các skill tương ứng nhưng giữ routing/docs/Knowledge Sync hiện tại làm source of truth.

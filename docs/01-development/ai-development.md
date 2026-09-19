@@ -52,6 +52,20 @@ Không cần tạo work folder nếu không giúp ích.
 
 Feature/bug chạm nhiều file, có business rule hoặc regression risk đáng kể.
 
+Nếu task còn mơ hồ/decision-heavy, chạy `shape-task` trước implementation:
+
+```text
+Task ngắn
+→ Research facts
+→ hỏi user các decision còn mở theo từng round
+→ shared understanding
+→ Spec/Plan
+→ Approval
+→ Implement
+```
+
+Nếu requirement đã rõ:
+
 ```text
 Understand → Research vừa đủ → Plan → Implement → Verify → Review → Sync → Report
 ```
@@ -60,8 +74,20 @@ Understand → Research vừa đủ → Plan → Implement → Verify → Review
 
 Architecture, auth/security/payment, migration dữ liệu, cross-cutting change, refactor lớn hoặc codebase chưa hiểu rõ.
 
+Mặc định dùng task shaping nếu chưa có spec/plan đã approve:
+
 ```text
-Research → Spec → Plan → Tasks → Implement theo phase → Verify → Independent Review → Production Gate
+Research facts
+→ Shape Task / decision-tree interview
+→ Shared Understanding
+→ Spec
+→ Plan
+→ Approval
+→ Tasks
+→ Implement theo phase
+→ Verify
+→ Independent Review
+→ Production Gate
 ```
 
 Dùng `docs/06-work/` khi artifacts giúp giữ context, review hoặc handoff.
@@ -128,7 +154,32 @@ Không duplicate business rule quan trọng ở nhiều nơi nếu có thể có
 
 Không reuse chỉ vì tên giống nhau nếu semantics khác.
 
-## 5. Dependency Gate
+## 5. Simplicity Gate
+
+Trước khi viết thêm code, đi theo thứ tự:
+
+```text
+Có thể không viết gì / chỉ cấu hình?
+→ có thể reuse/extend code hiện có?
+→ standard library/platform đã đủ?
+→ dependency project đang có đã đủ?
+→ chỉ còn thiếu capability thật sự?
+→ viết phần nhỏ nhất cần thiết
+```
+
+Rules:
+
+- Không tạo abstraction trước khi có repetition/complexity thật.
+- Không thêm wrapper/helper chỉ để "đẹp".
+- Không future-proof cho requirement chưa tồn tại.
+- Không đổi architecture chỉ vì agent thích pattern khác.
+- Không thêm dependency khi code/platform hiện có giải quyết đủ.
+- Không viết lại capability đã có trong framework/toolchain.
+- Nếu implementation dài bất thường, dừng và kiểm tra lại reuse/dependency/seam trước khi tiếp tục.
+
+Đây là rule core lấy theo tinh thần "senior dev lười đúng chỗ": giảm code phải sở hữu, giảm surface bug và giảm maintenance.
+
+## 6. Dependency Gate
 
 Trước khi thêm package/library/service bên ngoài:
 
@@ -140,7 +191,7 @@ Trước khi thêm package/library/service bên ngoài:
 
 Dependency ảnh hưởng architecture/public contract/deployment phải được xem như decision/risk tương ứng.
 
-## 6. Plan
+## 7. Plan
 
 Task nhỏ có thể implement ngay sau khi qua các gate trên.
 
@@ -157,7 +208,7 @@ Task vừa/lớn cần plan đủ để trả lời:
 
 Không plan vượt quá scope task.
 
-## 7. Implement
+## 8. Implement
 
 - Bám đúng scope và Acceptance Criteria.
 - Theo convention thật của project.
@@ -169,7 +220,7 @@ Không plan vượt quá scope task.
 - Không hard-code output chỉ để test hiện tại pass.
 - Với schema/data destructive, phải thiết kế rollback/recovery hoặc nêu rõ vì sao không thể rollback.
 
-## 8. Verify
+## 9. Verify
 
 Verification là evidence, không phải cảm giác.
 
@@ -181,7 +232,7 @@ Verification là evidence, không phải cảm giác.
 6. Không sửa/xóa test đúng chỉ để né failure; nếu test sai, phải giải thích bằng evidence.
 7. Test phải xác minh behavior, không chỉ implementation detail vô nghĩa.
 
-## 9. Cleanup Gate
+## 10. Cleanup Gate
 
 Trước review/Done:
 
@@ -192,7 +243,7 @@ Trước review/Done:
 - không format/refactor hàng loạt file ngoài scope;
 - không để duplicate helper/business logic mà Reuse Gate lẽ ra phải phát hiện.
 
-## 10. Independent Review
+## 11. Independent Review
 
 Không cần spawn reviewer cho mọi typo nhỏ.
 
@@ -205,7 +256,7 @@ Claude Code có thể dùng:
 
 Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năng gây sai behavior hoặc production incident hơn style preference.
 
-## 11. Knowledge Sync — bắt buộc
+## 12. Knowledge Sync — bắt buộc
 
 ### Conflict-safe Knowledge Sync
 
@@ -246,7 +297,7 @@ Knowledge Sync: no durable changes
 Policy đầy đủ: `docs/03-knowledge/README.md`.
 
 
-## 12. Production Gate
+## 13. Production Gate
 
 Trước khi gọi change là Production Candidate, đánh giá những mục liên quan:
 
@@ -265,7 +316,7 @@ Không phải task nào cũng cần mọi mục. Nhưng mục có liên quan kh�
 
 Nếu có production risk chưa được giải quyết hoặc chưa xác minh, không báo `Production Ready`; nêu rõ blocker/risk.
 
-## 13. Final Report
+## 14. Final Report
 
 Báo ngắn gọn và dựa trên evidence:
 
@@ -301,7 +352,7 @@ Knowledge mới → không để chết trong chat.
 Risk production chưa xử lý → không gọi Production Ready.
 ```
 
-## 14. Context Efficiency Gate
+## 15. Context Efficiency Gate
 
 Trước khi mở rộng investigation:
 
