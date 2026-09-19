@@ -30,7 +30,7 @@ def main() -> None:
         "Simplicity Gate",
         "Có thể không viết gì / chỉ cấu hình?",
         "standard library/platform",
-        "existing dependency",
+        "dependency project đang có",
     ]:
         require(task, needle, "task execution")
 
