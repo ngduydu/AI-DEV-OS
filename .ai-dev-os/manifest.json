@@ -231,6 +231,21 @@
       "path": ".agents/skills/verify-change/SKILL.md",
       "ownership": "framework",
       "scope": "generic"
+    },
+    {
+      "path": "docs/01-development/codebase-intelligence.md",
+      "ownership": "framework",
+      "scope": "core"
+    },
+    {
+      "path": ".claude/skills/shape-task/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/shape-task/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
     }
   ]
 }
