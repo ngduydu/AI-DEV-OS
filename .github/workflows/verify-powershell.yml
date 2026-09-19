@@ -70,3 +70,7 @@ jobs:
       - name: Verify active ordered references
         shell: powershell
         run: python .\tools\tests\verify-active-ordered-references.py .
+
+      - name: Verify AI engineering stack 2.7
+        shell: powershell
+        run: python .\tools\tests\verify-engineering-stack.py .
