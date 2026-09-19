@@ -89,6 +89,29 @@ dab init `
   --config dab-config.json
 ```
 
+Bật MCP trong `dab-config.json` và chỉ bật tool cần thiết. Read-only baseline:
+
+```json
+{
+  "runtime": {
+    "mcp": {
+      "enabled": true,
+      "dml-tools": {
+        "describe-entities": true,
+        "read-records": true,
+        "aggregate-records": true,
+        "execute-entity": true,
+        "create-record": false,
+        "update-record": false,
+        "delete-record": false
+      }
+    }
+  }
+}
+```
+
+Nếu project không cần stored procedure qua MCP, tắt cả `execute-entity`.
+
 Sau đó expose từng entity cần thiết với quyền tối thiểu.
 
 Ví dụ read-only:
