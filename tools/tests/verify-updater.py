@@ -60,6 +60,25 @@ def main() -> None:
         if not (root / path).exists():
             fail(f"managed source path does not exist: {path}")
 
+    protected_project_knowledge = {
+        "docs/00-overview/project-context.md",
+        "docs/00-overview/product.md",
+        "docs/00-overview/architecture.md",
+        "docs/00-overview/codebase-map.md",
+        "docs/01-development/coding-standards.md",
+        "docs/01-development/commands.md",
+        "docs/01-development/testing.md",
+        "docs/01-development/security.md",
+        "docs/01-development/git-workflow.md",
+        "docs/01-development/definition-of-ready.md",
+        "docs/01-development/definition-of-done.md",
+        "docs/03-knowledge/business-rules.md",
+        "docs/03-knowledge/known-pitfalls.md",
+    }
+    accidentally_managed = sorted(protected_project_knowledge & seen)
+    if accidentally_managed:
+        fail(f"project-owned knowledge must not be manifest-managed: {accidentally_managed}")
+
     claude_skill = (root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     generic_skill = (root / ".agents" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     if claude_skill != generic_skill:
