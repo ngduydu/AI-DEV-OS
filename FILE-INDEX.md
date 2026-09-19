@@ -1,6 +1,6 @@
 # File Index
 
-Tổng số file: 121
+Tổng số file: 125
 
 File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, xóa hoặc di chuyển file, CI sẽ kiểm tra để tránh tài liệu mô tả cấu trúc bị lệch với repository thật.
 
@@ -12,6 +12,7 @@ File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, 
 .agents/skills/plan-change/SKILL.md
 .agents/skills/research-codebase/SKILL.md
 .agents/skills/review-change/SKILL.md
+.agents/skills/shape-task/SKILL.md
 .agents/skills/resolve-merge-conflicts/SKILL.md
 .agents/skills/update-ai-dev-os/SKILL.md
 .agents/skills/update-project-knowledge/SKILL.md
@@ -31,6 +32,7 @@ File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, 
 .claude/skills/plan-change/SKILL.md
 .claude/skills/research-codebase/SKILL.md
 .claude/skills/review-change/SKILL.md
+.claude/skills/shape-task/SKILL.md
 .claude/skills/resolve-merge-conflicts/SKILL.md
 .claude/skills/update-ai-dev-os/SKILL.md
 .claude/skills/update-project-knowledge/SKILL.md
@@ -63,6 +65,7 @@ docs/00-overview/product.md
 docs/00-overview/project-context.md
 docs/01-development/ai-development.md
 docs/01-development/coding-standards.md
+docs/01-development/codebase-intelligence.md
 docs/01-development/commands.md
 docs/01-development/context-compression.md
 docs/01-development/context-retrieval.md
@@ -116,6 +119,7 @@ templates/mcp/claude-sql-server-dab.json
 tools/install-personal-updater.ps1
 tools/migrate-docs-layout.ps1
 tools/setup-ai-dev-machine.ps1
+tools/start-claude-headroom.ps1
 tools/tests/test-migrate-docs-layout-safety.ps1
 tools/tests/test-migrate-docs-layout.ps1
 tools/tests/verify-active-ordered-references.py
