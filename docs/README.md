@@ -15,8 +15,8 @@ Task context        → chỉ nạp những gì liên quan
 1. Hiểu yêu cầu hiện tại.
 2. Đọc `docs/01-development/ai-development.md`.
 3. Xác định module/khu vực code bị ảnh hưởng.
-4. Đọc `04-CODEBASE-MAP.md` khi cần tìm canonical implementation/reuse source.
-5. Đọc `06-CODING-STANDARDS.md` khi task tạo/sửa code.
+4. Đọc `docs/00-overview/codebase-map.md` khi cần tìm canonical implementation/reuse source.
+5. Đọc `docs/01-development/coding-standards.md` khi task tạo/sửa code.
 6. Chỉ đọc thêm docs và code liên quan đến khu vực đó.
 
 ## Routing
@@ -48,7 +48,7 @@ Task context        → chỉ nạp những gì liên quan
 Trước khi tạo service/helper/component/validator/query/mapper/DTO pattern hoặc business logic mới:
 
 ```text
-04-CODEBASE-MAP.md
+docs/00-overview/codebase-map.md
 → canonical examples
 → reusable building blocks
 → nearby code/tests
