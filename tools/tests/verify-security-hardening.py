@@ -67,6 +67,8 @@ def main() -> None:
         "Target working tree must be clean before migration",
         "reset --hard HEAD",
         "$stateExistedBefore",
+        'foreach ($folder in @("docs", ".claude", ".agents", ".github", "prompts"))',
+        'Get-ChildItem -LiteralPath $Root -File -Filter *.md -Force',
     ]:
         require(migrator, needle, "migration hardening")
 
@@ -79,6 +81,8 @@ def main() -> None:
         "AGENTS.md` hoặc `CLAUDE.md` **không đủ**",
         "Không được chạy framework migration trực tiếp trên branch task",
         "STOP trước mutation",
+        "git symbolic-ref --short refs/remotes/origin/HEAD",
+        "không hard-code repository phải dùng `main`/`master`",
     ]:
         require(updater, needle, "updater safety")
 
@@ -87,6 +91,8 @@ def main() -> None:
         "Apply phải chạy trên branch riêng",
         "feature/task branch khác",
         "STOP trước mutation",
+        "git symbolic-ref --short refs/remotes/origin/HEAD",
+        "target base branch",
     ]:
         require(apply_skill, needle, "apply branch safety")
 
