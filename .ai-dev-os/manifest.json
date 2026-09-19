@@ -181,6 +181,56 @@
       "path": "templates/mcp/claude-sql-server-dab.json",
       "ownership": "framework",
       "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/implement-plan/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/plan-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/research-codebase/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/review-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".claude/skills/verify-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "claude"
+    },
+    {
+      "path": ".agents/skills/implement-plan/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/plan-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/research-codebase/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/review-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
+    },
+    {
+      "path": ".agents/skills/verify-change/SKILL.md",
+      "ownership": "framework",
+      "scope": "generic"
     }
   ]
 }
