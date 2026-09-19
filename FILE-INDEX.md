@@ -1,18 +1,21 @@
 # File Index
 
-Tổng số file: 110
+Tổng số file: 121
 
 File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, xóa hoặc di chuyển file, CI sẽ kiểm tra để tránh tài liệu mô tả cấu trúc bị lệch với repository thật.
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
+.agents/skills/domain-modeling/SKILL.md
 .agents/skills/fix-bug/SKILL.md
 .agents/skills/implement-plan/SKILL.md
 .agents/skills/plan-change/SKILL.md
 .agents/skills/research-codebase/SKILL.md
 .agents/skills/review-change/SKILL.md
+.agents/skills/resolve-merge-conflicts/SKILL.md
 .agents/skills/update-ai-dev-os/SKILL.md
 .agents/skills/update-project-knowledge/SKILL.md
+.agents/skills/tdd/SKILL.md
 .agents/skills/verify-change/SKILL.md
 .ai-dev-os/VERSION
 .ai-dev-os/layouts.json
@@ -22,13 +25,16 @@ File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, 
 .claude/agents/production-reviewer.md
 .claude/skills/apply-ai-dev-os/SKILL.md
 .claude/skills/bootstrap-project/SKILL.md
+.claude/skills/domain-modeling/SKILL.md
 .claude/skills/fix-bug/SKILL.md
 .claude/skills/implement-plan/SKILL.md
 .claude/skills/plan-change/SKILL.md
 .claude/skills/research-codebase/SKILL.md
 .claude/skills/review-change/SKILL.md
+.claude/skills/resolve-merge-conflicts/SKILL.md
 .claude/skills/update-ai-dev-os/SKILL.md
 .claude/skills/update-project-knowledge/SKILL.md
+.claude/skills/tdd/SKILL.md
 .claude/skills/verify-change/SKILL.md
 .github/ISSUE_TEMPLATE/bug-report.yml
 .github/ISSUE_TEMPLATE/config.yml
@@ -58,6 +64,7 @@ docs/00-overview/project-context.md
 docs/01-development/ai-development.md
 docs/01-development/coding-standards.md
 docs/01-development/commands.md
+docs/01-development/context-compression.md
 docs/01-development/context-retrieval.md
 docs/01-development/definition-of-done.md
 docs/01-development/definition-of-ready.md
@@ -65,6 +72,7 @@ docs/01-development/documentation-governance.md
 docs/01-development/git-workflow.md
 docs/01-development/security.md
 docs/01-development/setup-checklist.md
+docs/01-development/sql-server-mcp.md
 docs/01-development/testing.md
 docs/01-development/tool-adoption.md
 docs/02-modules/README.md
@@ -103,6 +111,8 @@ templates/POSTMORTEM.md
 templates/PR-DESCRIPTION.md
 templates/RELEASE-CHECKLIST.md
 templates/mcp/claude-codebase-memory.json
+templates/mcp/claude-headroom.json
+templates/mcp/claude-sql-server-dab.json
 tools/install-personal-updater.ps1
 tools/migrate-docs-layout.ps1
 tools/setup-ai-dev-machine.ps1
@@ -112,6 +122,7 @@ tools/tests/verify-active-ordered-references.py
 tools/tests/verify-apply-agent-selection.py
 tools/tests/verify-conflict-safe-knowledge.py
 tools/tests/verify-docs-layout.py
+tools/tests/verify-engineering-stack.py
 tools/tests/verify-machine-setup.py
 tools/tests/verify-security-hardening.py
 tools/tests/verify-updater.py
