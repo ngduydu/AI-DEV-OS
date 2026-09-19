@@ -152,9 +152,15 @@ Nhìn tổng thể:
 ├── USAGE.md
 ├── CLAUDE-CODE-GUIDE.md
 │
+├── .ai-dev-os/
+│   ├── VERSION
+│   ├── manifest.json
+│   ├── layouts.json
+│   └── state.json          # target repo tạo khi apply/update; source chỉ giữ canonical marker
+│
 ├── docs/
 │   ├── README.md
-│   ├── 00-overview/       # repo apply mới
+│   ├── 00-overview/
 │   ├── 01-development/
 │   ├── 02-modules/
 │   ├── 03-knowledge/
@@ -178,6 +184,9 @@ Nhìn tổng thể:
 | Thành phần | Nó là gì? | Khi copy vào project thì để làm gì? |
 |---|---|---|
 | `.ai-dev-os/VERSION` | Version baseline của AI-DEV-OS trong product repo | Giúp biết project đang dùng framework version nào để upgrade đúng thay vì copy đè toàn bộ framework. |
+| `.ai-dev-os/manifest.json` | Danh sách file framework quản lý và ownership của từng file | Cho updater biết file nào được thay, file nào phải semantic merge, file nào là project-owned. |
+| `.ai-dev-os/layouts.json` | Contract layout + mapping legacy → ordered | Cho updater migrate repo cũ về cấu trúc ordered một cách deterministic. |
+| `.ai-dev-os/state.json` | Trạng thái layout của target repo | Được tạo/cập nhật sau apply/update thành công; không dùng để thay thế VERSION. |
 | `UPGRADE.md` | Contract/migration guide của framework | Giải thích file nào được update, file nào phải preserve khi nâng AI-DEV-OS. |
 | `AGENTS.md` | Entry point rule chung cho AI agent | Nói cho agent biết phải đọc documentation map nào, phải tuân workflow/gate nào và không được tự ý bỏ qua verify/reuse/clarification. Đây là file nhỏ nhưng luôn quan trọng. |
 | `docs/` | Bộ nhớ lâu dài của project | Lưu những thứ AI cần hiểu về project mà không nên chỉ nằm trong chat: product, architecture, codebase map, coding convention, commands, testing, business rules, module knowledge, operations, ADR... Sau bootstrap, AI sẽ đọc/update các file này theo task. |
@@ -194,6 +203,9 @@ Nếu project chỉ dùng Claude Code, thường copy:
 
 ```text
 .ai-dev-os/VERSION
+.ai-dev-os/manifest.json
+.ai-dev-os/layouts.json
+# .ai-dev-os/state.json được tạo sau apply thành công
 UPGRADE.md
 AGENTS.md
 CLAUDE.md
@@ -460,11 +472,16 @@ Chi tiết: `docs/01-development/context-retrieval.md`.
 
 ## Framework version và upgrade
 
-Product repo từ baseline 2.2.0 có:
+Product repo hiện dùng bộ metadata:
 
 ~~~text
 .ai-dev-os/VERSION
+.ai-dev-os/manifest.json
+.ai-dev-os/layouts.json
+.ai-dev-os/state.json
 ~~~
+
+`VERSION` là framework baseline; `state.json` là docs-layout state. Hai khái niệm này tách nhau.
 
 Khi AI-DEV-OS thay đổi, không copy đè toàn bộ `docs/`.
 
