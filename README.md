@@ -288,7 +288,7 @@ Mục tiêu của repo là có core knowledge chung, còn adapter nào được 
 | `USAGE.md` | Hướng dẫn cách giao task hằng ngày sau khi setup. |
 | `CLAUDE-CODE-GUIDE.md` | Hướng dẫn cài và vận hành Claude Code. |
 | `prompts/` | Prompt thủ công cho các tình huống cần chạy bằng tay hoặc tham khảo. Không cần nếu đã dùng skill tương ứng. |
-| `templates/` | Mẫu Feature Brief, Bug Brief, PR, Postmortem, Release Checklist... Chỉ copy khi team muốn áp dụng các mẫu này. |
+| `templates/` | Mẫu Feature Brief, Bug Brief, PR, Postmortem, Release Checklist và MCP reference config. Không copy mặc định, trừ các MCP template được /apply-ai-dev-os allowlist cho Claude profile. |
 
 ## Project knowledge
 
