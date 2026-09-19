@@ -58,13 +58,17 @@ Trước khi sửa target:
 3. Target working tree phải clean.
 4. Nếu target đã có `.ai-dev-os/VERSION`: dừng và bảo dùng `/update-ai-dev-os`.
 5. Nếu target đã có AI-DEV-OS artifacts đáng kể: coi là legacy/partial install, dừng và bảo dùng `/update-ai-dev-os`.
-6. Apply phải chạy trên branch riêng:
-   - nếu current branch là `main` hoặc `master`, tạo:
+6. Xác định **target base branch**:
+   - ưu tiên `git symbolic-ref --short refs/remotes/origin/HEAD` và bỏ prefix `origin/`;
+   - nếu remote HEAD chưa được set, fallback `main`, rồi `master` nếu branch đó tồn tại;
+   - nếu vẫn không xác định được: STOP trước mutation.
+7. Apply phải chạy trên branch riêng:
+   - nếu current branch = target base branch, tạo:
      `<git-user-slug>/apply-ai-dev-os-<version>`
      fallback: `ai-dev-os/apply-<version>`;
    - nếu current branch đã đúng pattern apply cho version này thì tiếp tục;
-   - nếu current branch là feature/task branch khác: **STOP trước mutation** và yêu cầu chạy lại từ `main`/`master`.
-7. Nếu branch apply đích đã tồn tại nhưng HEAD khác HEAD của `main`/`master`: STOP, không reuse branch cũ bằng suy đoán.
+   - nếu current branch là feature/task branch khác: **STOP trước mutation** và yêu cầu chạy lại từ target base branch.
+8. Nếu branch apply đích đã tồn tại nhưng HEAD khác HEAD của target base branch: STOP, không reuse branch cũ bằng suy đoán.
 
 Không tự commit/push/merge.
 
