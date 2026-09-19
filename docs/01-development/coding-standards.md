@@ -75,7 +75,7 @@ Quy tắc chung:
 Trước khi tạo service/helper/component/validator/query/mapper/DTO pattern hoặc business logic mới:
 
 1. Search tên domain và behavior tương tự.
-2. Đọc `04-CODEBASE-MAP.md` và canonical examples liên quan.
+2. Đọc `docs/00-overview/codebase-map.md` và canonical examples liên quan.
 3. Kiểm tra reusable building blocks hiện có.
 4. Reuse/extend khi semantics phù hợp.
 5. Chỉ tạo abstraction mới khi có lý do kỹ thuật rõ và không làm API/architecture phức tạp hơn vô ích.
@@ -254,7 +254,7 @@ Ví dụ tốt:
 
 ## 15. Canonical examples
 
-Không chỉ mô tả convention bằng chữ. `04-CODEBASE-MAP.md` phải trỏ tới implementation được coi là chuẩn cho các pattern quan trọng của project.
+Không chỉ mô tả convention bằng chữ. `docs/00-overview/codebase-map.md` phải trỏ tới implementation được coi là chuẩn cho các pattern quan trọng của project.
 
 Khi tạo code mới, agent phải ưu tiên đọc canonical example phù hợp trước.
 
