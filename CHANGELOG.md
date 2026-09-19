@@ -6,6 +6,30 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.7.0 — AI engineering stack integration
+
+### Added
+
+- Optional Headroom MCP context-compression profile với compress/retrieve/stats và policy không bật proxy toàn cục mặc định.
+- Optional Microsoft SQL MCP Server profile qua Data API builder, test/dev + least-privilege/read-only baseline.
+- Skills mới: `tdd`, `resolve-merge-conflicts`, `domain-modeling` cho Claude và generic agent adapters.
+- Claude MCP templates cho Headroom và SQL Server DAB.
+- Machine setup flag `-WithSqlServerMcp` cài/verify Microsoft.DataApiBuilder 2.0.12 mà không tự cấu hình database.
+
+### Changed
+
+- Task Execution thêm Simplicity Gate: no-code/config → reuse → stdlib/platform → existing dependency → minimum new code.
+- Plan/review contract kiểm tra test seam, code ownership cost, overengineering và dependency reuse rõ hơn.
+- Context Retrieval biết dùng Headroom khi output lớn/noisy và SQL MCP như runtime evidence cho SQL Server.
+- External engineering patterns được hấp thụ vào core thay vì cài chồng Ponytail/mattpocock skills nguyên bộ.
+- codebase-memory-mcp tiếp tục là graph/code-intelligence profile, không bị thay bởi tool overlap.
+
+### Safety
+
+- Headroom không auto-install/auto-proxy qua apply/update.
+- SQL MCP không tự tạo connection string, không expose database và không cho production/write mặc định.
+- Durable knowledge vẫn đi qua conflict-safe Knowledge Sync của AI-DEV-OS.
+
 ## 2.6.1 — Update/apply hardening
 
 ### Fixed
