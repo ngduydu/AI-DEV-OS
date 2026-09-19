@@ -23,36 +23,48 @@ MCP mode cung cấp:
 
 Compression chạy local; original có thể được retrieve lại trong TTL của session.
 
-## Vì sao không bật proxy mặc định?
+## Hai mode sử dụng
 
-AI-DEV-OS không route toàn bộ Claude traffic qua proxy mặc định vì:
-
-- thay đổi trust/network path của agent;
-- compression tự động có thể che chi tiết cần debug;
-- machine/team cần benchmark accuracy/latency thực tế;
-- MCP on-demand có exit path đơn giản hơn.
-
-Default recommendation:
+### 1. MCP on-demand
 
 ```text
-Headroom MCP on-demand
-→ dùng cho output lớn/noisy
-→ retrieve original khi cần evidence
+Claude nhận output lớn
+→ gọi headroom_compress
+→ reasoning trên bản nén
+→ cần exact evidence
+→ headroom_retrieve
 ```
 
-Proxy/wrap chỉ bật khi team đã pilot và chấp nhận trade-off.
+Phù hợp khi muốn agent tự quyết lúc nào cần nén.
+
+### 2. Transparent proxy/wrap
+
+```text
+Claude request
+→ Headroom proxy
+→ tự compress/cache-align context phù hợp
+→ Anthropic
+```
+
+Đây là mode dùng khi mục tiêu là tiết kiệm token tự động trên toàn session.
+
+AI-DEV-OS hỗ trợ mode này nhưng không ép bật cho mọi máy. Sau khi pilot ổn, team có thể dùng làm profile hằng ngày cho Claude Code.
+
+Xem thống kê token tiết kiệm qua endpoint `/stats` hoặc `headroom_stats`.
 
 ## Setup
 
 Headroom không được cài tự động bởi `/apply-ai-dev-os` hoặc `/update-ai-dev-os`.
 
-Cài riêng trên máy khi muốn pilot:
+Cài riêng trên máy khi muốn pilot.
+
+Khuyến nghị dùng `uv` để tách khỏi Python project:
 
 ```powershell
-py -m pip install "headroom-ai[mcp]==0.37.0"
+uv tool install --python 3.13 "headroom-ai[proxy,mcp]==0.37.0"
 ```
 
-Hoặc dùng môi trường Python/uv riêng theo hướng dẫn upstream.
+Nếu môi trường team quản lý Python theo cách khác, cài package tương đương trong môi trường riêng; không nhét dependency Headroom vào application project.
 
 Template MCP:
 
@@ -114,3 +126,56 @@ Nó bổ sung một lớp **output compression** giữa retrieval và reasoning.
 - không bật proxy tự động trên máy/team mà chưa review config;
 - không dùng `headroom learn` để tự ghi vào shared AI-DEV-OS/project instructions trong workflow mặc định;
 - mọi durable knowledge vẫn đi qua Knowledge Sync của AI-DEV-OS.
+
+
+## Claude Code qua proxy
+
+### CLI
+
+AI-DEV-OS có launcher:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\start-claude-headroom.ps1
+```
+
+Launcher:
+
+```text
+kiểm tra headroom + claude
+→ start local proxy nếu chưa chạy
+→ set ANTHROPIC_BASE_URL
+→ mở Claude Code
+→ khi Claude thoát thì dọn proxy do launcher tạo
+```
+
+Xem stats khi session đang chạy:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8787/stats
+```
+
+### VS Code Claude extension
+
+Upstream hỗ trợ wrapper:
+
+```powershell
+headroom wrap vscode-claude
+```
+
+Sau đó reload VS Code theo hướng dẫn Headroom.
+
+Không sửa settings thủ công nếu wrapper upstream đã quản lý được.
+
+## Profile khuyến nghị
+
+```text
+Mặc định team
+→ Headroom proxy/wrap nếu máy đã pilot ổn
+→ MCP vẫn Connected để compress/retrieve thủ công khi cần
+→ theo dõi headroom_stats hoặc /stats
+
+Khi debug security/data-destructive/exact SQL
+→ retrieve/read original trước kết luận
+```
+
+Mục tiêu là giảm token mà không hy sinh evidence.
