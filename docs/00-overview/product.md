@@ -42,4 +42,4 @@ Những thứ chủ động không giải quyết ở thời điểm hiện tạ
 
 ## Thuật ngữ sản phẩm
 
-Xem thêm `15-GLOSSARY.md`.
+Xem thêm `docs/00-overview/glossary.md`.
