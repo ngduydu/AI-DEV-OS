@@ -26,6 +26,8 @@ Chỉ bổ sung khi có bằng chứng hoặc task bắt đầu chạm tới:
 - [ ] Pitfall/gotcha mới → `docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `docs/03-knowledge/known-pitfalls.md` trong task bình thường.
 - [ ] ADR mới → `docs/05-decisions/entries/<entry-id>-<slug>.md`; không dùng global sequence.
 - [ ] Skill cho procedure đã lặp lại và ổn định.
+- [ ] Nếu project cần runtime SQL diagnostics: đánh giá `docs/01-development/sql-server-mcp.md`; không bật production/write mặc định.
+- [ ] Nếu task thường xuyên sinh output/log/RAG rất lớn: pilot `docs/01-development/context-compression.md`; không bật proxy toàn cục mặc định.
 
 ## Với repository đã có code
 
