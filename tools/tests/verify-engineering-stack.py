@@ -25,12 +25,22 @@ def main() -> None:
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
+    agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+    for needle in [
+        "Mọi phản hồi, báo cáo, plan/spec",
+        "Comment mới hoặc comment được sửa",
+        "tiếng Việt",
+    ]:
+        require(agents, needle, "language policy")
+
     task = (root / "docs" / "01-development" / "ai-development.md").read_text(encoding="utf-8")
     for needle in [
         "Simplicity Gate",
         "Có thể không viết gì / chỉ cấu hình?",
         "standard library/platform",
         "dependency project đang có",
+        "shape-task",
+        "decision-tree interview",
     ]:
         require(task, needle, "task execution")
 
@@ -49,9 +59,22 @@ def main() -> None:
         "headroom_compress",
         "headroom_retrieve",
         "MCP on-demand",
-        "không bật proxy",
+        "transparent proxy/wrap",
+        "start-claude-headroom.ps1",
+        "/stats",
     ]:
         require(compression, needle, "context compression")
+
+    codebase = (root / "docs" / "01-development" / "codebase-intelligence.md").read_text(encoding="utf-8")
+    for needle in [
+        "Graph UI",
+        "localhost:9749",
+        "auto_index = false",
+        "auto_watch",
+        "watcher_enabled",
+        "Profile ít tài nguyên",
+    ]:
+        require(codebase, needle, "codebase intelligence")
 
     sql = (root / "docs" / "01-development" / "sql-server-mcp.md").read_text(encoding="utf-8")
     for needle in [
@@ -86,16 +109,23 @@ def main() -> None:
         ".agents/skills/domain-modeling/SKILL.md",
         "templates/mcp/claude-headroom.json",
         "templates/mcp/claude-sql-server-dab.json",
+        "docs/01-development/codebase-intelligence.md",
+        ".claude/skills/shape-task/SKILL.md",
+        ".agents/skills/shape-task/SKILL.md",
     }
     missing = sorted(required_managed - manifest_paths)
     if missing:
         fail(f"manifest missing 2.7 managed files: {missing}")
 
-    for name in ["tdd", "resolve-merge-conflicts", "domain-modeling"]:
+    for name in ["shape-task", "tdd", "resolve-merge-conflicts", "domain-modeling"]:
         claude = (root / ".claude" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
         generic = (root / ".agents" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
         if claude != generic:
             fail(f"Claude/generic skill differs: {name}")
+
+    launcher = (root / "tools" / "start-claude-headroom.ps1").read_text(encoding="utf-8")
+    for needle in ["ANTHROPIC_BASE_URL", "/stats", "headroom", "claude"]:
+        require(launcher, needle, "Headroom launcher")
 
     headroom_template = json.loads((root / "templates" / "mcp" / "claude-headroom.json").read_text(encoding="utf-8"))
     if "headroom" not in headroom_template.get("mcpServers", {}):
