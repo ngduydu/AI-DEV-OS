@@ -87,18 +87,22 @@ Nếu target version bằng source version nhưng layout còn legacy, vẫn ph�
 Không được chạy framework migration trực tiếp trên branch task đang phát triển.
 
 1. đọc current branch;
-2. nếu current branch là `main` hoặc `master`:
+2. xác định **target base branch**:
+   - ưu tiên `git symbolic-ref --short refs/remotes/origin/HEAD` và bỏ prefix `origin/`;
+   - nếu remote HEAD chưa được set, fallback `main`, rồi `master` nếu branch đó tồn tại;
+   - nếu vẫn không xác định được: STOP trước mutation, không đoán default branch;
+3. nếu current branch = target base branch:
    - lấy `git config user.name`;
    - chuyển thành slug lowercase, ký tự không hợp lệ → `-`;
    - branch đích: `<slug>/update-ai-dev-os-<source-version>`;
    - fallback: `ai-dev-os/update-<source-version>`;
    - nếu branch đích chưa tồn tại: tạo từ đúng HEAD hiện tại rồi switch;
-   - nếu branch đích đã tồn tại nhưng HEAD của nó khác HEAD hiện tại: STOP, không reuse branch cũ bằng suy đoán;
-   - nếu branch đích đã tồn tại và cùng HEAD: switch.
-3. nếu current branch đã đúng pattern update cho `<source-version>`: tiếp tục.
-4. nếu current branch là bất kỳ feature/task branch nào khác: **STOP trước mutation** và yêu cầu chạy lại từ `main`/`master`.
+   - nếu branch đích đã tồn tại nhưng HEAD của nó khác HEAD base hiện tại: STOP, không reuse branch cũ bằng suy đoán;
+   - nếu branch đích đã tồn tại và cùng HEAD: switch;
+4. nếu current branch đã đúng pattern update cho `<source-version>`: tiếp tục;
+5. nếu current branch là bất kỳ feature/task branch nào khác: **STOP trước mutation** và yêu cầu chạy lại từ target base branch.
 
-Mục tiêu: framework update luôn nằm trên branch riêng, không trộn rename/migration vào task đang chạy của thành viên.
+Mục tiêu: framework update luôn nằm trên branch riêng, không trộn rename/migration vào task đang chạy của thành viên và không hard-code repository phải dùng `main`/`master`.
 
 Không commit/merge/push tự động trừ khi user yêu cầu.
 
