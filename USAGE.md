@@ -368,9 +368,9 @@ Kiểm tra theo thứ tự:
 1. `CLAUDE.md`/adapter của tool có tồn tại và đúng không?
 2. `AGENTS.md` có trỏ tới `docs/README.md` và Task Execution Contract không?
 3. Project đã bootstrap đủ chưa?
-4. `04-CODEBASE-MAP.md` có canonical examples/building blocks chưa?
-5. `06-CODING-STANDARDS.md` có convention thật của project chưa?
-6. `07-COMMANDS.md` có command verify thật chưa?
+4. `docs/00-overview/codebase-map.md` có canonical examples/building blocks chưa?
+5. `docs/01-development/coding-standards.md` có convention thật của project chưa?
+6. `docs/01-development/commands.md` có command verify thật chưa?
 7. Business/module docs có thiếu knowledge quan trọng không?
 8. Tool enforcement/CI có bắt được rule nào nên tự động bắt không?
 
