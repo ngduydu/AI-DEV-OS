@@ -13,6 +13,27 @@ LEGACY_PREFIXES = (
     "docs/work/",
 )
 
+LEGACY_CANONICAL_BASENAMES = (
+    "01-PROJECT-CONTEXT.md",
+    "02-PRODUCT.md",
+    "03-ARCHITECTURE.md",
+    "04-CODEBASE-MAP.md",
+    "05-BUSINESS-RULES.md",
+    "06-CODING-STANDARDS.md",
+    "07-COMMANDS.md",
+    "08-TESTING.md",
+    "09-SECURITY.md",
+    "10-GIT-WORKFLOW.md",
+    "11-DEFINITION-OF-READY.md",
+    "12-DEFINITION-OF-DONE.md",
+    "13-KNOWN-PITFALLS.md",
+    "14-AI-SYSTEM-MAINTENANCE.md",
+    "15-GLOSSARY.md",
+    "16-TASK-EXECUTION.md",
+    "17-CONTEXT-RETRIEVAL.md",
+    "18-TOOL-ADOPTION.md",
+)
+
 # These files intentionally describe migration FROM the legacy layout.
 ALLOW_LEGACY_REFERENCES = {
     ".claude/skills/update-ai-dev-os/SKILL.md",
@@ -69,6 +90,9 @@ def main() -> None:
         for legacy in LEGACY_PREFIXES:
             if legacy in text:
                 stale.append(f"{relative}: {legacy}")
+        for legacy_name in LEGACY_CANONICAL_BASENAMES:
+            if f"`{legacy_name}`" in text:
+                stale.append(f"{relative}: {legacy_name}")
 
     if stale:
         fail("stale legacy docs reference(s):\n- " + "\n- ".join(sorted(stale)))
