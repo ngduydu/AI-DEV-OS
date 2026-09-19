@@ -16,6 +16,8 @@ def main() -> None:
     required = [
         root / ".ai-dev-os" / "VERSION",
         root / ".ai-dev-os" / "manifest.json",
+        root / ".ai-dev-os" / "layouts.json",
+        root / ".ai-dev-os" / "state.json",
         root / "UPGRADE.md",
         root / "tools" / "install-personal-updater.ps1",
         root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md",
@@ -28,10 +30,15 @@ def main() -> None:
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
 
-    if version != "2.3.0":
-        fail(f"expected VERSION 2.3.0, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest framework_version does not match VERSION")
+
+    layouts = json.loads((root / ".ai-dev-os" / "layouts.json").read_text(encoding="utf-8"))
+    state = json.loads((root / ".ai-dev-os" / "state.json").read_text(encoding="utf-8"))
+    if layouts.get("default_layout") != "ordered-v2":
+        fail("default layout must be ordered-v2")
+    if state.get("docs_layout") != "ordered-v2" or state.get("docs_layout_version") != 2:
+        fail("canonical source state must be ordered-v2 / 2")
 
     managed = manifest.get("managed_files")
     if not isinstance(managed, list) or not managed:
@@ -72,12 +79,19 @@ def main() -> None:
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for needle in [
         "2.3.0",
+        "2.6.0",
         "17-AI-USAGE-POLICY.md",
         "docs/team/AI-USAGE-POLICY.md",
         "install-personal-updater.ps1",
+        "ordered-v2",
+        "không bootstrap lại project",
     ]:
         if needle not in upgrade:
             fail(f"UPGRADE.md missing: {needle}")
+
+    changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+    if version not in changelog:
+        fail(f"CHANGELOG.md does not mention current VERSION {version}")
 
     print("PASS: updater static verification")
     print(f"PASS: version={version}")
