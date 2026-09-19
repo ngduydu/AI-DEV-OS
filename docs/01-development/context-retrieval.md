@@ -135,6 +135,8 @@ Không ép dùng cho SQL/XML nếu text search/source read đơn giản hơn.
 
 Optional local MCP/code-intelligence layer cho codebase lớn.
 
+Profile UI/index/resource đầy đủ: `docs/01-development/codebase-intelligence.md`.
+
 Dùng khi cần:
 
 - symbol discovery;
