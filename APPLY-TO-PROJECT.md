@@ -55,6 +55,8 @@ Copy thêm:
 ```text
 CLAUDE.md
 .claude/skills/
+templates/mcp/claude-headroom.json          # optional reference
+templates/mcp/claude-sql-server-dab.json    # optional reference
 ```
 
 Nếu muốn Claude dùng reviewer/subagent độc lập, copy thêm:
