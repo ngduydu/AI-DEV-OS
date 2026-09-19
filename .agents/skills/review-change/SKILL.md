@@ -17,6 +17,8 @@ Prioritize:
 6. migration and rollback risk;
 7. missing tests for new behavior;
 8. unnecessary complexity and scope creep;
-9. stale docs or misleading comments.
+9. code that could have been avoided by reuse/stdlib/existing dependency;
+10. abstractions/wrappers introduced before a real repeated need;
+11. stale docs or misleading comments.
 
 For each finding include severity, exact path/location, impact, evidence/reasoning, and a concrete remediation. Do not invent issues merely to fill a checklist.
