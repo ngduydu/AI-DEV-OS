@@ -208,6 +208,8 @@ Copy thêm:
 - `CLAUDE.md`
 - toàn bộ `.claude/skills/` trừ `.claude/skills/apply-ai-dev-os/`
 - toàn bộ `.claude/agents/`
+- `templates/mcp/claude-headroom.json`
+- `templates/mcp/claude-sql-server-dab.json`
 
 Không copy `.agents/skills/`.
 
