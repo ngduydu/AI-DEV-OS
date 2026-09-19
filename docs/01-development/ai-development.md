@@ -71,10 +71,10 @@ Dùng `docs/06-work/` khi artifacts giúp giữ context, review hoặc handoff.
 Trước khi sửa code:
 
 1. Đọc `docs/README.md`.
-2. Đọc `04-CODEBASE-MAP.md` để xác định area/canonical/reuse source trước khi search rộng.
+2. Đọc `docs/00-overview/codebase-map.md` để xác định area/canonical/reuse source trước khi search rộng.
 3. Đọc module docs và standards/commands/testing liên quan, không load toàn bộ docs.
 4. Nếu đã biết file/path thì đọc trực tiếp.
-5. Nếu chưa biết, search có mục tiêu theo `17-CONTEXT-RETRIEVAL.md`: text search → structural search → graph/MCP nếu phù hợp → broaden search khi evidence chưa đủ.
+5. Nếu chưa biết, search có mục tiêu theo `docs/01-development/context-retrieval.md`: text search → structural search → graph/MCP nếu phù hợp → broaden search khi evidence chưa đủ.
 6. Đọc source và test hiện có trước khi đề xuất implementation.
 
 Task bình thường sau bootstrap **không scan lại toàn repository theo mặc định**.
@@ -117,7 +117,7 @@ Ví dụ phải hỏi nếu repository chưa chứng minh được:
 
 Trước khi tạo mới service/helper/component/validator/query/mapper/DTO pattern/business logic:
 
-1. Đọc canonical examples/reusable building blocks trong `04-CODEBASE-MAP.md` nếu có.
+1. Đọc canonical examples/reusable building blocks trong `docs/00-overview/codebase-map.md` nếu có.
 2. Search implementation tương tự bằng domain term và behavior, không chỉ tên class dự kiến.
 3. Đọc canonical pattern hiện có.
 4. Ưu tiên reuse hoặc extend nếu semantics phù hợp.
@@ -233,7 +233,7 @@ Không có central index/summary/changelog phải update sau mỗi task. Trướ
 
 Chỉ sửa shared canonical docs khi **canonical truth thực sự thay đổi**, ví dụ architecture, project-wide rule, coding convention, command chính thức hoặc canonical implementation thay đổi do chính task này.
 
-Nếu user giải thích một durable rule để gỡ ambiguity, persist rule đó theo conflict-safe routing thay vì mặc định append vào `05-BUSINESS-RULES.md` hoặc `13-KNOWN-PITFALLS.md`.
+Nếu user giải thích một durable rule để gỡ ambiguity, persist rule đó theo conflict-safe routing thay vì mặc định append vào `docs/03-knowledge/business-rules.md` hoặc `docs/03-knowledge/known-pitfalls.md`.
 
 Existing knowledge từ trước 2.6.0 tiếp tục được đọc; không di chuyển hoặc tách knowledge cũ tự động.
 

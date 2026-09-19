@@ -92,13 +92,13 @@ Cập nhật trước các file có ích ngay:
 - `docs/01-development/commands.md`
 - `docs/01-development/testing.md`
 
-Bổ sung `05-BUSINESS-RULES.md`, `09-SECURITY.md`, `docs/02-modules/`, `docs/04-operations/` chỉ khi project thực sự có knowledge để ghi.
+Bổ sung `docs/03-knowledge/business-rules.md`, `docs/01-development/security.md`, `docs/02-modules/`, `docs/04-operations/` chỉ khi project thực sự có knowledge để ghi.
 
 Không bắt buộc mọi template field phải đầy trước task đầu tiên.
 
 ## 5. Populate Codebase Map để phục vụ Reuse Gate
 
-`04-CODEBASE-MAP.md` phải có nếu repository cho phép xác định:
+`docs/00-overview/codebase-map.md` phải có nếu repository cho phép xác định:
 
 - entry points;
 - module/folder boundaries;
@@ -116,7 +116,7 @@ Nếu chưa có canonical example cho một pattern, để trống hoặc ghi `N
 
 ## 6. Populate Coding Standards từ evidence
 
-`06-CODING-STANDARDS.md` phải phân biệt:
+`docs/01-development/coding-standards.md` phải phân biệt:
 
 - generic engineering rule của AI-DEV-OS;
 - convention thật của project;

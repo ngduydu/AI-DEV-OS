@@ -23,20 +23,27 @@ Trước tiên xác định project sẽ dùng agent nào.
 
 ### 1.1. Core dùng chung
 
-Hai thành phần này dùng cho mọi agent:
+Sáu thành phần core này dùng cho mọi agent:
 
 ```text
 .ai-dev-os/VERSION
+.ai-dev-os/manifest.json
+.ai-dev-os/layouts.json
 UPGRADE.md
 AGENTS.md
 docs/
 ```
+
+Sau apply thành công, tạo thêm `.ai-dev-os/state.json` cho target repo; không copy state của source như project state.
 
 Tác dụng:
 
 | Thành phần | Dùng để làm gì? |
 |---|---|
 | `.ai-dev-os/VERSION` | Ghi baseline framework để sau này biết cần upgrade từ version nào. |
+| `.ai-dev-os/manifest.json` | Khai báo file framework-managed/mixed và scope adapter để update không overwrite project knowledge. |
+| `.ai-dev-os/layouts.json` | Khai báo ordered layout và mapping dùng khi migrate repo legacy. |
+| `.ai-dev-os/state.json` | Target-specific layout state; được tạo sau apply/update thành công, không copy như canonical project content. |
 | `UPGRADE.md` | Hướng dẫn nâng framework mà không overwrite project knowledge. |
 | `AGENTS.md` | Entry point ngắn chứa các rule chung cho AI: phải đọc documentation map, tuân Task Execution Contract, không đoán requirement quan trọng, reuse trước khi tạo mới và phải verify trước khi báo Done. |
 | `docs/` | Knowledge lâu dài của project: project context, product, architecture, codebase map, coding convention, command, testing, business rule, module knowledge, operations, ADR và task artifacts khi cần. |
@@ -61,7 +68,10 @@ Cấu trúc tối thiểu:
 ```text
 MyProject/
 ├── .ai-dev-os/
-│   └── VERSION
+│   ├── VERSION
+│   ├── manifest.json
+│   ├── layouts.json
+│   └── state.json
 ├── UPGRADE.md
 ├── AGENTS.md
 ├── CLAUDE.md
@@ -439,7 +449,7 @@ Nguyên tắc cuối cùng:
 
 Không copy lại toàn bộ framework.
 
-Nếu project chưa có `.ai-dev-os/VERSION`, coi là **legacy / unversioned**.
+Nếu project chưa có `.ai-dev-os/VERSION` nhưng có đủ AI-DEV-OS artifacts legacy theo updater preflight, coi là **legacy / unversioned**. Không nhận diện chỉ dựa vào `AGENTS.md` hoặc `CLAUDE.md`.
 
 Flow:
 

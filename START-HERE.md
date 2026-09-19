@@ -213,6 +213,8 @@ Copy vào root repository:
 
 ```text
 .ai-dev-os/VERSION
+.ai-dev-os/manifest.json
+.ai-dev-os/layouts.json
 UPGRADE.md
 AGENTS.md
 CLAUDE.md
@@ -233,7 +235,10 @@ Cấu trúc mong muốn:
 MyProduct/
 ├── .git/
 ├── .ai-dev-os/
-│   └── VERSION
+│   ├── VERSION
+│   ├── manifest.json
+│   ├── layouts.json
+│   └── state.json      # tạo sau apply thành công
 ├── UPGRADE.md
 ├── AGENTS.md
 ├── CLAUDE.md
@@ -541,6 +546,9 @@ Chi tiết: `CLAUDE-CODE-GUIDE.md`.
 [ ] Claude CLI nếu cần đã hoạt động
 [ ] Project toolchain đúng version đã có hoặc blocker đã ghi rõ
 [ ] .ai-dev-os/VERSION tồn tại
+[ ] .ai-dev-os/manifest.json tồn tại
+[ ] .ai-dev-os/layouts.json tồn tại
+[ ] .ai-dev-os/state.json = ordered-v2 / 2 sau apply
 [ ] UPGRADE.md tồn tại
 [ ] AGENTS.md ở repo root
 [ ] CLAUDE.md ở repo root

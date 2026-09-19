@@ -87,18 +87,22 @@ Nếu target version bằng source version nhưng layout còn legacy, vẫn ph�
 Không được chạy framework migration trực tiếp trên branch task đang phát triển.
 
 1. đọc current branch;
-2. nếu current branch là `main` hoặc `master`:
+2. xác định **target base branch**:
+   - ưu tiên `git symbolic-ref --short refs/remotes/origin/HEAD` và bỏ prefix `origin/`;
+   - nếu remote HEAD chưa được set, fallback `main`, rồi `master` nếu branch đó tồn tại;
+   - nếu vẫn không xác định được: STOP trước mutation, không đoán default branch;
+3. nếu current branch = target base branch:
    - lấy `git config user.name`;
    - chuyển thành slug lowercase, ký tự không hợp lệ → `-`;
    - branch đích: `<slug>/update-ai-dev-os-<source-version>`;
    - fallback: `ai-dev-os/update-<source-version>`;
    - nếu branch đích chưa tồn tại: tạo từ đúng HEAD hiện tại rồi switch;
-   - nếu branch đích đã tồn tại nhưng HEAD của nó khác HEAD hiện tại: STOP, không reuse branch cũ bằng suy đoán;
-   - nếu branch đích đã tồn tại và cùng HEAD: switch.
-3. nếu current branch đã đúng pattern update cho `<source-version>`: tiếp tục.
-4. nếu current branch là bất kỳ feature/task branch nào khác: **STOP trước mutation** và yêu cầu chạy lại từ `main`/`master`.
+   - nếu branch đích đã tồn tại nhưng HEAD của nó khác HEAD base hiện tại: STOP, không reuse branch cũ bằng suy đoán;
+   - nếu branch đích đã tồn tại và cùng HEAD: switch;
+4. nếu current branch đã đúng pattern update cho `<source-version>`: tiếp tục;
+5. nếu current branch là bất kỳ feature/task branch nào khác: **STOP trước mutation** và yêu cầu chạy lại từ target base branch.
 
-Mục tiêu: framework update luôn nằm trên branch riêng, không trộn rename/migration vào task đang chạy của thành viên.
+Mục tiêu: framework update luôn nằm trên branch riêng, không trộn rename/migration vào task đang chạy của thành viên và không hard-code repository phải dùng `main`/`master`.
 
 Không commit/merge/push tự động trừ khi user yêu cầu.
 
@@ -263,14 +267,38 @@ Mixed files đặc biệt:
 
 - `AGENTS.md`
 - `docs/README.md`
-- `docs/00-overview/codebase-map.md`
 - `docs/01-development/setup-checklist.md`
 - `docs/01-development/documentation-governance.md`
 - `docs/02-modules/README.md`
-- `docs/03-knowledge/known-pitfalls.md`
 - `docs/04-operations/README.md`
 - `docs/05-decisions/README.md`
 - `docs/06-work/README.md`
+
+### Project-owned knowledge phải bất khả xâm phạm
+
+Các file bootstrap/task knowledge sau **không nằm trong manifest** và updater không được semantic-merge/overwrite:
+
+- `docs/00-overview/project-context.md`
+- `docs/00-overview/product.md`
+- `docs/00-overview/architecture.md`
+- `docs/00-overview/codebase-map.md`
+- `docs/01-development/coding-standards.md`
+- `docs/01-development/commands.md`
+- `docs/01-development/testing.md`
+- `docs/01-development/security.md`
+- `docs/01-development/git-workflow.md`
+- `docs/01-development/definition-of-ready.md`
+- `docs/01-development/definition-of-done.md`
+- `docs/03-knowledge/business-rules.md`
+- `docs/03-knowledge/known-pitfalls.md`
+- mọi file dưới `docs/02-modules/<module>/`, `docs/03-knowledge/**/entries/`, `docs/04-operations/` ngoài các root README framework-mixed, `docs/05-decisions/entries/`, `docs/06-work/<task>/`.
+
+Updater chỉ được:
+1. `git mv` nguyên file khi layout migration yêu cầu;
+2. rewrite **chính xác path reference cũ → mới**;
+3. sau đó giữ nguyên toàn bộ nội dung còn lại.
+
+Không được dùng source template/framework file để thay thế các file project-owned này.
 
 Nếu không thể merge mà không có nguy cơ mất project rule: report `CONFLICT`, không đoán.
 
@@ -303,18 +331,19 @@ Trước khi write VERSION:
 4. mọi migrated file giữ nguyên content hash trước bước framework merge;
 5. tất cả active `framework` paths tồn tại ở đúng canonical ordered path;
 6. mixed files vẫn chứa project-specific knowledge trước upgrade;
-7. không còn broken reference tới migrated legacy docs path;
-8. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
-9. nếu target có team policy thì route mới đúng;
-10. optional tool không bị auto-enabled;
-11. target working tree chỉ chứa expected upgrade + layout migration changes;
-12. migration-specific checks trong UPGRADE.md đã pass;
-13. không còn unresolved conflict;
-14. conflict-safe knowledge policy đã có;
-15. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
-16. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
-17. không còn duplicate scaffold ở legacy path và ordered path;
-18. không có bước bootstrap-project nào được chạy trong upgrade.
+7. mọi project-owned knowledge file trước update vẫn tồn tại sau update ở cùng path hoặc mapped ordered path; ngoài deterministic path-reference rewrite, nội dung phải được preserve;
+8. không còn broken reference tới migrated legacy docs path;
+9. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
+10. nếu target có team policy thì route mới đúng;
+11. optional tool không bị auto-enabled;
+12. target working tree chỉ chứa expected upgrade + layout migration changes;
+13. migration-specific checks trong UPGRADE.md đã pass;
+14. không còn unresolved conflict;
+15. conflict-safe knowledge policy đã có;
+16. active task/knowledge/fix-bug skills không còn append discovery vào shared docs;
+17. ADR/task-generated docs mới dùng entry-per-file và không phụ thuộc global sequence;
+18. không còn duplicate scaffold ở legacy path và ordered path;
+19. không có bước bootstrap-project nào được chạy trong upgrade.
 
 Nếu verification fail: KHÔNG bump version.
 

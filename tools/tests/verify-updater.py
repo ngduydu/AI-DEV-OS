@@ -16,6 +16,8 @@ def main() -> None:
     required = [
         root / ".ai-dev-os" / "VERSION",
         root / ".ai-dev-os" / "manifest.json",
+        root / ".ai-dev-os" / "layouts.json",
+        root / ".ai-dev-os" / "state.json",
         root / "UPGRADE.md",
         root / "tools" / "install-personal-updater.ps1",
         root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md",
@@ -28,10 +30,15 @@ def main() -> None:
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
 
-    if version != "2.3.0":
-        fail(f"expected VERSION 2.3.0, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest framework_version does not match VERSION")
+
+    layouts = json.loads((root / ".ai-dev-os" / "layouts.json").read_text(encoding="utf-8"))
+    state = json.loads((root / ".ai-dev-os" / "state.json").read_text(encoding="utf-8"))
+    if layouts.get("default_layout") != "ordered-v2":
+        fail("default layout must be ordered-v2")
+    if state.get("docs_layout") != "ordered-v2" or state.get("docs_layout_version") != 2:
+        fail("canonical source state must be ordered-v2 / 2")
 
     managed = manifest.get("managed_files")
     if not isinstance(managed, list) or not managed:
@@ -53,6 +60,25 @@ def main() -> None:
         if not (root / path).exists():
             fail(f"managed source path does not exist: {path}")
 
+    protected_project_knowledge = {
+        "docs/00-overview/project-context.md",
+        "docs/00-overview/product.md",
+        "docs/00-overview/architecture.md",
+        "docs/00-overview/codebase-map.md",
+        "docs/01-development/coding-standards.md",
+        "docs/01-development/commands.md",
+        "docs/01-development/testing.md",
+        "docs/01-development/security.md",
+        "docs/01-development/git-workflow.md",
+        "docs/01-development/definition-of-ready.md",
+        "docs/01-development/definition-of-done.md",
+        "docs/03-knowledge/business-rules.md",
+        "docs/03-knowledge/known-pitfalls.md",
+    }
+    accidentally_managed = sorted(protected_project_knowledge & seen)
+    if accidentally_managed:
+        fail(f"project-owned knowledge must not be manifest-managed: {accidentally_managed}")
+
     claude_skill = (root / ".claude" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     generic_skill = (root / ".agents" / "skills" / "update-ai-dev-os" / "SKILL.md").read_text(encoding="utf-8")
     if claude_skill != generic_skill:
@@ -72,12 +98,19 @@ def main() -> None:
     upgrade = (root / "UPGRADE.md").read_text(encoding="utf-8")
     for needle in [
         "2.3.0",
+        "2.6.0",
         "17-AI-USAGE-POLICY.md",
         "docs/team/AI-USAGE-POLICY.md",
         "install-personal-updater.ps1",
+        "ordered-v2",
+        "không bootstrap lại project",
     ]:
         if needle not in upgrade:
             fail(f"UPGRADE.md missing: {needle}")
+
+    changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+    if version not in changelog:
+        fail(f"CHANGELOG.md does not mention current VERSION {version}")
 
     print("PASS: updater static verification")
     print(f"PASS: version={version}")

@@ -20,14 +20,20 @@ try {
     Invoke-GitCommand $temp @("config", "user.name", "AI DEV OS Test")
 
     $fixtures = @{
-        "docs/ai/03-ARCHITECTURE.md" = "ARCH"
-        "docs/ai/custom-project-note.md" = "CUSTOM"
+        "docs/ai/01-PROJECT-CONTEXT.md" = "PROJECT-CONTEXT: bootstrapped custom data"
+        "docs/ai/03-ARCHITECTURE.md" = "ARCH: project architecture custom data"
+        "docs/ai/05-BUSINESS-RULES.md" = "BUSINESS-RULES: durable task knowledge"
+        "docs/ai/13-KNOWN-PITFALLS.md" = "PITFALLS: task-discovered knowledge"
+        "docs/ai/custom-project-note.md" = "CUSTOM: project-owned note"
         "docs/modules/sales/rules.md" = "MODULE"
         "docs/knowledge/pitfalls/legacy.md" = "PITFALL"
         "docs/operations/deployment.md" = "OPS"
         "docs/decisions/0001-old.md" = "ADR"
         "docs/work/task-1/PLAN.md" = "PLAN"
         "AGENTS.md" = "Read docs/ai/03-ARCHITECTURE.md and docs/modules/sales/rules.md"
+        "README.md" = "See docs/ai/03-ARCHITECTURE.md"
+        ".github/copilot-instructions.md" = "Read docs/work/task-1/PLAN.md"
+        "prompts/custom.md" = "Use docs/operations/deployment.md"
     }
 
     foreach ($entry in $fixtures.GetEnumerator()) {
@@ -55,8 +61,11 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Apply failed" }
 
     $expected = @{
-        "docs/00-overview/architecture.md" = "ARCH"
-        "docs/01-development/project/custom-project-note.md" = "CUSTOM"
+        "docs/00-overview/project-context.md" = "PROJECT-CONTEXT: bootstrapped custom data"
+        "docs/00-overview/architecture.md" = "ARCH: project architecture custom data"
+        "docs/03-knowledge/business-rules.md" = "BUSINESS-RULES: durable task knowledge"
+        "docs/03-knowledge/known-pitfalls.md" = "PITFALLS: task-discovered knowledge"
+        "docs/01-development/project/custom-project-note.md" = "CUSTOM: project-owned note"
         "docs/02-modules/sales/rules.md" = "MODULE"
         "docs/03-knowledge/pitfalls/legacy.md" = "PITFALL"
         "docs/04-operations/deployment.md" = "OPS"
@@ -77,7 +86,10 @@ try {
     }
 
     foreach ($legacy in @(
+        "docs/ai/01-PROJECT-CONTEXT.md",
         "docs/ai/03-ARCHITECTURE.md",
+        "docs/ai/05-BUSINESS-RULES.md",
+        "docs/ai/13-KNOWN-PITFALLS.md",
         "docs/ai/custom-project-note.md",
         "docs/modules/sales/rules.md",
         "docs/knowledge/pitfalls/legacy.md",
@@ -97,6 +109,21 @@ try {
     }
     if ($agents -notmatch "docs/02-modules/sales/rules.md") {
         throw "Module reference was not rewritten"
+    }
+
+    $readme = Get-Content -LiteralPath (Join-Path $temp "README.md") -Raw -Encoding UTF8
+    if ($readme -notmatch "docs/00-overview/architecture.md") {
+        throw "Root Markdown reference was not rewritten"
+    }
+
+    $copilot = Get-Content -LiteralPath (Join-Path $temp ".github/copilot-instructions.md") -Raw -Encoding UTF8
+    if ($copilot -notmatch "docs/06-work/task-1/PLAN.md") {
+        throw ".github Markdown reference was not rewritten"
+    }
+
+    $prompt = Get-Content -LiteralPath (Join-Path $temp "prompts/custom.md") -Raw -Encoding UTF8
+    if ($prompt -notmatch "docs/04-operations/deployment.md") {
+        throw "Prompt Markdown reference was not rewritten"
     }
 
     $state = Get-Content -LiteralPath (Join-Path $temp ".ai-dev-os/state.json") -Raw -Encoding UTF8 | ConvertFrom-Json

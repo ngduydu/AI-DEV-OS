@@ -18,11 +18,6 @@
       "scope": "core"
     },
     {
-      "path": "docs/00-overview/codebase-map.md",
-      "ownership": "mixed",
-      "scope": "core"
-    },
-    {
       "path": "docs/01-development/documentation-governance.md",
       "ownership": "mixed",
       "scope": "core"
@@ -85,11 +80,6 @@
     {
       "path": "docs/03-knowledge/README.md",
       "ownership": "framework",
-      "scope": "core"
-    },
-    {
-      "path": "docs/03-knowledge/known-pitfalls.md",
-      "ownership": "mixed",
       "scope": "core"
     },
     {

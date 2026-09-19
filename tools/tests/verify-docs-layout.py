@@ -46,17 +46,57 @@ def main() -> None:
 
     path_map = ordered.get("path_map", {})
     required_map = {
+        "docs/ai/00-SETUP-CHECKLIST.md": "docs/01-development/setup-checklist.md",
+        "docs/ai/01-PROJECT-CONTEXT.md": "docs/00-overview/project-context.md",
+        "docs/ai/02-PRODUCT.md": "docs/00-overview/product.md",
         "docs/ai/03-ARCHITECTURE.md": "docs/00-overview/architecture.md",
+        "docs/ai/04-CODEBASE-MAP.md": "docs/00-overview/codebase-map.md",
+        "docs/ai/05-BUSINESS-RULES.md": "docs/03-knowledge/business-rules.md",
+        "docs/ai/06-CODING-STANDARDS.md": "docs/01-development/coding-standards.md",
+        "docs/ai/07-COMMANDS.md": "docs/01-development/commands.md",
+        "docs/ai/08-TESTING.md": "docs/01-development/testing.md",
+        "docs/ai/09-SECURITY.md": "docs/01-development/security.md",
+        "docs/ai/10-GIT-WORKFLOW.md": "docs/01-development/git-workflow.md",
+        "docs/ai/11-DEFINITION-OF-READY.md": "docs/01-development/definition-of-ready.md",
+        "docs/ai/12-DEFINITION-OF-DONE.md": "docs/01-development/definition-of-done.md",
+        "docs/ai/13-KNOWN-PITFALLS.md": "docs/03-knowledge/known-pitfalls.md",
+        "docs/ai/14-AI-SYSTEM-MAINTENANCE.md": "docs/01-development/documentation-governance.md",
+        "docs/ai/15-GLOSSARY.md": "docs/00-overview/glossary.md",
         "docs/ai/16-TASK-EXECUTION.md": "docs/01-development/ai-development.md",
+        "docs/ai/17-CONTEXT-RETRIEVAL.md": "docs/01-development/context-retrieval.md",
+        "docs/ai/18-TOOL-ADOPTION.md": "docs/01-development/tool-adoption.md",
         "docs/modules/README.md": "docs/02-modules/README.md",
         "docs/knowledge/README.md": "docs/03-knowledge/README.md",
         "docs/operations/README.md": "docs/04-operations/README.md",
         "docs/decisions/README.md": "docs/05-decisions/README.md",
+        "docs/decisions/ADR-TEMPLATE.md": "docs/05-decisions/ADR-TEMPLATE.md",
         "docs/work/README.md": "docs/06-work/README.md",
+        "docs/work/_template/PLAN.md": "docs/06-work/_template/PLAN.md",
+        "docs/work/_template/RESEARCH.md": "docs/06-work/_template/RESEARCH.md",
+        "docs/work/_template/SPEC.md": "docs/06-work/_template/SPEC.md",
+        "docs/work/_template/TASKS.md": "docs/06-work/_template/TASKS.md",
+        "docs/work/_template/VERIFICATION.md": "docs/06-work/_template/VERIFICATION.md",
     }
-    for source, target in required_map.items():
-        if path_map.get(source) != target:
-            fail(f"bad ordered-v2 mapping: {source} -> {path_map.get(source)!r}")
+    if path_map != required_map:
+        missing = sorted(set(required_map) - set(path_map))
+        extra = sorted(set(path_map) - set(required_map))
+        wrong = sorted(
+            source for source in set(required_map) & set(path_map)
+            if required_map[source] != path_map[source]
+        )
+        fail(f"ordered-v2 path_map mismatch; missing={missing}, extra={extra}, wrong={wrong}")
+
+    required_prefix_map = {
+        "docs/modules/": "docs/02-modules/",
+        "docs/knowledge/": "docs/03-knowledge/",
+        "docs/operations/": "docs/04-operations/",
+        "docs/decisions/": "docs/05-decisions/",
+        "docs/work/": "docs/06-work/",
+        "docs/ai/": "docs/01-development/project/",
+        "docs/team/": "docs/01-development/team/",
+    }
+    if ordered.get("prefix_map") != required_prefix_map:
+        fail("ordered-v2 prefix_map is incomplete or changed unexpectedly")
 
     # Canonical source itself must already use ordered-v2.
     for relative in [
