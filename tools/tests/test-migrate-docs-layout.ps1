@@ -28,6 +28,9 @@ try {
         "docs/decisions/0001-old.md" = "ADR"
         "docs/work/task-1/PLAN.md" = "PLAN"
         "AGENTS.md" = "Read docs/ai/03-ARCHITECTURE.md and docs/modules/sales/rules.md"
+        "README.md" = "See docs/ai/03-ARCHITECTURE.md"
+        ".github/copilot-instructions.md" = "Read docs/work/task-1/PLAN.md"
+        "prompts/custom.md" = "Use docs/operations/deployment.md"
     }
 
     foreach ($entry in $fixtures.GetEnumerator()) {
@@ -97,6 +100,21 @@ try {
     }
     if ($agents -notmatch "docs/02-modules/sales/rules.md") {
         throw "Module reference was not rewritten"
+    }
+
+    $readme = Get-Content -LiteralPath (Join-Path $temp "README.md") -Raw -Encoding UTF8
+    if ($readme -notmatch "docs/00-overview/architecture.md") {
+        throw "Root Markdown reference was not rewritten"
+    }
+
+    $copilot = Get-Content -LiteralPath (Join-Path $temp ".github/copilot-instructions.md") -Raw -Encoding UTF8
+    if ($copilot -notmatch "docs/06-work/task-1/PLAN.md") {
+        throw ".github Markdown reference was not rewritten"
+    }
+
+    $prompt = Get-Content -LiteralPath (Join-Path $temp "prompts/custom.md") -Raw -Encoding UTF8
+    if ($prompt -notmatch "docs/04-operations/deployment.md") {
+        throw "Prompt Markdown reference was not rewritten"
     }
 
     $state = Get-Content -LiteralPath (Join-Path $temp ".ai-dev-os/state.json") -Raw -Encoding UTF8 | ConvertFrom-Json
