@@ -658,6 +658,16 @@ Claude MCP user-scope
 
 sẽ được cài/verify ở mức máy/user tùy capability hiện có.
 
+Optional nếu project dùng SQL Server runtime diagnostics:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1 -WithSqlServerMcp
+~~~
+
+Lệnh này chỉ cài/verify Microsoft Data API builder; không tự kết nối database.
+
+Nếu task thường xuyên có log/tool/RAG output lớn, xem `docs/01-development/context-compression.md` để pilot Headroom MCP on-demand. Không bật proxy toàn cục mặc định.
+
 Restart Claude Code rồi chạy:
 
 ~~~text
