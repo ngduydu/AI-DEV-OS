@@ -52,6 +52,20 @@ Không cần tạo work folder nếu không giúp ích.
 
 Feature/bug chạm nhiều file, có business rule hoặc regression risk đáng kể.
 
+Nếu task còn mơ hồ/decision-heavy, chạy `shape-task` trước implementation:
+
+```text
+Task ngắn
+→ Research facts
+→ hỏi user các decision còn mở theo từng round
+→ shared understanding
+→ Spec/Plan
+→ Approval
+→ Implement
+```
+
+Nếu requirement đã rõ:
+
 ```text
 Understand → Research vừa đủ → Plan → Implement → Verify → Review → Sync → Report
 ```
@@ -60,8 +74,20 @@ Understand → Research vừa đủ → Plan → Implement → Verify → Review
 
 Architecture, auth/security/payment, migration dữ liệu, cross-cutting change, refactor lớn hoặc codebase chưa hiểu rõ.
 
+Mặc định dùng task shaping nếu chưa có spec/plan đã approve:
+
 ```text
-Research → Spec → Plan → Tasks → Implement theo phase → Verify → Independent Review → Production Gate
+Research facts
+→ Shape Task / decision-tree interview
+→ Shared Understanding
+→ Spec
+→ Plan
+→ Approval
+→ Tasks
+→ Implement theo phase
+→ Verify
+→ Independent Review
+→ Production Gate
 ```
 
 Dùng `docs/06-work/` khi artifacts giúp giữ context, review hoặc handoff.
