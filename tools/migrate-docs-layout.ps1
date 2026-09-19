@@ -122,6 +122,39 @@ function Load-OrderedLayout([string]$File) {
     return $layout
 }
 
+function Get-RewritePairs($Layout) {
+    $pairs = @()
+
+    $Layout.path_map.PSObject.Properties |
+        Sort-Object { $_.Name.Length } -Descending |
+        ForEach-Object {
+            $pairs += [PSCustomObject]@{
+                From = Normalize-Rel $_.Name
+                To = Normalize-Rel ([string]$_.Value)
+            }
+        }
+
+    $Layout.prefix_map.PSObject.Properties |
+        Sort-Object { $_.Name.Length } -Descending |
+        ForEach-Object {
+            $pairs += [PSCustomObject]@{
+                From = Normalize-Rel $_.Name
+                To = Normalize-Rel ([string]$_.Value)
+            }
+        }
+
+    return @($pairs)
+}
+
+function Rewrite-Text([string]$Text, [object[]]$Pairs) {
+    $result = $Text
+    foreach ($pair in $Pairs) {
+        $result = $result.Replace($pair.From, $pair.To)
+        $result = $result.Replace(($pair.From -replace "/", "\"), ($pair.To -replace "/", "\"))
+    }
+    return $result
+}
+
 function Build-Plan([string]$Root, $Layout) {
     $legacyRoots = @(
         "docs/ai",
@@ -149,12 +182,20 @@ function Build-Plan([string]$Root, $Layout) {
 
             $destinationFull = Resolve-SafeDestinationFullPath -Root $Root -Destination $destination
 
+            $isMarkdown = $_.Extension -ieq ".md"
+            $originalText = $null
+            if ($isMarkdown) {
+                $originalText = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
+            }
+
             $plan += [PSCustomObject]@{
                 Source = $source
                 Destination = $destination
                 SourceFull = $_.FullName
                 DestinationFull = $destinationFull
                 Hash = File-Hash $_.FullName
+                IsMarkdown = $isMarkdown
+                OriginalText = $originalText
                 Action = "Move"
             }
         }
@@ -197,26 +238,7 @@ function Validate-Plan([object[]]$Plan) {
 }
 
 function Rewrite-References([string]$Root, $Layout) {
-    $pairs = @()
-
-    $Layout.path_map.PSObject.Properties |
-        Sort-Object { $_.Name.Length } -Descending |
-        ForEach-Object {
-            $pairs += [PSCustomObject]@{
-                From = Normalize-Rel $_.Name
-                To = Normalize-Rel ([string]$_.Value)
-            }
-        }
-
-    $Layout.prefix_map.PSObject.Properties |
-        Sort-Object { $_.Name.Length } -Descending |
-        ForEach-Object {
-            $pairs += [PSCustomObject]@{
-                From = Normalize-Rel $_.Name
-                To = Normalize-Rel ([string]$_.Value)
-            }
-        }
-
+    $pairs = Get-RewritePairs $Layout
     $files = @()
 
     # Rewrite documentation/instruction Markdown only; never application source code.
@@ -239,12 +261,7 @@ function Rewrite-References([string]$Root, $Layout) {
 
     foreach ($file in @($files | Sort-Object FullName -Unique)) {
         $before = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
-        $after = $before
-
-        foreach ($pair in $pairs) {
-            $after = $after.Replace($pair.From, $pair.To)
-            $after = $after.Replace(($pair.From -replace "/", "\"), ($pair.To -replace "/", "\"))
-        }
+        $after = Rewrite-Text -Text $before -Pairs $pairs
 
         if ($after -ne $before) {
             Set-Content -LiteralPath $file.FullName -Value $after -Encoding UTF8 -NoNewline
@@ -328,6 +345,26 @@ try {
     }
 
     $rewritten = Rewrite-References $root $layout
+
+    # Data-loss guard: migrated files must equal the original content with only
+    # deterministic path-reference rewrites applied. Binary/non-Markdown files
+    # must remain byte-identical.
+    $rewritePairs = Get-RewritePairs $layout
+    foreach ($item in $plan) {
+        if ($item.IsMarkdown) {
+            $expectedText = Rewrite-Text -Text $item.OriginalText -Pairs $rewritePairs
+            $actualText = Get-Content -LiteralPath $item.DestinationFull -Raw -Encoding UTF8
+            if ($actualText -ne $expectedText) {
+                throw "Data preservation check failed after reference rewrite: $($item.Source) -> $($item.Destination)"
+            }
+        }
+        else {
+            if ((File-Hash $item.DestinationFull) -ne $item.Hash) {
+                throw "Binary/non-Markdown content changed during migration: $($item.Source) -> $($item.Destination)"
+            }
+        }
+    }
+
     Write-State $root
 
     Write-Host ("Reference files rewritten: {0}" -f $rewritten)
