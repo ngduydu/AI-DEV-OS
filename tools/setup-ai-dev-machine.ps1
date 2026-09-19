@@ -36,7 +36,8 @@ function Refresh-ProcessPath {
     $extra = @(
         (Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"),
         (Join-Path $env:LOCALAPPDATA "Programs\codebase-memory-mcp"),
-        (Join-Path $env:APPDATA "npm")
+        (Join-Path $env:APPDATA "npm"),
+        (Join-Path $HOME ".dotnet\tools")
     ) | Where-Object { $_ -and (Test-Path $_) }
 
     $env:Path = (($machine, $user) + $extra | Where-Object { $_ } | Select-Object -Unique) -join ";"
