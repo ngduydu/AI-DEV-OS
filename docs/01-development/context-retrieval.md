@@ -27,6 +27,9 @@ biết file/path rồi?
    codebase lớn + cần graph/dependency/impact?
    → codebase-memory-mcp nếu máy đã setup + MCP Connected
    ↓
+   output/log/RAG/result quá lớn và noisy?
+   → Headroom MCP nếu đã Connected; retrieve original khi cần exact evidence
+   ↓
    đọc source + tests liên quan
    ↓
    vẫn thiếu evidence?
@@ -151,7 +154,15 @@ Nếu project bật tool này, verify trong Claude Code bằng:
 
 Nếu không Connected, fallback về STANDARD profile.
 
-## Legacy SQL / XML / DSL
+## SQL Server / Legacy SQL / XML / DSL
+
+Với SQL Server:
+
+- SQL source/migration/SP trong Git vẫn là implementation ground truth;
+- nếu project đã cấu hình SQL MCP an toàn, có thể dùng runtime DB evidence để reproduce/diagnose;
+- ưu tiên test/dev database + read-only role + allowlist entity;
+- không dùng SQL MCP để tự ý sửa production/DDL/data;
+- profile chi tiết: `docs/01-development/sql-server-mcp.md`.
 
 Với SQL stored procedure, XML metadata/controller, generated/vendor code hoặc DSL:
 
@@ -200,6 +211,7 @@ direct read
 → text search
 → structural search
 → graph
+→ optional output compression khi result lớn/noisy
 → broad search
 → history
 ~~~
@@ -227,3 +239,21 @@ Sau setup, các tool có thể sẵn sàng trên mọi repo của máy:
 Có tool sẵn **không có nghĩa task nào cũng phải gọi**. Vẫn dùng escalation order của tài liệu này.
 
 Trước khi dùng graph/memory cho một repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, fallback về CODEBASE-MAP + targeted search + source.
+
+
+## Output compression
+
+Khi output/log/RAG/file result lớn làm loãng context, có thể dùng Headroom MCP on-demand.
+
+Rule:
+
+```text
+compress
+→ reasoning
+→ finding cần exact evidence?
+→ retrieve original
+```
+
+Không dùng compressed output làm bằng chứng duy nhất cho security/data-destructive decision.
+
+Chi tiết: `docs/01-development/context-compression.md`.
