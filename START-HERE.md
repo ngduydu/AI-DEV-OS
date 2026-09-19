@@ -221,6 +221,8 @@ CLAUDE.md
 docs/
 .claude/skills/
 .claude/agents/
+templates/mcp/claude-headroom.json          # optional reference
+templates/mcp/claude-sql-server-dab.json    # optional reference
 ```
 
 Nếu muốn compatibility với agent khác, copy thêm:
