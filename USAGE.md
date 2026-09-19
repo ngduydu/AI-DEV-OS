@@ -184,7 +184,7 @@ AI thường cần:
 docs/01-development/ai-development.md
 docs/01-development/coding-standards.md
 module docs liên quan
-canonical API example trong 04-CODEBASE-MAP.md
+canonical API example trong docs/00-overview/codebase-map.md
 API implementation/tests liên quan
 ```
 
