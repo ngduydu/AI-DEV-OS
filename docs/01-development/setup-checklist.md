@@ -6,13 +6,13 @@ Checklist dùng khi đưa AI-DEV-OS vào một repository thật. Không cần �
 
 Bắt buộc xác minh và điền ở mức repository hiện có:
 
-- [ ] `01-PROJECT-CONTEXT.md` — project là gì, boundary chính, ai dùng.
-- [ ] `02-PRODUCT.md` — behavior/product intent nếu đây là product repo.
-- [ ] `03-ARCHITECTURE.md` — architecture hiện tại, không tưởng tượng tương lai.
-- [ ] `04-CODEBASE-MAP.md` — entry point, module/thư mục chính, canonical examples và reusable building blocks.
-- [ ] `06-CODING-STANDARDS.md` — convention thật sự của project, project-specific values và tool enforcement.
-- [ ] `07-COMMANDS.md` — build/run/test/lint/format/migration command thực tế và trạng thái đã verify.
-- [ ] `08-TESTING.md` — test strategy, test location và minimum verification hiện tại.
+- [ ] `docs/00-overview/project-context.md` — project là gì, boundary chính, ai dùng.
+- [ ] `docs/00-overview/product.md` — behavior/product intent nếu đây là product repo.
+- [ ] `docs/00-overview/architecture.md` — architecture hiện tại, không tưởng tượng tương lai.
+- [ ] `docs/00-overview/codebase-map.md` — entry point, module/thư mục chính, canonical examples và reusable building blocks.
+- [ ] `docs/01-development/coding-standards.md` — convention thật sự của project, project-specific values và tool enforcement.
+- [ ] `docs/01-development/commands.md` — build/run/test/lint/format/migration command thực tế và trạng thái đã verify.
+- [ ] `docs/01-development/testing.md` — test strategy, test location và minimum verification hiện tại.
 
 Business rule và security rule nào đã rõ thì ghi ngay; phần chưa biết có thể để thiếu nếu không chặn task hiện tại.
 
@@ -20,10 +20,10 @@ Business rule và security rule nào đã rõ thì ghi ngay; phần chưa biết
 
 Chỉ bổ sung khi có bằng chứng hoặc task bắt đầu chạm tới:
 
-- [ ] `05-BUSINESS-RULES.md` và `docs/02-modules/<module>/`.
-- [ ] `09-SECURITY.md`.
+- [ ] `docs/03-knowledge/business-rules.md` và `docs/02-modules/<module>/`.
+- [ ] `docs/01-development/security.md`.
 - [ ] `docs/04-operations/` cho deploy/migration/rollback/monitoring/troubleshooting.
-- [ ] Pitfall/gotcha mới → `docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `13-KNOWN-PITFALLS.md` trong task bình thường.
+- [ ] Pitfall/gotcha mới → `docs/03-knowledge/pitfalls/entries/<entry-id>-<slug>.md`; không append vào `docs/03-knowledge/known-pitfalls.md` trong task bình thường.
 - [ ] ADR mới → `docs/05-decisions/entries/<entry-id>-<slug>.md`; không dùng global sequence.
 - [ ] Skill cho procedure đã lặp lại và ổn định.
 
@@ -73,7 +73,7 @@ Với Claude Code, flow phải là:
 CLAUDE.md
 → AGENTS.md
 → docs/README.md
-→ 16-TASK-EXECUTION.md
+→ docs/01-development/ai-development.md
 → docs/module/code/test liên quan
 ```
 
