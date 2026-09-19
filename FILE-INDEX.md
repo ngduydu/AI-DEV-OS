@@ -1,6 +1,8 @@
 # File Index
 
-Tổng số file: 102
+Tổng số file: 110
+
+File này phản ánh **đúng tree hiện tại của repository**. Khi thêm, xóa hoặc di chuyển file, CI sẽ kiểm tra để tránh tài liệu mô tả cấu trúc bị lệch với repository thật.
 
 ~~~text
 .agents/skills/bootstrap-project/SKILL.md
@@ -13,7 +15,9 @@ Tổng số file: 102
 .agents/skills/update-project-knowledge/SKILL.md
 .agents/skills/verify-change/SKILL.md
 .ai-dev-os/VERSION
+.ai-dev-os/layouts.json
 .ai-dev-os/manifest.json
+.ai-dev-os/state.json
 .claude/agents/change-reviewer.md
 .claude/agents/production-reviewer.md
 .claude/skills/apply-ai-dev-os/SKILL.md
@@ -46,43 +50,43 @@ SECURITY.md
 START-HERE.md
 UPGRADE.md
 USAGE.md
-docs/README.md
-docs/01-development/setup-checklist.md
-docs/00-overview/project-context.md
-docs/00-overview/product.md
 docs/00-overview/architecture.md
 docs/00-overview/codebase-map.md
-docs/03-knowledge/business-rules.md
+docs/00-overview/glossary.md
+docs/00-overview/product.md
+docs/00-overview/project-context.md
+docs/01-development/ai-development.md
 docs/01-development/coding-standards.md
 docs/01-development/commands.md
-docs/01-development/testing.md
-docs/01-development/security.md
-docs/01-development/git-workflow.md
-docs/01-development/definition-of-ready.md
-docs/01-development/definition-of-done.md
-docs/03-knowledge/known-pitfalls.md
-docs/01-development/documentation-governance.md
-docs/00-overview/glossary.md
-docs/01-development/ai-development.md
 docs/01-development/context-retrieval.md
+docs/01-development/definition-of-done.md
+docs/01-development/definition-of-ready.md
+docs/01-development/documentation-governance.md
+docs/01-development/git-workflow.md
+docs/01-development/security.md
+docs/01-development/setup-checklist.md
+docs/01-development/testing.md
 docs/01-development/tool-adoption.md
+docs/02-modules/README.md
+docs/03-knowledge/README.md
+docs/03-knowledge/business-rules.md
+docs/03-knowledge/known-pitfalls.md
+docs/04-operations/README.md
 docs/05-decisions/ADR-TEMPLATE.md
 docs/05-decisions/README.md
-docs/03-knowledge/README.md
-docs/02-modules/README.md
-docs/04-operations/README.md
-docs/superpowers/plans/2026-09-16-framework-lifecycle-context-retrieval.md
-docs/superpowers/plans/2026-09-18-ai-dev-machine-tooling-setup.md
-docs/superpowers/plans/2026-09-18-conflict-safe-knowledge-sync.md
-docs/superpowers/plans/2026-09-18-global-ai-dev-os-updater.md
-docs/superpowers/specs/2026-09-16-framework-lifecycle-context-retrieval-design.md
-docs/superpowers/specs/2026-09-18-global-ai-dev-os-updater-design.md
 docs/06-work/README.md
 docs/06-work/_template/PLAN.md
 docs/06-work/_template/RESEARCH.md
 docs/06-work/_template/SPEC.md
 docs/06-work/_template/TASKS.md
 docs/06-work/_template/VERIFICATION.md
+docs/README.md
+docs/superpowers/plans/2026-09-16-framework-lifecycle-context-retrieval.md
+docs/superpowers/plans/2026-09-18-ai-dev-machine-tooling-setup.md
+docs/superpowers/plans/2026-09-18-conflict-safe-knowledge-sync.md
+docs/superpowers/plans/2026-09-18-global-ai-dev-os-updater.md
+docs/superpowers/specs/2026-09-16-framework-lifecycle-context-retrieval-design.md
+docs/superpowers/specs/2026-09-18-global-ai-dev-os-updater-design.md
 prompts/01-RESEARCH-CODEBASE.md
 prompts/02-PLAN-CHANGE.md
 prompts/03-IMPLEMENT-PLAN.md
@@ -100,9 +104,15 @@ templates/PR-DESCRIPTION.md
 templates/RELEASE-CHECKLIST.md
 templates/mcp/claude-codebase-memory.json
 tools/install-personal-updater.ps1
+tools/migrate-docs-layout.ps1
 tools/setup-ai-dev-machine.ps1
+tools/tests/test-migrate-docs-layout-safety.ps1
+tools/tests/test-migrate-docs-layout.ps1
+tools/tests/verify-active-ordered-references.py
 tools/tests/verify-apply-agent-selection.py
 tools/tests/verify-conflict-safe-knowledge.py
+tools/tests/verify-docs-layout.py
 tools/tests/verify-machine-setup.py
+tools/tests/verify-security-hardening.py
 tools/tests/verify-updater.py
 ~~~
