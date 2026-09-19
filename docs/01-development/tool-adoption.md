@@ -23,7 +23,7 @@ Trước khi thêm tool vào recommended/default:
 | ast-grep | structural/syntax-aware search | Machine tool, dùng khi cần |
 | Repomix | bootstrap/snapshot/handoff | Machine tool, dùng khi cần |
 | codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Machine tool + MCP user-scope, dùng khi cần |
-| Headroom | compress/retrieve tool output, logs, RAG và file context | Optional recommended profile; MCP on-demand trước, proxy chỉ sau pilot |
+| Headroom | compress/cache-align/retrieve context, tool output, logs, RAG và file result | Optional recommended profile; proxy/wrap cho automatic savings sau pilot + MCP cho retrieve/stats |
 | SQL MCP Server (Microsoft DAB) | runtime SQL Server diagnostics qua allowlisted entity/tools | Optional per-project; test/dev + least privilege mặc định |
 | Sourcegraph MCP | enterprise code intelligence khi tổ chức đã có Sourcegraph | Enterprise alternative |
 
