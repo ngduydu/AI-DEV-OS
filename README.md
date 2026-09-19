@@ -454,6 +454,8 @@ Stack 2.2.0:
 - **ast-grep** — optional structural search.
 - **Repomix** — optional bootstrap/snapshot/handoff.
 - **codebase-memory-mcp** — optional pilot cho large codebase.
+- **Headroom** — optional local compression/retrieve layer cho tool output/log/RAG/file context lớn.
+- **SQL MCP Server (Microsoft DAB)** — optional per-project runtime SQL Server diagnostics với allowlist + least privilege.
 - **Sourcegraph MCP** — enterprise alternative khi tổ chức đã có Sourcegraph.
 
 Không bắt buộc cài tất cả. Tool mới phải qua `docs/01-development/tool-adoption.md`.
@@ -618,3 +620,16 @@ Repo **apply mới** dùng `ordered-v2` để tree có thứ tự rõ ràng gi�
 ```
 
 Repo đã apply phiên bản cũ được `/update-ai-dev-os` tự migrate sang `ordered-v2` bằng inventory → collision preflight → `git mv` nguyên file → rewrite reference → verify content. Updater **không bootstrap lại project**, không suy đoán để split nội dung file cũ và chỉ ghi state/version sau khi bảo toàn dữ liệu đã pass.
+
+
+## Engineering patterns 2.7
+
+AI-DEV-OS hấp thụ pattern tốt thay vì cài chồng nhiều bộ agent instructions:
+
+- Ponytail → `Simplicity Gate`: no-code/config → reuse → stdlib/platform → existing dependency → minimum new code.
+- mattpocock/skills → TDD theo test seam, domain modeling, merge-conflict resolution và planning ngắn theo verification seam.
+- Headroom → optional context compression profile; không bật proxy toàn cục mặc định.
+- Microsoft SQL MCP Server → optional SQL Server runtime diagnostics; test/dev + read-only/least-privilege mặc định.
+- codebase-memory-mcp → tiếp tục là graph/code-intelligence profile hiện có.
+
+Các workflow mới nằm trong `.claude/skills/` và `.agents/skills/`; không cài nguyên Ponytail hay nguyên bộ external skills để tránh rule conflict.
