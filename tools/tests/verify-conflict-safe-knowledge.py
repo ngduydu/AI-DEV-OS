@@ -79,7 +79,6 @@ def main() -> None:
     managed = {item["path"]: item for item in manifest["managed_files"]}
     for path in [
         "docs/03-knowledge/README.md",
-        "docs/03-knowledge/known-pitfalls.md",
         ".claude/skills/update-project-knowledge/SKILL.md",
         ".agents/skills/update-project-knowledge/SKILL.md",
         "docs/01-development/setup-checklist.md",
@@ -92,6 +91,9 @@ def main() -> None:
     ]:
         if path not in managed:
             fail(f"manifest missing managed path: {path}")
+
+    if "docs/03-knowledge/known-pitfalls.md" in managed:
+        fail("known-pitfalls must remain project-owned to preserve existing task knowledge")
 
     decisions = (root / "docs" / "05-decisions" / "README.md").read_text(encoding="utf-8")
     require(decisions, "docs/05-decisions/entries/", "decisions routing")
