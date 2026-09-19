@@ -36,6 +36,7 @@ Task context        → chỉ nạp những gì liên quan
 | Gotcha / lỗi khó nhớ | existing/canonical route: `docs/03-knowledge/known-pitfalls.md`; task discovery: `docs/03-knowledge/pitfalls/` |
 | Knowledge maintenance | `docs/01-development/documentation-governance.md` |
 | Context/token-efficient retrieval | `docs/01-development/context-retrieval.md` |
+| Code graph / caller-callee / impact / graph UI | `docs/01-development/codebase-intelligence.md` |
 | Output/log/RAG quá lớn, cần compression | `docs/01-development/context-compression.md` |
 | SQL Server runtime diagnostics qua MCP | `docs/01-development/sql-server-mcp.md` |
 | Chọn/đánh giá tool | `docs/01-development/tool-adoption.md` |
