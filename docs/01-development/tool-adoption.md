@@ -15,7 +15,7 @@ Trước khi thêm tool vào recommended/default:
 7. **Overlap** — không thêm tool mới nếu tool hiện có đã làm đủ tốt.
 8. **Exit path** — optional tool phải có fallback, không lock project vào tool.
 
-## Stack 2.4.0
+## Stack 2.7.0
 
 | Tool | Vai trò | Trạng thái |
 |---|---|---|
@@ -23,9 +23,11 @@ Trước khi thêm tool vào recommended/default:
 | ast-grep | structural/syntax-aware search | Machine tool, dùng khi cần |
 | Repomix | bootstrap/snapshot/handoff | Machine tool, dùng khi cần |
 | codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Machine tool + MCP user-scope, dùng khi cần |
+| Headroom | compress/retrieve tool output, logs, RAG và file context | Optional recommended profile; MCP on-demand trước, proxy chỉ sau pilot |
+| SQL MCP Server (Microsoft DAB) | runtime SQL Server diagnostics qua allowlisted entity/tools | Optional per-project; test/dev + least privilege mặc định |
 | Sourcegraph MCP | enterprise code intelligence khi tổ chức đã có Sourcegraph | Enterprise alternative |
 
-Không đưa vào machine stack ở 2.4.0:
+Không đưa vào default machine stack:
 
 - CodeGraph;
 - grepai;
@@ -81,3 +83,40 @@ Không sửa `.mcp.json` của product repo.
 Không cài CodeGraph song song ở 2.4.0 vì overlap với graph/memory capability của `codebase-memory-mcp`.
 
 Nếu thực tế chứng minh `codebase-memory-mcp` thiếu capability quan trọng, đánh giá lại CodeGraph qua Tool Adoption Gate thay vì cài trùng từ đầu.
+
+
+## Pattern adoption 2.7.0
+
+Một số nguồn tốt được **hấp thụ vào core**, không cài thêm plugin để tránh hai bộ instruction chồng nhau:
+
+- Ponytail → Simplicity Gate: no-code/config → reuse → stdlib/platform → existing dependency → minimum new code.
+- mattpocock/skills → test seam trước implementation, TDD skill, domain-modeling skill, merge-conflict skill, concise review/implementation handoff.
+- Không cài nguyên Ponytail hay nguyên bộ mattpocock/skills vào project vì AI-DEV-OS đã có execution/knowledge architecture riêng.
+
+Nguyên tắc:
+
+```text
+external pattern tốt hơn phần core hiện tại
+→ thay/nâng core
+
+external workflow còn thiếu
+→ thêm skill nhỏ, portable
+
+external tool tạo capability mới
+→ optional tool profile
+
+overlap mà không thêm capability
+→ không cài
+```
+
+### Headroom
+
+Dùng optional khi context/output lớn. Mặc định dùng MCP on-demand; proxy/wrap không bật tự động.
+
+Chi tiết: `docs/01-development/context-compression.md`.
+
+### SQL Server MCP
+
+Dùng Microsoft Data API builder SQL MCP Server làm profile khuyến nghị vì permission/entity surface rõ và có stdio.
+
+Chi tiết: `docs/01-development/sql-server-mcp.md`.
