@@ -35,7 +35,9 @@ Cân nhắc cập nhật:
 
 ```text
 AGENTS.md
-docs/ai/
+docs/00-overview/
+docs/01-development/
+docs/03-knowledge/
 ```
 
 Không nên làm `AGENTS.md` dài nếu nội dung có thể đặt trong tài liệu chuyên biệt.
