@@ -10,9 +10,9 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ### Added
 
-- Optional Headroom MCP context-compression profile với compress/retrieve/stats và policy không bật proxy toàn cục mặc định.
+- Optional Headroom context-compression profile với MCP compress/retrieve/stats **và transparent proxy/wrap** cho automatic token savings sau pilot.
 - Optional Microsoft SQL MCP Server profile qua Data API builder, test/dev + least-privilege/read-only baseline.
-- Skills mới: `tdd`, `resolve-merge-conflicts`, `domain-modeling` cho Claude và generic agent adapters.
+- Skills mới: `shape-task`, `tdd`, `resolve-merge-conflicts`, `domain-modeling` cho Claude và generic agent adapters.
 - Claude MCP templates cho Headroom và SQL Server DAB.
 - Machine setup flag `-WithSqlServerMcp` cài/verify Microsoft.DataApiBuilder 2.0.12 mà không tự cấu hình database.
 
@@ -26,7 +26,7 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ### Safety
 
-- Headroom không auto-install/auto-proxy qua apply/update.
+- Headroom không auto-install qua apply/update; proxy/wrap là opt-in machine profile và có launcher riêng.
 - SQL MCP không tự tạo connection string, không expose database và không cho production/write mặc định.
 - Durable knowledge vẫn đi qua conflict-safe Knowledge Sync của AI-DEV-OS.
 
