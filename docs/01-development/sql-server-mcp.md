@@ -86,6 +86,9 @@ dab init `
   --database-type mssql `
   --connection-string "@env('MSSQL_CONNECTION_STRING')" `
   --host-mode Development `
+  --rest.enabled false `
+  --graphql.enabled false `
+  --mcp.enabled true `
   --config dab-config.json
 ```
 
