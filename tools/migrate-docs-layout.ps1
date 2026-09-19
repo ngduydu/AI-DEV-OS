@@ -219,18 +219,16 @@ function Rewrite-References([string]$Root, $Layout) {
 
     $files = @()
 
-    foreach ($rootFile in @("AGENTS.md", "CLAUDE.md")) {
-        $p = Join-Path $Root $rootFile
-        if (Test-Path -LiteralPath $p -PathType Leaf) {
-            $rootFileItem = Get-Item -LiteralPath $p -Force
-            if ($rootFileItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-                throw "Refusing reparse-point instruction file during docs migration: $p"
-            }
-            $files += $rootFileItem
+    # Rewrite documentation/instruction Markdown only; never application source code.
+    # Root Markdown is included because project README/usage guides commonly link to AI-DEV-OS docs.
+    foreach ($rootFileItem in @(Get-ChildItem -LiteralPath $Root -File -Filter *.md -Force)) {
+        if ($rootFileItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+            throw "Refusing reparse-point instruction file during docs migration: $($rootFileItem.FullName)"
         }
+        $files += $rootFileItem
     }
 
-    foreach ($folder in @("docs", ".claude", ".agents")) {
+    foreach ($folder in @("docs", ".claude", ".agents", ".github", "prompts")) {
         $p = Join-Path $Root $folder
         if (Test-Path -LiteralPath $p -PathType Container) {
             $files += @(Get-SafeFiles -Directory $p | Where-Object { $_.Extension -eq ".md" })
