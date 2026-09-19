@@ -267,14 +267,30 @@ function Ensure-SqlServerMcp {
         return
     }
 
+    Refresh-ProcessPath
+
     if (Test-Command "dab") {
         try {
-            $version = (& dab --version 2>&1 | Select-Object -First 1)
-            Add-Result "SQL Server MCP" "PASS" "Đã có DAB: $version"
+            $versionText = (& dab --version 2>&1 | Select-Object -First 1)
+            $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
+            if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
+                Add-Result "SQL Server MCP" "PASS" "Đã có DAB đủ MCP profile: $versionText"
+                return
+            }
+            Write-Host "DAB hiện có chưa đạt baseline 2.0; sẽ update lên 2.0.12..." -ForegroundColor Cyan
+            & dotnet tool update --global Microsoft.DataApiBuilder --version 2.0.12
+            if ($LASTEXITCODE -ne 0) {
+                Add-Result "SQL Server MCP" "FAIL" "dotnet tool update Microsoft.DataApiBuilder 2.0.12 thất bại với mã $LASTEXITCODE."
+                return
+            }
+            Refresh-ProcessPath
+            $updatedVersion = (& dab --version 2>&1 | Select-Object -First 1)
+            Add-Result "SQL Server MCP" "PASS" "Đã update DAB: $updatedVersion. Chưa cấu hình database/project."
+            return
         } catch {
-            Add-Result "SQL Server MCP" "PASS" "Đã có command dab."
+            Add-Result "SQL Server MCP" "BLOCKED" "Có command dab nhưng không xác minh được version: $($_.Exception.Message)"
+            return
         }
-        return
     }
 
     if (-not (Test-Command "dotnet")) {
