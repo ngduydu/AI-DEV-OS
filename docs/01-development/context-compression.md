@@ -54,9 +54,15 @@ Xem thống kê token tiết kiệm qua endpoint `/stats` hoặc `headroom_stats
 
 ## Setup
 
-Headroom không được cài tự động bởi `/apply-ai-dev-os` hoặc `/update-ai-dev-os`.
+Headroom không được cài bởi `/apply-ai-dev-os` hoặc `/update-ai-dev-os` vì đó là project-framework update.
 
-Cài riêng trên máy khi muốn pilot.
+Từ AI-DEV-OS 2.8.0, machine setup mặc định cài Headroom upstream:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+```
+
+Có thể bỏ qua external stack bằng `-SkipExternalAiStack`.
 
 Khuyến nghị dùng `uv` để tách khỏi Python project:
 
