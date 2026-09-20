@@ -6,6 +6,24 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.0 — Upstream-first external AI stack
+
+### Changed
+
+- Machine setup mặc định cài **upstream thật** cho Ponytail, mattpocock/skills, Headroom, codebase-memory-mcp và Microsoft DAB/SQL MCP CLI.
+- Ponytail không còn chỉ được mô phỏng bằng Simplicity Gate trên Claude Code; plugin upstream cung cấp persistence, hooks, subagent injection và các skill review/audit/debt/gain.
+- mattpocock/skills được cài từ Claude Code official marketplace; `/grill-with-docs` là workflow ưu tiên cho task mơ hồ/decision-heavy trên Claude.
+- AI-DEV-OS adapters tiếp tục làm fallback cho generic agents, không được coi là bản thay thế upstream khi Claude plugin đã có.
+- Setup đảm bảo thư mục cài codebase-memory-mcp vào User PATH để CLI/UI gọi được từ terminal mới.
+- SQL MCP/DAB chuyển thành machine capability mặc định; có `-SkipSqlServerMcp` nếu không muốn cài.
+- Thêm `-SkipExternalAiStack` để opt-out toàn bộ external stack.
+
+### Preserved
+
+- Framework update và machine-tool installation vẫn tách biệt.
+- Project knowledge, ordered docs và conflict-safe Knowledge Sync giữ nguyên.
+- SQL MCP không tự tạo connection string/permission hoặc kết nối production.
+
 ## 2.7.0 — AI engineering stack integration
 
 ### Added
