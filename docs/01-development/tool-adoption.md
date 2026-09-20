@@ -105,7 +105,7 @@ generic agent không dùng được plugin upstream
 Cụ thể:
 
 - Ponytail: dùng plugin upstream thật để giữ ladder + persistence + lifecycle hooks + subagent injection + review/audit/debt/gain.
-- mattpocock/skills: dùng plugin upstream thật để nhận toàn bộ skill và update upstream; AI-DEV-OS chỉ route artifacts/knowledge theo cấu trúc repo.
+- mattpocock/skills: dùng plugin upstream thật `mattpocock-skills` để nhận toàn bộ skill và update upstream; AI-DEV-OS chỉ route artifacts/knowledge theo cấu trúc repo.
 - codebase-memory-mcp, Headroom, Microsoft DAB: dùng binary/package upstream thật.
 - Simplicity Gate và các adapter hiện có vẫn là fallback/core guard cho agent không có plugin, không được coi là bản thay thế upstream trên Claude Code.
 
