@@ -622,17 +622,17 @@ Repo **apply mới** dùng `ordered-v2` để tree có thứ tự rõ ràng gi�
 Repo đã apply phiên bản cũ được `/update-ai-dev-os` tự migrate sang `ordered-v2` bằng inventory → collision preflight → `git mv` nguyên file → rewrite reference → verify content. Updater **không bootstrap lại project**, không suy đoán để split nội dung file cũ và chỉ ghi state/version sau khi bảo toàn dữ liệu đã pass.
 
 
-## Engineering patterns 2.7
+## Engineering stack 2.8
 
-AI-DEV-OS hấp thụ pattern tốt thay vì cài chồng nhiều bộ agent instructions:
+AI-DEV-OS dùng **upstream-first** cho stack team đã chọn:
 
-- Ponytail → `Simplicity Gate`: no-code/config → reuse → stdlib/platform → existing dependency → minimum new code.
-- mattpocock/skills → TDD theo test seam, domain modeling, merge-conflict resolution và planning ngắn theo verification seam.
-- Headroom → optional context compression profile; không bật proxy toàn cục mặc định.
-- Microsoft SQL MCP Server → optional SQL Server runtime diagnostics; test/dev + read-only/least-privilege mặc định.
-- codebase-memory-mcp → tiếp tục là graph/code-intelligence profile hiện có.
+- Ponytail → cài Claude plugin upstream thật; `Simplicity Gate` chỉ là fallback/core guard.
+- mattpocock/skills → cài plugin upstream thật; ưu tiên các workflow upstream như `/grill-with-docs`, `/to-spec`, `/implement`, `/tdd`, `/code-review`.
+- Headroom → cài upstream thật; proxy/wrap cho automatic savings, MCP cho compress/retrieve/stats.
+- Microsoft SQL MCP Server → cài DAB CLI; database config vẫn least-privilege/per-project.
+- codebase-memory-mcp → cài binary upstream thật + Claude MCP + Graph UI.
 
-Các workflow mới nằm trong `.claude/skills/` và `.agents/skills/`; không cài nguyên Ponytail hay nguyên bộ external skills để tránh rule conflict.
+Các skill AI-DEV-OS tương tự vẫn tồn tại để hỗ trợ generic agent/fallback, không thay thế upstream trên Claude Code.
 
 
 ## Upstream tool stack
