@@ -679,7 +679,29 @@ Restart Claude Code rồi chạy:
 để xác nhận `codebase-memory-mcp` Connected.
 
 
-## Optional power-user profiles
+## Upstream AI engineering stack
+
+Sau khi clone/pull AI-DEV-OS, chạy một lần trên mỗi máy Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+```
+
+Từ 2.8.0, setup mặc định cài/verify:
+
+```text
+ripgrep
+ast-grep
+Repomix
+codebase-memory-mcp + Claude MCP
+Headroom + MCP/proxy capability
+Ponytail Claude plugin upstream
+mattpocock-skills Claude plugin upstream
+Microsoft Data API builder / SQL MCP CLI
+personal /apply-ai-dev-os + /update-ai-dev-os
+```
+
+Có thể dùng `-SkipExternalAiStack`, `-SkipSqlServerMcp` hoặc `-SkipMcp` khi thật sự muốn bỏ qua.
 
 ### Code graph cho AI và developer
 
@@ -703,10 +725,20 @@ Mode này route Claude CLI qua local Headroom proxy để tự động tối ưu
 
 ### Task còn mơ hồ
 
-Không cần viết prompt dài. Chạy:
+Không cần viết prompt dài.
+
+Claude Code sau khi cài mattpocock-skills:
+
+```text
+/grill-with-docs
+```
+
+Agent sẽ interview theo decision tree, tự tìm facts, chốt shared understanding và docs. Sau đó dùng các skill upstream như `/to-spec`, `/implement`, `/tdd`, `/code-review` khi phù hợp.
+
+Nếu agent không hỗ trợ plugin upstream, dùng fallback:
 
 ```text
 /shape-task
 ```
 
-rồi mô tả task ngắn. Agent tự tìm facts, hỏi bạn các decision còn mở, chốt spec/plan rồi mới chuyển sang implement.
+Sau khi cài mattpocock-skills, mỗi product repo chạy `/setup-matt-pocock-skills` một lần để chọn issue tracker/labels/docs location.
