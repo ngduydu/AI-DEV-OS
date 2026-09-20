@@ -447,28 +447,38 @@ function Invoke-ClaudePluginCommand {
         [string[]]$PluralArgs
     )
 
-    $output = & claude @SingularArgs 2>&1
-    $exitCode = $LASTEXITCODE
-    $text = ($output | Out-String)
+    # Windows PowerShell 5.1 có thể biến stderr của native command thành ErrorRecord.
+    # Tạm hạ ErrorActionPreference để lấy exit code/output và tự xử lý fallback.
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
 
-    if ($exitCode -eq 0 -or $text -match "already|installed|enabled|exists|configured") {
-        return [PSCustomObject]@{ Success = $true; Output = $output; ExitCode = $exitCode }
-    }
+        $output = & claude @SingularArgs 2>&1
+        $exitCode = $LASTEXITCODE
+        $text = ($output | Out-String)
 
-    if ($PluralArgs -and $PluralArgs.Count -gt 0) {
-        $fallbackOutput = & claude @PluralArgs 2>&1
-        $fallbackExit = $LASTEXITCODE
-        $fallbackText = ($fallbackOutput | Out-String)
-        $combined = @($output) + @($fallbackOutput)
-
-        if ($fallbackExit -eq 0 -or $fallbackText -match "already|installed|enabled|exists|configured") {
-            return [PSCustomObject]@{ Success = $true; Output = $combined; ExitCode = $fallbackExit }
+        if ($exitCode -eq 0 -or $text -match "already|installed|enabled|exists|configured") {
+            return [PSCustomObject]@{ Success = $true; Output = $output; ExitCode = $exitCode }
         }
 
-        return [PSCustomObject]@{ Success = $false; Output = $combined; ExitCode = $fallbackExit }
-    }
+        if ($PluralArgs -and $PluralArgs.Count -gt 0) {
+            $fallbackOutput = & claude @PluralArgs 2>&1
+            $fallbackExit = $LASTEXITCODE
+            $fallbackText = ($fallbackOutput | Out-String)
+            $combined = @($output) + @($fallbackOutput)
 
-    return [PSCustomObject]@{ Success = $false; Output = $output; ExitCode = $exitCode }
+            if ($fallbackExit -eq 0 -or $fallbackText -match "already|installed|enabled|exists|configured") {
+                return [PSCustomObject]@{ Success = $true; Output = $combined; ExitCode = $fallbackExit }
+            }
+
+            return [PSCustomObject]@{ Success = $false; Output = $combined; ExitCode = $fallbackExit }
+        }
+
+        return [PSCustomObject]@{ Success = $false; Output = $output; ExitCode = $exitCode }
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
 }
 function Ensure-Ponytail {
     if ($SkipExternalAiStack) {
@@ -518,12 +528,29 @@ function Ensure-MattPocockSkills {
         return
     }
 
-    Write-Host "Đang cài mattpocock-skills từ Claude Code official marketplace..." -ForegroundColor Cyan
+    Write-Host "Đang cài mattpocock-skills upstream..." -ForegroundColor Cyan
+
+    # Upstream repo có marketplace riêng tên "mattpocock".
+    # Thử marketplace đang cấu hình trước; nếu chưa có thì add repo marketplace rồi cài qualified plugin.
     $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "mattpocock-skills") -PluralArgs @("plugins", "install", "mattpocock-skills")
     $install.Output | ForEach-Object { Write-Host $_ }
 
     if (-not $install.Success) {
-        Add-Result "Matt Pocock skills" "FAIL" "Không cài được mattpocock-skills plugin."
+        Write-Host "mattpocock-skills chưa có trong marketplace hiện tại; đang thêm marketplace upstream mattpocock/skills..." -ForegroundColor Cyan
+        $market = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "marketplace", "add", "mattpocock/skills") -PluralArgs @("plugins", "marketplace", "add", "mattpocock/skills")
+        $market.Output | ForEach-Object { Write-Host $_ }
+
+        if (-not $market.Success) {
+            Add-Result "Matt Pocock skills" "FAIL" "Không thêm được upstream marketplace mattpocock/skills."
+            return
+        }
+
+        $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "mattpocock-skills@mattpocock") -PluralArgs @("plugins", "install", "mattpocock-skills@mattpocock")
+        $install.Output | ForEach-Object { Write-Host $_ }
+    }
+
+    if (-not $install.Success) {
+        Add-Result "Matt Pocock skills" "FAIL" "Không cài được mattpocock-skills upstream kể cả sau khi thêm marketplace mattpocock/skills."
         return
     }
 
@@ -570,6 +597,8 @@ if ($SelfTest) {
         'Invoke-ClaudePluginCommand',
         'DietrichGebert/ponytail',
         'ponytail@ponytail',
+        'mattpocock/skills',
+        'mattpocock-skills@mattpocock',
         'mattpocock-skills',
         'Ensure-UserPathEntry',
         'Đã cài DAB'
