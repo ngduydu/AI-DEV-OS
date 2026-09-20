@@ -441,6 +441,35 @@ function Ensure-Headroom {
     Add-Result "Headroom" "PASS" "Đã cài upstream: $version; proxy/wrap + MCP sẵn sàng."
 }
 
+function Invoke-ClaudePluginCommand {
+    param(
+        [string[]]$SingularArgs,
+        [string[]]$PluralArgs
+    )
+
+    $output = & claude @SingularArgs 2>&1
+    $exitCode = $LASTEXITCODE
+    $text = ($output | Out-String)
+
+    if ($exitCode -eq 0 -or $text -match "already|installed|enabled|exists|configured") {
+        return [PSCustomObject]@{ Success = $true; Output = $output; ExitCode = $exitCode }
+    }
+
+    if ($PluralArgs -and $PluralArgs.Count -gt 0) {
+        $fallbackOutput = & claude @PluralArgs 2>&1
+        $fallbackExit = $LASTEXITCODE
+        $fallbackText = ($fallbackOutput | Out-String)
+        $combined = @($output) + @($fallbackOutput)
+
+        if ($fallbackExit -eq 0 -or $fallbackText -match "already|installed|enabled|exists|configured") {
+            return [PSCustomObject]@{ Success = $true; Output = $combined; ExitCode = $fallbackExit }
+        }
+
+        return [PSCustomObject]@{ Success = $false; Output = $combined; ExitCode = $fallbackExit }
+    }
+
+    return [PSCustomObject]@{ Success = $false; Output = $output; ExitCode = $exitCode }
+}
 function Ensure-Ponytail {
     if ($SkipExternalAiStack) {
         Add-Result "Ponytail" "SKIP" "Đã bỏ qua theo -SkipExternalAiStack."
@@ -458,23 +487,19 @@ function Ensure-Ponytail {
     }
 
     Write-Host "Đang thêm Ponytail marketplace upstream..." -ForegroundColor Cyan
-    $marketOutput = & claude plugin marketplace add DietrichGebert/ponytail 2>&1
-    $marketExit = $LASTEXITCODE
-    $marketText = ($marketOutput | Out-String)
-    $marketOutput | ForEach-Object { Write-Host $_ }
+    $market = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "marketplace", "add", "DietrichGebert/ponytail") -PluralArgs @("plugins", "marketplace", "add", "DietrichGebert/ponytail")
+    $market.Output | ForEach-Object { Write-Host $_ }
 
-    if ($marketExit -ne 0 -and $marketText -notmatch "already|exists|configured") {
+    if (-not $market.Success) {
         Add-Result "Ponytail" "FAIL" "Không thêm được Ponytail marketplace."
         return
     }
 
     Write-Host "Đang cài Ponytail plugin upstream..." -ForegroundColor Cyan
-    $installOutput = & claude plugin install ponytail@ponytail 2>&1
-    $installExit = $LASTEXITCODE
-    $installText = ($installOutput | Out-String)
-    $installOutput | ForEach-Object { Write-Host $_ }
+    $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "ponytail@ponytail") -PluralArgs @("plugins", "install", "ponytail@ponytail")
+    $install.Output | ForEach-Object { Write-Host $_ }
 
-    if ($installExit -ne 0 -and $installText -notmatch "already|installed|enabled") {
+    if (-not $install.Success) {
         Add-Result "Ponytail" "FAIL" "Không cài được Ponytail plugin."
         return
     }
@@ -494,12 +519,10 @@ function Ensure-MattPocockSkills {
     }
 
     Write-Host "Đang cài mattpocock-skills từ Claude Code official marketplace..." -ForegroundColor Cyan
-    $output = & claude plugins install mattpocock-skills 2>&1
-    $exit = $LASTEXITCODE
-    $text = ($output | Out-String)
-    $output | ForEach-Object { Write-Host $_ }
+    $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "mattpocock-skills") -PluralArgs @("plugins", "install", "mattpocock-skills")
+    $install.Output | ForEach-Object { Write-Host $_ }
 
-    if ($exit -ne 0 -and $text -notmatch "already|installed|enabled") {
+    if (-not $install.Success) {
         Add-Result "Matt Pocock skills" "FAIL" "Không cài được mattpocock-skills plugin."
         return
     }
@@ -544,9 +567,10 @@ if ($SelfTest) {
         'Microsoft.DataApiBuilder --version 2.0.12',
         'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
         'headroom mcp install --force',
-        'claude plugin marketplace add DietrichGebert/ponytail',
-        'claude plugin install ponytail@ponytail',
-        'claude plugins install mattpocock-skills',
+        'Invoke-ClaudePluginCommand',
+        'DietrichGebert/ponytail',
+        'ponytail@ponytail',
+        'mattpocock-skills',
         'Ensure-UserPathEntry',
         'Đã cài DAB'
     )
