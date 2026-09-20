@@ -235,12 +235,11 @@ Bộ khung chọn các nguyên tắc sau:
 
 https://github.com/headroomlabs-ai/headroom
 
-Điểm lấy vào bộ khung:
+Cách dùng từ 2.8.0:
 
-- compress tool output/log/RAG/file context khi output lớn/noisy;
-- retrieve original khi cần exact evidence;
-- MCP on-demand là integration mặc định của AI-DEV-OS;
-- không bật proxy/wrap toàn cục mặc định;
+- cài package upstream thật bằng machine setup;
+- dùng proxy/wrap cho automatic compression/cache alignment;
+- dùng MCP cho compress/retrieve/stats;
 - durable knowledge vẫn đi qua AI-DEV-OS Knowledge Sync.
 
 ### DeusData/codebase-memory-mcp
@@ -260,31 +259,21 @@ https://github.com/DeusData/codebase-memory-mcp
 
 https://github.com/DietrichGebert/ponytail
 
-Không cài plugin nguyên bộ. Hấp thụ pattern có giá trị vào Task Execution Contract:
+Cách dùng từ 2.8.0:
 
-```text
-no-code/config
-→ reuse
-→ stdlib/platform
-→ existing dependency
-→ minimum new code
-```
-
-Mục tiêu: giảm code phải sở hữu, abstraction thừa và maintenance surface.
+- cài **Ponytail Claude plugin upstream thật**;
+- dùng default mode `full` trừ khi user đổi mode;
+- giữ nguyên lifecycle hooks/persistence/subagent injection và các skill review/audit/debt/gain của upstream;
+- Simplicity Gate trong AI-DEV-OS chỉ còn là fallback/core guard cho agent không có plugin.
 
 ### mattpocock/skills
 
 https://github.com/mattpocock/skills
 
-Không cài nguyên bộ vì AI-DEV-OS đã có skill/knowledge architecture riêng.
+Cách dùng từ 2.8.0:
 
-Pattern lấy vào:
-
-- test seam trước implementation;
-- TDD theo small red-green slice;
-- implementation chạy focused check thường xuyên + broad check cuối;
-- domain terminology/decision phải persist;
-- merge conflict resolve theo intent, không chọn ours/theirs mù;
-- review ngắn, tập trung correctness và unnecessary code.
-
-AI-DEV-OS bổ sung các skill tương ứng nhưng giữ routing/docs/Knowledge Sync hiện tại làm source of truth.
+- cài **mattpocock-skills upstream thật** từ Claude Code official marketplace;
+- mỗi product repo chạy `/setup-matt-pocock-skills` một lần;
+- ưu tiên upstream `/grill-with-docs`, `/to-spec`, `/implement`, `/tdd`, `/code-review`, `/diagnosing-bugs` và các skill upstream khác;
+- AI-DEV-OS giữ project docs/Knowledge Sync/production rules làm orchestration chung;
+- các skill AI-DEV-OS tương tự tồn tại như adapter/fallback cho generic agents, không đại diện cho bản upstream trên Claude Code.
