@@ -28,9 +28,17 @@ def main() -> None:
         "personal updater": "install-personal-updater.ps1",
         "Vietnamese output": "TÓM TẮT THIẾT LẬP",
         "no project MCP mutation": "Không sửa .mcp.json của project",
-        "optional SQL MCP flag": "[switch]$WithSqlServerMcp",
+        "skip SQL MCP flag": "[switch]$SkipSqlServerMcp",
+        "skip external stack flag": "[switch]$SkipExternalAiStack",
         "Microsoft SQL MCP": "Microsoft.DataApiBuilder --version 2.0.12",
         "SQL MCP remains project-specific": "Chưa cấu hình database/project",
+        "uv": "astral-sh.uv",
+        "Headroom upstream": 'headroom-ai[proxy,mcp]',
+        "Headroom MCP": "headroom mcp install --force",
+        "Ponytail marketplace": "claude plugin marketplace add DietrichGebert/ponytail",
+        "Ponytail plugin": "claude plugin install ponytail@ponytail",
+        "Matt Pocock plugin": "claude plugins install mattpocock-skills",
+        "persistent user PATH": "Ensure-UserPathEntry",
     }
 
     for name, needle in required.items():
