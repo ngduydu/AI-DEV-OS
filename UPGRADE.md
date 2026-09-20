@@ -379,3 +379,53 @@ Headroom dùng profile trong `docs/01-development/context-compression.md`; khôn
 - Project knowledge/entries cũ giữ nguyên.
 - Không tạo lại shared append-only knowledge.
 - Skills mới không thay project-specific custom skill trùng tên bằng suy đoán; nếu target đã customize cùng managed path, updater phải review theo ownership contract trước merge.
+
+
+## 2.8.0 — Upstream-first AI stack
+
+Mục tiêu: các tool/skill bên ngoài mà team đã chọn sử dụng được cài **nguyên upstream**, không chỉ copy ý tưởng rồi viết lại gần giống.
+
+### Machine setup
+
+Sau khi update source AI-DEV-OS lên 2.8.0:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+```
+
+Mặc định script cài/verify:
+
+- codebase-memory-mcp upstream + Claude MCP;
+- Headroom upstream + MCP/proxy capability;
+- Ponytail upstream Claude plugin;
+- mattpocock-skills upstream Claude plugin;
+- Microsoft Data API builder cho SQL MCP;
+- ripgrep, ast-grep, Repomix;
+- personal apply/update skills.
+
+Các skip flag:
+
+```powershell
+-SkipExternalAiStack
+-SkipSqlServerMcp
+-SkipMcp
+```
+
+### Product repository
+
+`/update-ai-dev-os` vẫn chỉ update framework files trong product repo, không cài machine tools.
+
+Sau khi mattpocock-skills được cài ở Claude Code, mỗi product repo chạy một lần:
+
+```text
+/setup-matt-pocock-skills
+```
+
+để cấu hình issue tracker, labels và nơi lưu docs theo upstream.
+
+### Compatibility
+
+- Project knowledge vẫn được preserve.
+- Generic agents vẫn có các adapter/fallback của AI-DEV-OS.
+- Claude Code ưu tiên upstream Ponytail và mattpocock-skills thật.
+- Database connection/permission của SQL MCP vẫn là project-specific; setup machine không tự kết nối production.
