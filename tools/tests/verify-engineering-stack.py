@@ -20,8 +20,8 @@ def main() -> None:
 
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
-    if version != "2.7.0":
-        fail(f"expected 2.7.0, got {version!r}")
+    if version != "2.8.0":
+        fail(f"expected 2.8.0, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
@@ -50,7 +50,9 @@ def main() -> None:
         "SQL MCP Server",
         "Ponytail",
         "mattpocock/skills",
-        "không cài nguyên Ponytail",
+        "Upstream-first adoption 2.8.0",
+        "cài upstream thật",
+        "mattpocock-skills",
     ]:
         require(tool_adoption, needle, "tool adoption")
 
@@ -85,14 +87,19 @@ def main() -> None:
         "create-record",
         "read-records",
         "delete-record",
-        "-WithSqlServerMcp",
+        "-SkipSqlServerMcp",
     ]:
         require(sql, needle, "SQL MCP")
 
     setup = (root / "tools" / "setup-ai-dev-machine.ps1").read_text(encoding="utf-8")
     for needle in [
-        "[switch]$WithSqlServerMcp",
+        "[switch]$SkipSqlServerMcp",
+        "[switch]$SkipExternalAiStack",
         "Microsoft.DataApiBuilder --version 2.0.12",
+        "headroom-ai[proxy,mcp]",
+        "ponytail@ponytail",
+        "mattpocock-skills",
+        "Ensure-UserPathEntry",
         "Chưa cấu hình database/project",
     ]:
         require(setup, needle, "machine setup")
@@ -115,7 +122,7 @@ def main() -> None:
     }
     missing = sorted(required_managed - manifest_paths)
     if missing:
-        fail(f"manifest missing 2.7 managed files: {missing}")
+        fail(f"manifest missing managed files: {missing}")
 
     for name in ["shape-task", "tdd", "resolve-merge-conflicts", "domain-modeling"]:
         claude = (root / ".claude" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
@@ -137,7 +144,7 @@ def main() -> None:
     if args != expected:
         fail(f"SQL MCP template args differ: {args!r}")
 
-    print("PASS: AI engineering stack 2.7 contract")
+    print("PASS: AI engineering stack 2.8 contract")
 
 
 if __name__ == "__main__":
