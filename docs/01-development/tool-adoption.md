@@ -15,16 +15,18 @@ Trước khi thêm tool vào recommended/default:
 7. **Overlap** — không thêm tool mới nếu tool hiện có đã làm đủ tốt.
 8. **Exit path** — optional tool phải có fallback, không lock project vào tool.
 
-## Stack 2.7.0
+## Stack 2.8.0
 
 | Tool | Vai trò | Trạng thái |
 |---|---|---|
 | ripgrep | text search nhanh | Recommended/default search |
 | ast-grep | structural/syntax-aware search | Machine tool, dùng khi cần |
 | Repomix | bootstrap/snapshot/handoff | Machine tool, dùng khi cần |
-| codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Machine tool + MCP user-scope, dùng khi cần |
-| Headroom | compress/cache-align/retrieve context, tool output, logs, RAG và file result | Optional recommended profile; proxy/wrap cho automatic savings sau pilot + MCP cho retrieve/stats |
-| SQL MCP Server (Microsoft DAB) | runtime SQL Server diagnostics qua allowlisted entity/tools | Optional per-project; test/dev + least privilege mặc định |
+| codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Cài upstream thật ở machine setup + MCP user-scope |
+| Headroom | compress/cache-align/retrieve context, tool output, logs, RAG và file result | Cài upstream thật ở machine setup; proxy/wrap + MCP |
+| Ponytail | always-on minimal-code discipline, hooks, review/audit/debt/gain | Cài upstream Claude plugin thật; default full |
+| mattpocock/skills | grilling/spec/TDD/debug/design/review/implementation workflows | Cài upstream Claude plugin thật; mỗi repo chạy setup upstream một lần |
+| SQL MCP Server (Microsoft DAB) | runtime SQL Server diagnostics qua allowlisted entity/tools | Cài DAB CLI ở machine setup; database config vẫn per-project |
 | Sourcegraph MCP | enterprise code intelligence khi tổ chức đã có Sourcegraph | Enterprise alternative |
 
 Không đưa vào default machine stack:
@@ -85,33 +87,31 @@ Không cài CodeGraph song song ở 2.4.0 vì overlap với graph/memory capabil
 Nếu thực tế chứng minh `codebase-memory-mcp` thiếu capability quan trọng, đánh giá lại CodeGraph qua Tool Adoption Gate thay vì cài trùng từ đầu.
 
 
-## Pattern adoption 2.7.0
+## Upstream-first adoption 2.8.0
 
-Một số nguồn tốt được **hấp thụ vào core**, không cài thêm plugin để tránh hai bộ instruction chồng nhau:
-
-- Ponytail → Simplicity Gate: no-code/config → reuse → stdlib/platform → existing dependency → minimum new code.
-- mattpocock/skills → test seam trước implementation, TDD skill, domain-modeling skill, merge-conflict skill, concise review/implementation handoff.
-- Không cài nguyên Ponytail hay nguyên bộ mattpocock/skills vào project vì AI-DEV-OS đã có execution/knowledge architecture riêng.
-
-Nguyên tắc:
+Từ 2.8.0, với các tool/skill được team chọn dùng thực tế, AI-DEV-OS ưu tiên **cài upstream thật** thay vì tự viết lại một bản gần giống.
 
 ```text
-external pattern tốt hơn phần core hiện tại
-→ thay/nâng core
+upstream có plugin/tool chính thức và team muốn dùng
+→ cài upstream thật
 
-external workflow còn thiếu
-→ thêm skill nhỏ, portable
+AI-DEV-OS
+→ giữ orchestration, project knowledge, routing, safety và upgrade contract
 
-external tool tạo capability mới
-→ optional tool profile
-
-overlap mà không thêm capability
-→ không cài
+generic agent không dùng được plugin upstream
+→ dùng adapter/fallback của AI-DEV-OS khi cần
 ```
+
+Cụ thể:
+
+- Ponytail: dùng plugin upstream thật để giữ ladder + persistence + lifecycle hooks + subagent injection + review/audit/debt/gain.
+- mattpocock/skills: dùng plugin upstream thật `mattpocock-skills` để nhận toàn bộ skill và update upstream; AI-DEV-OS chỉ route artifacts/knowledge theo cấu trúc repo.
+- codebase-memory-mcp, Headroom, Microsoft DAB: dùng binary/package upstream thật.
+- Simplicity Gate và các adapter hiện có vẫn là fallback/core guard cho agent không có plugin, không được coi là bản thay thế upstream trên Claude Code.
 
 ### Headroom
 
-Dùng optional khi context/output lớn. Mặc định dùng MCP on-demand; proxy/wrap không bật tự động.
+Machine setup cài Headroom upstream. Với Claude Code có thể dùng proxy/wrap để automatic savings và MCP để compress/retrieve/stats.
 
 Chi tiết: `docs/01-development/context-compression.md`.
 

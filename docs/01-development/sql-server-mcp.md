@@ -58,13 +58,15 @@ connection string trong repository
 
 ## Setup machine tool
 
-Nếu team muốn dùng SQL MCP:
+Từ AI-DEV-OS 2.8.0, machine setup mặc định cài/verify DAB CLI:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1 -WithSqlServerMcp
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
 ```
 
-Flag này chỉ cài/verify DAB CLI trên máy.
+Nếu máy không cần SQL MCP capability, dùng `-SkipSqlServerMcp`.
+
+Machine setup chỉ cài/verify DAB CLI trên máy.
 
 Nó **không**:
 

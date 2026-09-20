@@ -1,6 +1,8 @@
 ﻿param(
     [switch]$SkipMcp,
     [switch]$WithSqlServerMcp,
+    [switch]$SkipSqlServerMcp,
+    [switch]$SkipExternalAiStack,
     [switch]$SelfTest
 )
 
@@ -19,6 +21,7 @@ $CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"
 $CodebaseMemoryVersion = "v0.11.0"
 $CodebaseMemoryInstallerUrl = "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1"
 $CodebaseMemoryReleaseUrl = "https://github.com/DeusData/codebase-memory-mcp/releases/download/$CodebaseMemoryVersion"
+$HeadroomVersion = "0.37.0"
 
 function Add-Result {
     param([string]$Name, [string]$Status, [string]$Detail)
@@ -37,10 +40,34 @@ function Refresh-ProcessPath {
         (Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"),
         (Join-Path $env:LOCALAPPDATA "Programs\codebase-memory-mcp"),
         (Join-Path $env:APPDATA "npm"),
-        (Join-Path $HOME ".dotnet\tools")
+        (Join-Path $HOME ".dotnet\tools"),
+        (Join-Path $HOME ".local\bin")
     ) | Where-Object { $_ -and (Test-Path $_) }
 
     $env:Path = (($machine, $user) + $extra | Where-Object { $_ } | Select-Object -Unique) -join ";"
+}
+
+function Ensure-UserPathEntry {
+    param([string]$Path)
+
+    if (-not $Path -or -not (Test-Path $Path)) { return }
+
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    $parts = @($userPath -split ';' | Where-Object { $_ })
+    $exists = $false
+    foreach ($part in $parts) {
+        if ([string]::Equals($part.TrimEnd('\'), $Path.TrimEnd('\'), [System.StringComparison]::OrdinalIgnoreCase)) {
+            $exists = $true
+            break
+        }
+    }
+
+    if (-not $exists) {
+        $newUserPath = (($parts + $Path) | Select-Object -Unique) -join ';'
+        [Environment]::SetEnvironmentVariable("Path", $newUserPath, "User")
+    }
+
+    Refresh-ProcessPath
 }
 
 function Ensure-Winget {
@@ -146,9 +173,10 @@ function Resolve-CbmExecutable {
 function Ensure-CodebaseMemory {
     $existing = Resolve-CbmExecutable
     if ($existing) {
+        Ensure-UserPathEntry -Path (Split-Path -Parent $existing)
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version"
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH user đã được đảm bảo."
         } catch {
             Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing"
         }
@@ -193,8 +221,9 @@ function Ensure-CodebaseMemory {
             return $null
         }
 
+        Ensure-UserPathEntry -Path (Split-Path -Parent $installed)
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
-        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version"
+        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH user đã được đảm bảo."
         return $installed
     } catch {
         Add-Result "codebase-memory-mcp" "FAIL" $_.Exception.Message
@@ -262,8 +291,8 @@ function Ensure-ClaudeMcp {
 }
 
 function Ensure-SqlServerMcp {
-    if (-not $WithSqlServerMcp) {
-        Add-Result "SQL Server MCP" "SKIP" "Không bật -WithSqlServerMcp."
+    if ($SkipSqlServerMcp -or $SkipExternalAiStack) {
+        Add-Result "SQL Server MCP" "SKIP" "Đã bỏ qua theo tham số."
         return
     }
 
@@ -326,6 +355,181 @@ function Ensure-SqlServerMcp {
     }
 }
 
+function Ensure-Uv {
+    if ($SkipExternalAiStack) {
+        Add-Result "uv" "SKIP" "Đã bỏ qua theo -SkipExternalAiStack."
+        return $false
+    }
+
+    if (Test-Command "uv") {
+        $version = (& uv --version 2>&1 | Select-Object -First 1)
+        Add-Result "uv" "PASS" "Đã có: $version"
+        return $true
+    }
+
+    if (-not (Test-Command "winget")) {
+        Add-Result "uv" "BLOCKED" "Thiếu winget nên chưa thể cài astral-sh.uv."
+        return $false
+    }
+
+    Write-Host "Đang cài uv từ WinGet..." -ForegroundColor Cyan
+    & winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements --silent
+    if ($LASTEXITCODE -ne 0) {
+        Add-Result "uv" "FAIL" "winget install astral-sh.uv thất bại với mã $LASTEXITCODE."
+        return $false
+    }
+
+    Refresh-ProcessPath
+    if (-not (Test-Command "uv")) {
+        Add-Result "uv" "BLOCKED" "Đã cài uv nhưng terminal hiện tại chưa thấy command. Mở terminal mới rồi chạy lại."
+        return $false
+    }
+
+    $version = (& uv --version 2>&1 | Select-Object -First 1)
+    Add-Result "uv" "PASS" "Đã cài: $version"
+    return $true
+}
+
+function Ensure-Headroom {
+    param([bool]$UvReady)
+
+    if ($SkipExternalAiStack) {
+        Add-Result "Headroom" "SKIP" "Đã bỏ qua theo -SkipExternalAiStack."
+        return
+    }
+
+    if (-not $UvReady) {
+        Add-Result "Headroom" "BLOCKED" "Cần uv để cài Headroom trong môi trường tool tách biệt."
+        return
+    }
+
+    Write-Host "Đang cài/refresh Headroom $HeadroomVersion (proxy + MCP) bằng uv..." -ForegroundColor Cyan
+    & uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"
+    if ($LASTEXITCODE -ne 0) {
+        Add-Result "Headroom" "FAIL" "uv tool install Headroom thất bại với mã $LASTEXITCODE."
+        return
+    }
+
+    try {
+        $binDir = (& uv tool dir --bin 2>&1 | Select-Object -First 1)
+        if ($binDir -and (Test-Path $binDir)) {
+            Ensure-UserPathEntry -Path $binDir
+        }
+    } catch {
+        # Không chặn setup chỉ vì không đọc được tool bin path; verify command phía dưới sẽ quyết định.
+    }
+
+    Refresh-ProcessPath
+    if (-not (Test-Command "headroom")) {
+        Add-Result "Headroom" "BLOCKED" "Đã cài nhưng chưa thấy command headroom. Mở terminal mới rồi chạy lại."
+        return
+    }
+
+    $version = (& headroom --version 2>&1 | Select-Object -First 1)
+
+    if (-not $SkipMcp -and (Test-Command "claude")) {
+        Write-Host "Đang đăng ký Headroom MCP theo installer upstream..." -ForegroundColor Cyan
+        $mcpOutput = & headroom mcp install --force 2>&1
+        $mcpExit = $LASTEXITCODE
+        $mcpOutput | ForEach-Object { Write-Host $_ }
+        if ($mcpExit -ne 0) {
+            Add-Result "Headroom" "BLOCKED" "Headroom đã cài ($version) nhưng MCP install thất bại. Có thể vẫn dùng proxy/wrap."
+            return
+        }
+    }
+
+    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; proxy/wrap + MCP sẵn sàng."
+}
+
+function Invoke-ClaudePluginCommand {
+    param(
+        [string[]]$SingularArgs,
+        [string[]]$PluralArgs
+    )
+
+    $output = & claude @SingularArgs 2>&1
+    $exitCode = $LASTEXITCODE
+    $text = ($output | Out-String)
+
+    if ($exitCode -eq 0 -or $text -match "already|installed|enabled|exists|configured") {
+        return [PSCustomObject]@{ Success = $true; Output = $output; ExitCode = $exitCode }
+    }
+
+    if ($PluralArgs -and $PluralArgs.Count -gt 0) {
+        $fallbackOutput = & claude @PluralArgs 2>&1
+        $fallbackExit = $LASTEXITCODE
+        $fallbackText = ($fallbackOutput | Out-String)
+        $combined = @($output) + @($fallbackOutput)
+
+        if ($fallbackExit -eq 0 -or $fallbackText -match "already|installed|enabled|exists|configured") {
+            return [PSCustomObject]@{ Success = $true; Output = $combined; ExitCode = $fallbackExit }
+        }
+
+        return [PSCustomObject]@{ Success = $false; Output = $combined; ExitCode = $fallbackExit }
+    }
+
+    return [PSCustomObject]@{ Success = $false; Output = $output; ExitCode = $exitCode }
+}
+function Ensure-Ponytail {
+    if ($SkipExternalAiStack) {
+        Add-Result "Ponytail" "SKIP" "Đã bỏ qua theo -SkipExternalAiStack."
+        return
+    }
+
+    if (-not (Test-Command "claude")) {
+        Add-Result "Ponytail" "BLOCKED" "Không tìm thấy Claude Code CLI."
+        return
+    }
+
+    if (-not (Test-Command "node")) {
+        Add-Result "Ponytail" "BLOCKED" "Thiếu Node.js trên PATH; Ponytail Claude hooks cần Node."
+        return
+    }
+
+    Write-Host "Đang thêm Ponytail marketplace upstream..." -ForegroundColor Cyan
+    $market = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "marketplace", "add", "DietrichGebert/ponytail") -PluralArgs @("plugins", "marketplace", "add", "DietrichGebert/ponytail")
+    $market.Output | ForEach-Object { Write-Host $_ }
+
+    if (-not $market.Success) {
+        Add-Result "Ponytail" "FAIL" "Không thêm được Ponytail marketplace."
+        return
+    }
+
+    Write-Host "Đang cài Ponytail plugin upstream..." -ForegroundColor Cyan
+    $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "ponytail@ponytail") -PluralArgs @("plugins", "install", "ponytail@ponytail")
+    $install.Output | ForEach-Object { Write-Host $_ }
+
+    if (-not $install.Success) {
+        Add-Result "Ponytail" "FAIL" "Không cài được Ponytail plugin."
+        return
+    }
+
+    Add-Result "Ponytail" "PASS" "Đã cài plugin upstream. Default mode của Ponytail là full; restart/reload Claude để hooks hoạt động."
+}
+
+function Ensure-MattPocockSkills {
+    if ($SkipExternalAiStack) {
+        Add-Result "Matt Pocock skills" "SKIP" "Đã bỏ qua theo -SkipExternalAiStack."
+        return
+    }
+
+    if (-not (Test-Command "claude")) {
+        Add-Result "Matt Pocock skills" "BLOCKED" "Không tìm thấy Claude Code CLI."
+        return
+    }
+
+    Write-Host "Đang cài mattpocock-skills từ Claude Code official marketplace..." -ForegroundColor Cyan
+    $install = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "install", "mattpocock-skills") -PluralArgs @("plugins", "install", "mattpocock-skills")
+    $install.Output | ForEach-Object { Write-Host $_ }
+
+    if (-not $install.Success) {
+        Add-Result "Matt Pocock skills" "FAIL" "Không cài được mattpocock-skills plugin."
+        return
+    }
+
+    Add-Result "Matt Pocock skills" "PASS" "Đã cài upstream. Mỗi repo chạy /setup-matt-pocock-skills một lần trước khi dùng workflow của bộ skill."
+}
+
 function Ensure-PersonalUpdater {
     $installer = Join-Path $RepoRoot "tools\install-personal-updater.ps1"
     if (-not (Test-Path $installer)) {
@@ -358,8 +562,16 @@ if ($SelfTest) {
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',
         'claude mcp list',
-        '[switch]$WithSqlServerMcp',
+        '[switch]$SkipSqlServerMcp',
+        '[switch]$SkipExternalAiStack',
         'Microsoft.DataApiBuilder --version 2.0.12',
+        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
+        'headroom mcp install --force',
+        'Invoke-ClaudePluginCommand',
+        'DietrichGebert/ponytail',
+        'ponytail@ponytail',
+        'mattpocock-skills',
+        'Ensure-UserPathEntry',
         'Đã cài DAB'
     )
 
@@ -387,6 +599,10 @@ Ensure-WingetPackage -DisplayName "ast-grep" -CommandName "ast-grep" -PackageId 
 Ensure-Repomix
 $cbmExe = Ensure-CodebaseMemory
 Ensure-ClaudeMcp -CbmExe $cbmExe
+$uvReady = Ensure-Uv
+Ensure-Headroom -UvReady $uvReady
+Ensure-Ponytail
+Ensure-MattPocockSkills
 Ensure-SqlServerMcp
 Ensure-PersonalUpdater
 
@@ -420,5 +636,6 @@ if ($blocked -gt 0) {
 Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng." -ForegroundColor Green
 Write-Host "Restart Claude Code rồi dùng /mcp để xác nhận codebase-memory-mcp Connected." -ForegroundColor Green
 Write-Host ""
-Write-Host "Lưu ý: tool đã cài sẵn không có nghĩa task nào cũng dùng. AI-DEV-OS vẫn ưu tiên CODEBASE-MAP -> direct read -> ripgrep -> ast-grep -> codebase-memory-mcp khi thật sự cần." -ForegroundColor DarkGray
-Write-Host "SQL Server MCP chỉ được cài khi dùng -WithSqlServerMcp và vẫn cần project config + least-privilege DB role riêng." -ForegroundColor DarkGray
+Write-Host "Lưu ý: setup mặc định cài toàn bộ upstream stack đã chuẩn hóa: codebase-memory-mcp, Headroom, Ponytail, mattpocock-skills và Microsoft SQL MCP/DAB." -ForegroundColor DarkGray
+Write-Host "SQL Server MCP chỉ cài CLI; database config/connection/permission vẫn là project-specific và phải least privilege." -ForegroundColor DarkGray
+Write-Host "Mỗi product repo cần chạy /setup-matt-pocock-skills một lần nếu muốn dùng đầy đủ workflow Matt Pocock." -ForegroundColor DarkGray

@@ -52,7 +52,10 @@ Không cần tạo work folder nếu không giúp ích.
 
 Feature/bug chạm nhiều file, có business rule hoặc regression risk đáng kể.
 
-Nếu task còn mơ hồ/decision-heavy, chạy `shape-task` trước implementation:
+Nếu task còn mơ hồ/decision-heavy:
+
+- Claude Code đã cài mattpocock/skills → ưu tiên `/grill-with-docs` để research + hỏi quyết định + xây shared understanding; sau đó dùng flow spec/implement upstream phù hợp.
+- Agent khác hoặc chưa có plugin upstream → dùng `shape-task` fallback của AI-DEV-OS.
 
 ```text
 Task ngắn
@@ -74,11 +77,11 @@ Understand → Research vừa đủ → Plan → Implement → Verify → Review
 
 Architecture, auth/security/payment, migration dữ liệu, cross-cutting change, refactor lớn hoặc codebase chưa hiểu rõ.
 
-Mặc định dùng task shaping nếu chưa có spec/plan đã approve:
+Mặc định dùng task shaping nếu chưa có spec/plan đã approve. Với Claude Code có mattpocock/skills, ưu tiên upstream `/grill-with-docs`; `shape-task` là fallback:
 
 ```text
 Research facts
-→ Shape Task / decision-tree interview
+→ Grill/Shape Task / decision-tree interview
 → Shared Understanding
 → Spec
 → Plan
