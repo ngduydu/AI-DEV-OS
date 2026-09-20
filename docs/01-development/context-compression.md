@@ -138,21 +138,19 @@ Nó bổ sung một lớp **output compression** giữa retrieval và reasoning.
 
 ### CLI
 
-AI-DEV-OS có launcher:
+AI-DEV-OS có launcher mỏng gọi thẳng wrapper upstream:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\start-claude-headroom.ps1
 ```
 
-Launcher:
+Launcher tương đương:
 
-```text
-kiểm tra headroom + claude
-→ start local proxy nếu chưa chạy
-→ set ANTHROPIC_BASE_URL
-→ mở Claude Code
-→ khi Claude thoát thì dọn proxy do launcher tạo
+```powershell
+headroom wrap claude
 ```
+
+Không tự quản lý proxy lifecycle nữa; Headroom upstream tự khởi động proxy, cấu hình Claude session và giữ on-demand tool loading hoạt động.
 
 Xem stats khi session đang chạy:
 
