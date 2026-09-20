@@ -35,9 +35,9 @@ def main() -> None:
         "uv": "astral-sh.uv",
         "Headroom upstream": 'headroom-ai[proxy,mcp]',
         "Headroom MCP": "headroom mcp install --force",
-        "Ponytail marketplace": "claude plugin marketplace add DietrichGebert/ponytail",
-        "Ponytail plugin": "claude plugin install ponytail@ponytail",
-        "Matt Pocock plugin": "claude plugins install mattpocock-skills",
+        "Ponytail marketplace": "DietrichGebert/ponytail",
+        "Ponytail plugin": "ponytail@ponytail",
+        "Matt Pocock plugin": "mattpocock-skills",
         "persistent user PATH": "Ensure-UserPathEntry",
     }
 
