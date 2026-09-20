@@ -633,3 +633,26 @@ AI-DEV-OS hấp thụ pattern tốt thay vì cài chồng nhiều bộ agent ins
 - codebase-memory-mcp → tiếp tục là graph/code-intelligence profile hiện có.
 
 Các workflow mới nằm trong `.claude/skills/` và `.agents/skills/`; không cài nguyên Ponytail hay nguyên bộ external skills để tránh rule conflict.
+
+
+## Upstream tool stack
+
+AI-DEV-OS ưu tiên dùng tool/skill upstream thật cho các capability team đã chọn:
+
+```text
+codebase-memory-mcp
+Headroom
+Ponytail
+mattpocock/skills
+Microsoft SQL MCP / Data API builder
+```
+
+Cài/verify một lần trên máy Windows từ repo AI-DEV-OS:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+```
+
+Sau đó restart Claude Code. Với mattpocock-skills, mỗi product repo chạy `/setup-matt-pocock-skills` một lần.
+
+Chi tiết: `docs/01-development/tool-adoption.md`.
