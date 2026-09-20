@@ -6,6 +6,15 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.1 — Runtime integration fixes
+
+### Fixed
+
+- `start-claude-headroom.ps1` không còn tự spawn proxy rồi poll `/stats`; launcher gọi thẳng `headroom wrap claude` upstream để dùng đúng lifecycle/config của Headroom.
+- PowerShell launcher có UTF-8 BOM để Windows PowerShell 5.1 hiển thị tiếng Việt đúng.
+- Machine setup mang theo fix cài `mattpocock-skills` từ marketplace upstream `mattpocock/skills` khi plugin chưa có trong marketplace cấu hình sẵn.
+- Native Claude plugin command trên Windows PowerShell 5.1 không còn làm script chết trước fallback chỉ vì stderr.
+
 ## 2.8.0 — Upstream-first external AI stack
 
 ### Changed
