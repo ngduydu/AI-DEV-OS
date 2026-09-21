@@ -460,11 +460,14 @@ function Ensure-Headroom {
             return
         }
 
-        Write-Host "Đang cài Headroom persistent runtime cho Claude Code..." -ForegroundColor Cyan
+        Write-Host "Đang deploy Headroom persistent runtime cho Claude Code..." -ForegroundColor Cyan
         $previousErrorActionPreference = $ErrorActionPreference
         try {
             $ErrorActionPreference = "Continue"
-            $installOutput = & headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787 2>&1
+            # Dùng turnkey deploy upstream để Headroom tự chọn supervisor phù hợp Windows.
+            # --no-docker giữ runtime local Python; nếu Task Scheduler không khả dụng,
+            # upstream có thể fallback sang managed detached runtime thay vì fail cứng.
+            $installOutput = & headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker 2>&1
             $installExit = $LASTEXITCODE
         }
         finally {
@@ -473,7 +476,9 @@ function Ensure-Headroom {
         $installOutput | ForEach-Object { Write-Host $_ }
 
         if ($installExit -ne 0) {
-            Add-Result "Headroom" "BLOCKED" "Headroom MCP đã cài nhưng persistent runtime cho Claude thất bại. Có thể tạm dùng headroom wrap claude."
+            $installDetail = (($installOutput | Select-Object -Last 3) -join " | ").Trim()
+            if (-not $installDetail) { $installDetail = "Không có diagnostic output." }
+            Add-Result "Headroom" "BLOCKED" "Persistent deploy cho Claude thất bại: $installDetail"
             return
         }
 
@@ -650,7 +655,7 @@ if ($SelfTest) {
         'Microsoft.DataApiBuilder --version 2.0.12',
         'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
         'headroom mcp install --force',
-        'headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787',
+        'headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker',
         'headroom install status --profile ai-dev-os',
         'Invoke-ClaudePluginCommand',
         'DietrichGebert/ponytail',
