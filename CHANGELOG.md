@@ -10,6 +10,8 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ### Fixed
 
+- Machine setup tạo shim `~/.local/bin/codebase-memory-mcp.cmd` để CMD/PowerShell gọi `codebase-memory-mcp --version` ổn định.
+- Headroom được cấu hình persistent cho Claude Code trên Windows; sau setup có thể mở `claude` bình thường mà request vẫn đi qua proxy.
 - Headroom launcher dùng `--code-memory none` vì AI-DEV-OS đã chọn `codebase-memory-mcp` làm code-memory chuẩn.
 - Tránh để `headroom wrap claude` tự đăng ký thêm Serena và tạo hai graph/code-memory MCP cùng làm một việc.
 
