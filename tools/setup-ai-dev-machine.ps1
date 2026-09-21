@@ -170,10 +170,25 @@ function Resolve-CbmExecutable {
     return $null
 }
 
+function Ensure-CodebaseMemoryShim {
+    param([string]$Executable)
+
+    if (-not $Executable -or -not (Test-Path $Executable)) { return }
+
+    $binDir = Join-Path $HOME ".local\bin"
+    New-Item -ItemType Directory -Path $binDir -Force | Out-Null
+    Ensure-UserPathEntry -Path $binDir
+
+    $shimPath = Join-Path $binDir "codebase-memory-mcp.cmd"
+    $shimContent = "@echo off`r`n`"$Executable`" %*`r`n"
+    [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
+}
+
 function Ensure-CodebaseMemory {
     $existing = Resolve-CbmExecutable
     if ($existing) {
         Ensure-UserPathEntry -Path (Split-Path -Parent $existing)
+        Ensure-CodebaseMemoryShim -Executable $existing
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
             Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH user đã được đảm bảo."
@@ -222,6 +237,7 @@ function Ensure-CodebaseMemory {
         }
 
         Ensure-UserPathEntry -Path (Split-Path -Parent $installed)
+        Ensure-CodebaseMemoryShim -Executable $installed
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
         Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH user đã được đảm bảo."
         return $installed
@@ -429,16 +445,56 @@ function Ensure-Headroom {
 
     if (-not $SkipMcp -and (Test-Command "claude")) {
         Write-Host "Đang đăng ký Headroom MCP theo installer upstream..." -ForegroundColor Cyan
-        $mcpOutput = & headroom mcp install --force 2>&1
-        $mcpExit = $LASTEXITCODE
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = "Continue"
+            $mcpOutput = & headroom mcp install --force 2>&1
+            $mcpExit = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+        }
         $mcpOutput | ForEach-Object { Write-Host $_ }
         if ($mcpExit -ne 0) {
-            Add-Result "Headroom" "BLOCKED" "Headroom đã cài ($version) nhưng MCP install thất bại. Có thể vẫn dùng proxy/wrap."
+            Add-Result "Headroom" "BLOCKED" "Headroom đã cài ($version) nhưng MCP install thất bại."
+            return
+        }
+
+        Write-Host "Đang cài Headroom persistent runtime cho Claude Code..." -ForegroundColor Cyan
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = "Continue"
+            $installOutput = & headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787 2>&1
+            $installExit = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+        }
+        $installOutput | ForEach-Object { Write-Host $_ }
+
+        if ($installExit -ne 0) {
+            Add-Result "Headroom" "BLOCKED" "Headroom MCP đã cài nhưng persistent runtime cho Claude thất bại. Có thể tạm dùng headroom wrap claude."
+            return
+        }
+
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = "Continue"
+            $statusOutput = & headroom install status --profile ai-dev-os 2>&1
+            $statusExit = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+        }
+        $statusOutput | ForEach-Object { Write-Host $_ }
+
+        if ($statusExit -ne 0) {
+            Add-Result "Headroom" "BLOCKED" "Persistent runtime đã apply nhưng status chưa PASS."
             return
         }
     }
 
-    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; proxy/wrap + MCP sẵn sàng."
+    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; MCP + persistent Claude routing sẵn sàng. Mở Claude bình thường bằng lệnh claude là đi qua Headroom."
 }
 
 function Invoke-ClaudePluginCommand {
@@ -594,6 +650,8 @@ if ($SelfTest) {
         'Microsoft.DataApiBuilder --version 2.0.12',
         'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
         'headroom mcp install --force',
+        'headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787',
+        'headroom install status --profile ai-dev-os',
         'Invoke-ClaudePluginCommand',
         'DietrichGebert/ponytail',
         'ponytail@ponytail',
@@ -601,6 +659,8 @@ if ($SelfTest) {
         'mattpocock-skills@mattpocock',
         'mattpocock-skills',
         'Ensure-UserPathEntry',
+        'Ensure-CodebaseMemoryShim',
+        'codebase-memory-mcp.cmd',
         'Đã cài DAB'
     )
 
