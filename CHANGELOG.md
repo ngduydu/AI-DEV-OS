@@ -6,6 +6,13 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.4 — Headroom Windows persistent deployment fix
+
+### Fixed
+
+- Windows machine setup dùng upstream `headroom deploy --no-docker` thay vì ép trực tiếp `persistent-task`; Headroom tự chọn supervisor phù hợp và có fallback managed detached runtime.
+- Khi persistent deployment fail, setup giữ lại diagnostic output cuối để nhìn ra nguyên nhân thay vì chỉ báo BLOCKED chung chung.
+
 ## 2.8.3 — Runtime UX on Windows
 
 ### Fixed
