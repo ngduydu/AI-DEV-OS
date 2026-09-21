@@ -471,14 +471,14 @@ function Ensure-Headroom {
             return
         }
 
-        Write-Host "Đang deploy Headroom persistent runtime cho Claude Code..." -ForegroundColor Cyan
+        Write-Host "Đang cấu hình Headroom durable routing cho Claude Code..." -ForegroundColor Cyan
         $previousErrorActionPreference = $ErrorActionPreference
         try {
             $ErrorActionPreference = "Continue"
-            # Dùng turnkey deploy upstream để Headroom tự chọn supervisor phù hợp Windows.
-            # --no-docker giữ runtime local Python; nếu Task Scheduler không khả dụng,
-            # upstream có thể fallback sang managed detached runtime thay vì fail cứng.
-            $installOutput = & headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker 2>&1
+            # headroom init -g claude là upstream path dành cho durable Claude integration.
+            # Nó không cần quyền tạo Scheduled Task: ghi user-scope Claude settings + hooks,
+            # và SessionStart hook sẽ tự start/recover detached Headroom runtime khi cần.
+            $installOutput = & headroom init -g --port 8787 claude 2>&1
             $installExit = $LASTEXITCODE
         }
         finally {
@@ -487,30 +487,14 @@ function Ensure-Headroom {
         $installOutput | ForEach-Object { Write-Host $_ }
 
         if ($installExit -ne 0) {
-            $installDetail = (($installOutput | Select-Object -Last 3) -join " | ").Trim()
+            $installDetail = (($installOutput | Select-Object -Last 5) -join " | ").Trim()
             if (-not $installDetail) { $installDetail = "Không có diagnostic output." }
-            Add-Result "Headroom" "BLOCKED" "Persistent deploy cho Claude thất bại: $installDetail"
-            return
-        }
-
-        $previousErrorActionPreference = $ErrorActionPreference
-        try {
-            $ErrorActionPreference = "Continue"
-            $statusOutput = & headroom install status --profile ai-dev-os 2>&1
-            $statusExit = $LASTEXITCODE
-        }
-        finally {
-            $ErrorActionPreference = $previousErrorActionPreference
-        }
-        $statusOutput | ForEach-Object { Write-Host $_ }
-
-        if ($statusExit -ne 0) {
-            Add-Result "Headroom" "BLOCKED" "Persistent runtime đã apply nhưng status chưa PASS."
+            Add-Result "Headroom" "BLOCKED" "Durable routing cho Claude thất bại: $installDetail"
             return
         }
     }
 
-    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; MCP + persistent Claude routing sẵn sàng. Mở Claude bình thường bằng lệnh claude là đi qua Headroom."
+    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; MCP + durable Claude routing sẵn sàng. Chạy claude bình thường; SessionStart hook tự start/recover Headroom runtime."
 }
 
 function Invoke-ClaudePluginCommand {
@@ -666,8 +650,7 @@ if ($SelfTest) {
         'Microsoft.DataApiBuilder --version 2.0.12',
         'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
         'headroom mcp install --force',
-        'headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker',
-        'headroom install status --profile ai-dev-os',
+        'headroom init -g --port 8787 claude',
         'Invoke-ClaudePluginCommand',
         'DietrichGebert/ponytail',
         'ponytail@ponytail',
