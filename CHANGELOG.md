@@ -6,6 +6,14 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.5 — Windows setup hang fix
+
+### Fixed
+
+- Fix vòng lặp shim `codebase-memory-mcp.cmd` tự gọi chính nó khiến machine setup có thể treo ngay sau banner.
+- Resolver luôn ưu tiên binary `.exe` thật trong `%LOCALAPPDATA%\Programs\codebase-memory-mcp`.
+- Thêm progress marker `[1/12] ... [12/12]` để nếu setup dừng ở bước nào thì nhìn thấy ngay.
+
 ## 2.8.4 — Headroom Windows persistent deployment fix
 
 ### Fixed
