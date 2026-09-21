@@ -6,6 +6,14 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.6 — Headroom durable init on Windows
+
+### Fixed
+
+- Không dùng Scheduled Task cho Headroom nữa vì có thể bị Windows chặn quyền `schtasks /Create`.
+- Dùng upstream `headroom init -g --port 8787 claude` để cấu hình durable routing ở user scope.
+- Claude `SessionStart` hook của Headroom tự start/recover detached runtime khi cần; không yêu cầu admin hoặc một terminal proxy riêng.
+
 ## 2.8.5 — Windows setup hang fix
 
 ### Fixed

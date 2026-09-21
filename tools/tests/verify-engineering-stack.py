@@ -20,8 +20,8 @@ def main() -> None:
 
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
-    if version != "2.8.5":
-        fail(f"expected 2.8.5, got {version!r}")
+    if version != "2.8.6":
+        fail(f"expected 2.8.6, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
@@ -144,7 +144,7 @@ def main() -> None:
     if args != expected:
         fail(f"SQL MCP template args differ: {args!r}")
 
-    print("PASS: AI engineering stack 2.8.5 contract")
+    print("PASS: AI engineering stack 2.8.6 contract")
 
 
 if __name__ == "__main__":
