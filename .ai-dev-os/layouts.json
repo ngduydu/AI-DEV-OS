@@ -37,6 +37,8 @@
         "docs/ai/16-TASK-EXECUTION.md": "docs/01-development/ai-development.md",
         "docs/ai/17-CONTEXT-RETRIEVAL.md": "docs/01-development/context-retrieval.md",
         "docs/ai/18-TOOL-ADOPTION.md": "docs/01-development/tool-adoption.md",
+        "docs/ai/17-AI-USAGE-POLICY.md": "docs/01-development/ai-usage-policy.md",
+        "docs/team/AI-USAGE-POLICY.md": "docs/01-development/ai-usage-policy.md",
         "docs/modules/README.md": "docs/02-modules/README.md",
         "docs/knowledge/README.md": "docs/03-knowledge/README.md",
         "docs/ai/05-BUSINESS-RULES.md": "docs/03-knowledge/business-rules.md",
@@ -57,8 +59,10 @@
         "docs/operations/": "docs/04-operations/",
         "docs/decisions/": "docs/05-decisions/",
         "docs/work/": "docs/06-work/",
-        "docs/ai/": "docs/01-development/project/",
-        "docs/team/": "docs/01-development/team/"
+        "docs/ai/": "docs/01-development/",
+        "docs/team/": "docs/01-development/",
+        "docs/01-development/project/": "docs/01-development/",
+        "docs/01-development/team/": "docs/01-development/"
       }
     }
   }

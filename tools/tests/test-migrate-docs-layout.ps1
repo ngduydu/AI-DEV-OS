@@ -25,6 +25,9 @@ try {
         "docs/ai/05-BUSINESS-RULES.md" = "BUSINESS-RULES: durable task knowledge"
         "docs/ai/13-KNOWN-PITFALLS.md" = "PITFALLS: task-discovered knowledge"
         "docs/ai/custom-project-note.md" = "CUSTOM: project-owned note"
+        "docs/team/AI-USAGE-POLICY.md" = "TEAM-POLICY"
+        "docs/01-development/project/legacy-project-note.md" = "LEGACY-PROJECT-NOTE"
+        "docs/01-development/team/team-rule.md" = "TEAM-RULE"
         "docs/modules/sales/rules.md" = "MODULE"
         "docs/knowledge/pitfalls/legacy.md" = "PITFALL"
         "docs/operations/deployment.md" = "OPS"
@@ -65,7 +68,10 @@ try {
         "docs/00-overview/architecture.md" = "ARCH: project architecture custom data"
         "docs/03-knowledge/business-rules.md" = "BUSINESS-RULES: durable task knowledge"
         "docs/03-knowledge/known-pitfalls.md" = "PITFALLS: task-discovered knowledge"
-        "docs/01-development/project/custom-project-note.md" = "CUSTOM: project-owned note"
+        "docs/01-development/custom-project-note.md" = "CUSTOM: project-owned note"
+        "docs/01-development/ai-usage-policy.md" = "TEAM-POLICY"
+        "docs/01-development/legacy-project-note.md" = "LEGACY-PROJECT-NOTE"
+        "docs/01-development/team-rule.md" = "TEAM-RULE"
         "docs/02-modules/sales/rules.md" = "MODULE"
         "docs/03-knowledge/pitfalls/legacy.md" = "PITFALL"
         "docs/04-operations/deployment.md" = "OPS"
@@ -91,6 +97,9 @@ try {
         "docs/ai/05-BUSINESS-RULES.md",
         "docs/ai/13-KNOWN-PITFALLS.md",
         "docs/ai/custom-project-note.md",
+        "docs/team/AI-USAGE-POLICY.md",
+        "docs/01-development/project/legacy-project-note.md",
+        "docs/01-development/team/team-rule.md",
         "docs/modules/sales/rules.md",
         "docs/knowledge/pitfalls/legacy.md",
         "docs/operations/deployment.md",

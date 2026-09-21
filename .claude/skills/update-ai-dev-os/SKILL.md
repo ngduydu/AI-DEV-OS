@@ -110,25 +110,36 @@ Không commit/merge/push tự động trừ khi user yêu cầu.
 
 Chạy migration theo `UPGRADE.md` cho mọi version từ current → source.
 
-### Team AI policy namespace
+### Flat development namespace
 
-Nếu tồn tại:
+`docs/01-development/` là namespace phẳng cho development rule/policy của repository. Không tạo hoặc duy trì `project/` và `team/` bên dưới.
 
-`docs/ai/17-AI-USAGE-POLICY.md`
+Canonical rule:
 
-và chưa tồn tại:
+```text
+project/team development rule
+→ docs/01-development/<descriptive-file>.md
+```
 
-`docs/team/AI-USAGE-POLICY.md`
+Nếu tồn tại `docs/ai/17-AI-USAGE-POLICY.md`, `docs/team/`, `docs/01-development/project/` hoặc `docs/01-development/team/`, dùng deterministic migrator để đưa file trực tiếp vào `docs/01-development/`.
 
-thì:
+Ví dụ:
 
-1. dùng `git mv` để move file;
-2. giữ nguyên nội dung;
-3. search toàn repo các reference path cũ;
-4. update sang `docs/01-development/ai-usage-policy.md`;
-5. đảm bảo `docs/README.md` có route team policy.
+```text
+docs/ai/17-AI-USAGE-POLICY.md
+→ docs/01-development/ai-usage-policy.md
 
-Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
+docs/team/AI-USAGE-POLICY.md
+→ docs/01-development/ai-usage-policy.md
+
+docs/01-development/project/custom-project-note.md
+→ docs/01-development/custom-project-note.md
+
+docs/01-development/team/review-policy.md
+→ docs/01-development/review-policy.md
+```
+
+Giữ nguyên nội dung, rewrite reference theo mapping, ưu tiên `git mv` và chạy collision preflight. Nếu nhiều source map tới cùng destination nhưng khác nội dung: STOP, report conflict, không overwrite và không tự merge đoán.
 
 ### Conflict-safe knowledge + ordered layout migration — 2.6.0
 
@@ -152,7 +163,7 @@ docs/ai/03-ARCHITECTURE.md
 → docs/00-overview/architecture.md
 
 docs/ai/custom-project-note.md
-→ docs/01-development/project/custom-project-note.md
+→ docs/01-development/custom-project-note.md
 
 docs/modules/sales/*
 → docs/02-modules/sales/*
@@ -167,9 +178,11 @@ docs/decisions/*
 Không được dùng bootstrap để tái tạo knowledge vì sẽ tốn token và có nguy cơ khác nội dung cũ.
 
 
-## Phase 4.5 — Legacy → ordered-v2 migration
+## Phase 4.5 — Legacy/incorrect docs normalization
 
-Chỉ chạy khi target layout = `legacy-v1`.
+Chạy deterministic migrator khi target là `legacy-v1` **hoặc** còn `docs/ai/`, `docs/team/`, `docs/01-development/project/`, `docs/01-development/team/`.
+
+Nếu target đã là `ordered-v2` và không có các path sai trên thì bỏ qua Phase 4.5.
 
 ### A. Dùng deterministic migrator, không đọc/viết tay từng file
 
@@ -333,8 +346,9 @@ Trước khi write VERSION:
 7. mọi project-owned knowledge file trước update vẫn tồn tại sau update ở cùng path hoặc mapped ordered path; ngoài deterministic path-reference rewrite, nội dung phải được preserve;
 8. không còn broken reference tới migrated legacy docs path;
 9. không còn broken reference tới `docs/ai/17-AI-USAGE-POLICY.md` nếu migration đã chạy;
-10. nếu target có team policy thì route mới đúng;
-11. optional tool không bị auto-enabled;
+10. không còn `docs/01-development/project/` hoặc `docs/01-development/team/`; development/team policy nằm trực tiếp dưới `docs/01-development/`;
+11. nếu target có AI usage policy thì canonical path là `docs/01-development/ai-usage-policy.md`;
+12. optional tool không bị auto-enabled;
 12. target working tree chỉ chứa expected upgrade + layout migration changes;
 13. migration-specific checks trong UPGRADE.md đã pass;
 14. không còn unresolved conflict;

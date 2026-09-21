@@ -159,6 +159,8 @@ function Build-Plan([string]$Root, $Layout) {
     $legacyRoots = @(
         "docs/ai",
         "docs/team",
+        "docs/01-development/project",
+        "docs/01-development/team",
         "docs/modules",
         "docs/knowledge",
         "docs/operations",
