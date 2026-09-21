@@ -19,7 +19,8 @@ if (-not (Test-Command "claude")) {
 
 Write-Host "Đang mở Claude Code qua Headroom upstream tại cổng $Port..." -ForegroundColor Cyan
 Write-Host "Headroom sẽ tự khởi động proxy, cấu hình Claude session và giữ tool search hoạt động." -ForegroundColor DarkGray
+Write-Host "Không đăng ký Serena vì AI-DEV-OS đã dùng codebase-memory-mcp làm code-memory chuẩn." -ForegroundColor DarkGray
 Write-Host "Xem thống kê khi đang chạy: http://127.0.0.1:$Port/stats" -ForegroundColor DarkGray
 
-& headroom wrap claude --port $Port
+& headroom wrap claude --port $Port --code-memory none
 exit $LASTEXITCODE

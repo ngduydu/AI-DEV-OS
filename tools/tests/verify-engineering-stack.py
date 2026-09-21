@@ -20,8 +20,8 @@ def main() -> None:
 
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
-    if version != "2.8.1":
-        fail(f"expected 2.8.1, got {version!r}")
+    if version != "2.8.2":
+        fail(f"expected 2.8.2, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
@@ -131,7 +131,7 @@ def main() -> None:
             fail(f"Claude/generic skill differs: {name}")
 
     launcher = (root / "tools" / "start-claude-headroom.ps1").read_text(encoding="utf-8")
-    for needle in ["headroom wrap claude", "--port", "/stats", "claude"]:
+    for needle in ["headroom wrap claude", "--code-memory none", "--port", "/stats", "claude"]:
         require(launcher, needle, "Headroom launcher")
 
     headroom_template = json.loads((root / "templates" / "mcp" / "claude-headroom.json").read_text(encoding="utf-8"))
@@ -144,7 +144,7 @@ def main() -> None:
     if args != expected:
         fail(f"SQL MCP template args differ: {args!r}")
 
-    print("PASS: AI engineering stack 2.8.1 contract")
+    print("PASS: AI engineering stack 2.8.2 contract")
 
 
 if __name__ == "__main__":

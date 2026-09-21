@@ -147,10 +147,10 @@ powershell -ExecutionPolicy Bypass -File .\tools\start-claude-headroom.ps1
 Launcher tương đương:
 
 ```powershell
-headroom wrap claude
+headroom wrap claude --code-memory none
 ```
 
-Không tự quản lý proxy lifecycle nữa; Headroom upstream tự khởi động proxy, cấu hình Claude session và giữ on-demand tool loading hoạt động.
+Không tự quản lý proxy lifecycle nữa; Headroom upstream tự khởi động proxy, cấu hình Claude session và giữ on-demand tool loading hoạt động. AI-DEV-OS truyền `--code-memory none` vì codebase-memory-mcp đã là code-memory chuẩn; không bật thêm Serena.
 
 Xem stats khi session đang chạy:
 

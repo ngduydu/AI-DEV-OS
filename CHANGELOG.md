@@ -6,6 +6,13 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.2 — Headroom/code-memory de-duplication
+
+### Fixed
+
+- Headroom launcher dùng `--code-memory none` vì AI-DEV-OS đã chọn `codebase-memory-mcp` làm code-memory chuẩn.
+- Tránh để `headroom wrap claude` tự đăng ký thêm Serena và tạo hai graph/code-memory MCP cùng làm một việc.
+
 ## 2.8.1 — Runtime integration fixes
 
 ### Fixed
