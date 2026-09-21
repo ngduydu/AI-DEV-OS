@@ -187,10 +187,10 @@ Mục tiêu là giảm token mà không hy sinh evidence.
 
 ## Persistent mặc định cho Claude Code
 
-Trên Windows, machine setup của AI-DEV-OS cấu hình Headroom persistent bằng upstream CLI:
+Trên Windows, machine setup của AI-DEV-OS cấu hình Headroom persistent bằng upstream turnkey deploy để Headroom tự chọn supervisor phù hợp:
 
 ```powershell
-headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787
+headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker
 ```
 
 Sau khi PASS:
