@@ -122,12 +122,11 @@ và chưa tồn tại:
 
 thì:
 
-1. tạo `docs/team/` nếu cần;
-2. dùng `git mv` để move file;
-3. giữ nguyên nội dung;
-4. search toàn repo các reference path cũ;
-5. update sang `docs/team/AI-USAGE-POLICY.md`;
-6. đảm bảo `docs/README.md` có route team policy.
+1. dùng `git mv` để move file;
+2. giữ nguyên nội dung;
+3. search toàn repo các reference path cũ;
+4. update sang `docs/01-development/ai-usage-policy.md`;
+5. đảm bảo `docs/README.md` có route team policy.
 
 Nếu cả source và destination đều tồn tại: STOP migration đó và report conflict; không overwrite.
 
