@@ -161,11 +161,15 @@ function Ensure-Repomix {
 }
 
 function Resolve-CbmExecutable {
-    $command = Get-Command "codebase-memory-mcp" -ErrorAction SilentlyContinue
-    if ($command) { return $command.Source }
-
+    # Luôn ưu tiên binary thật. Không lấy shim .cmd do chính AI-DEV-OS tạo,
+    # nếu không shim có thể tự trỏ vào chính nó và lặp vô hạn.
     $defaultPath = Join-Path $env:LOCALAPPDATA "Programs\codebase-memory-mcp\codebase-memory-mcp.exe"
     if (Test-Path $defaultPath) { return $defaultPath }
+
+    $command = Get-Command "codebase-memory-mcp" -ErrorAction SilentlyContinue
+    if ($command -and $command.Source -and ([System.IO.Path]::GetExtension($command.Source) -ieq ".exe")) {
+        return $command.Source
+    }
 
     return $null
 }
@@ -174,12 +178,19 @@ function Ensure-CodebaseMemoryShim {
     param([string]$Executable)
 
     if (-not $Executable -or -not (Test-Path $Executable)) { return }
+    if ([System.IO.Path]::GetExtension($Executable) -ine ".exe") {
+        throw "Không tạo shim codebase-memory-mcp từ non-exe path: $Executable"
+    }
 
     $binDir = Join-Path $HOME ".local\bin"
     New-Item -ItemType Directory -Path $binDir -Force | Out-Null
     Ensure-UserPathEntry -Path $binDir
 
     $shimPath = Join-Path $binDir "codebase-memory-mcp.cmd"
+    if ([System.IO.Path]::GetFullPath($shimPath) -eq [System.IO.Path]::GetFullPath($Executable)) {
+        throw "Shim codebase-memory-mcp không được trỏ vào chính nó."
+    }
+
     $shimContent = "@echo off`r`n`"$Executable`" %*`r`n"
     [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
 }
@@ -666,6 +677,8 @@ if ($SelfTest) {
         'Ensure-UserPathEntry',
         'Ensure-CodebaseMemoryShim',
         'codebase-memory-mcp.cmd',
+        'Luôn ưu tiên binary thật',
+        '[5/12] Kiểm tra codebase-memory-mcp...',
         'Đã cài DAB'
     )
 
@@ -687,17 +700,29 @@ Write-Host "Script này cài tool ở cấp máy/user, Không sửa .mcp.json c�
 Write-Host "CodeGraph: KHÔNG cài vì overlap với codebase-memory-mcp." -ForegroundColor DarkGray
 Write-Host ""
 
+Write-Host "[1/12] Kiểm tra winget..." -ForegroundColor Cyan
 Ensure-Winget
+Write-Host "[2/12] Kiểm tra ripgrep..." -ForegroundColor Cyan
 Ensure-WingetPackage -DisplayName "ripgrep" -CommandName "rg" -PackageId "BurntSushi.ripgrep.MSVC"
+Write-Host "[3/12] Kiểm tra ast-grep..." -ForegroundColor Cyan
 Ensure-WingetPackage -DisplayName "ast-grep" -CommandName "ast-grep" -PackageId "ast-grep.ast-grep"
+Write-Host "[4/12] Kiểm tra Repomix..." -ForegroundColor Cyan
 Ensure-Repomix
+Write-Host "[5/12] Kiểm tra codebase-memory-mcp..." -ForegroundColor Cyan
 $cbmExe = Ensure-CodebaseMemory
+Write-Host "[6/12] Kiểm tra Claude MCP..." -ForegroundColor Cyan
 Ensure-ClaudeMcp -CbmExe $cbmExe
+Write-Host "[7/12] Kiểm tra uv..." -ForegroundColor Cyan
 $uvReady = Ensure-Uv
+Write-Host "[8/12] Kiểm tra Headroom..." -ForegroundColor Cyan
 Ensure-Headroom -UvReady $uvReady
+Write-Host "[9/12] Kiểm tra Ponytail..." -ForegroundColor Cyan
 Ensure-Ponytail
+Write-Host "[10/12] Kiểm tra Matt Pocock skills..." -ForegroundColor Cyan
 Ensure-MattPocockSkills
+Write-Host "[11/12] Kiểm tra SQL Server MCP..." -ForegroundColor Cyan
 Ensure-SqlServerMcp
+Write-Host "[12/12] Kiểm tra personal updater..." -ForegroundColor Cyan
 Ensure-PersonalUpdater
 
 Write-Host ""

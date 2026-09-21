@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "framework_version": "2.8.4",
+  "framework_version": "2.8.5",
   "managed_files": [
     {
       "path": "UPGRADE.md",
