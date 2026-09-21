@@ -155,17 +155,21 @@ docs/ai/17-AI-USAGE-POLICY.md
 
 Đây là team-specific policy và bị trùng namespace với framework 2.2+.
 
-Updater 2.3.0 phải tự move an toàn:
+Updater hiện tại khi gặp policy legacy phải đưa thẳng về canonical development namespace:
 
 ```text
 docs/ai/17-AI-USAGE-POLICY.md
-→ docs/team/AI-USAGE-POLICY.md
+→ docs/01-development/ai-usage-policy.md
+
+docs/team/AI-USAGE-POLICY.md
+→ docs/01-development/ai-usage-policy.md
 ```
 
 Rule:
 
 - giữ nguyên nội dung;
 - ưu tiên `git mv`;
+- không tạo lại `docs/team/`;
 - update references sang path mới;
 - merge route vào `docs/README.md`;
 - nếu destination đã tồn tại thì không overwrite, report conflict.
@@ -296,6 +300,8 @@ ordered-v2
 → docs/05-decisions
 → docs/06-work
 ```
+
+`docs/01-development/` là namespace **phẳng**. Development rule/policy của project hoặc team đều là file trực tiếp trong folder này; không tạo `docs/01-development/project/` hoặc `docs/01-development/team/`.
 
 ### Repo cũ được migrate thế nào?
 
@@ -429,3 +435,33 @@ Sau khi mattpocock-skills được cài ở Claude Code, mỗi product repo ch�
 - Generic agents vẫn có các adapter/fallback của AI-DEV-OS.
 - Claude Code ưu tiên upstream Ponytail và mattpocock-skills thật.
 - Database connection/permission của SQL MCP vẫn là project-specific; setup machine không tự kết nối production.
+
+
+## 2.8.7 — Flat development namespace
+
+### Mục tiêu
+
+Chuẩn hóa `docs/01-development/` thành một namespace duy nhất, không chia `project/` và `team/`.
+
+Canonical:
+
+```text
+docs/01-development/
+├── ai-development.md
+├── coding-standards.md
+├── commands.md
+├── testing.md
+├── git-workflow.md
+├── ai-usage-policy.md
+└── <development-policy>.md
+```
+
+Không tạo:
+
+```text
+docs/01-development/project/
+docs/01-development/team/
+docs/team/
+```
+
+Updater/migrator phải flatten các path cũ về trực tiếp `docs/01-development/`, preserve content, rewrite reference và chạy collision preflight trước khi move.

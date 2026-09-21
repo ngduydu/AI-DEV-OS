@@ -31,6 +31,7 @@ Task context        → chỉ nạp những gì liên quan
 | Build / run / test / lint / format | `docs/01-development/commands.md`, `docs/01-development/testing.md` |
 | Security | `docs/01-development/security.md` |
 | Git / PR | `docs/01-development/git-workflow.md` |
+| Quy định sử dụng AI của team/project | `docs/01-development/ai-usage-policy.md` nếu repository có policy này |
 | Ready / ambiguity | `docs/01-development/definition-of-ready.md` |
 | Done | `docs/01-development/definition-of-done.md` |
 | Gotcha / lỗi khó nhớ | existing/canonical route: `docs/03-knowledge/known-pitfalls.md`; task discovery: `docs/03-knowledge/pitfalls/` |

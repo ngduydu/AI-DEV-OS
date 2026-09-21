@@ -6,6 +6,15 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+## 2.8.7 — Flat development namespace
+
+### Changed
+
+- `docs/01-development/` là namespace phẳng; không sinh `project/` hoặc `team/` bên dưới.
+- Legacy `docs/ai/*`, `docs/team/*` và `docs/01-development/project|team/*` được normalize trực tiếp vào `docs/01-development/*` bằng deterministic mapping + collision preflight.
+- AI usage policy canonical ở `docs/01-development/ai-usage-policy.md`; updater không tạo lại `docs/team/`.
+- Migrator và test contract được cập nhật để chặn cấu trúc project/team quay trở lại.
+
 ## 2.8.6 — Headroom durable init on Windows
 
 ### Fixed

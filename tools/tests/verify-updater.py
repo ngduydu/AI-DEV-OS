@@ -100,7 +100,7 @@ def main() -> None:
         "2.3.0",
         "2.6.0",
         "17-AI-USAGE-POLICY.md",
-        "docs/team/AI-USAGE-POLICY.md",
+        "docs/01-development/ai-usage-policy.md",
         "install-personal-updater.ps1",
         "ordered-v2",
         "không bootstrap lại project",

@@ -38,6 +38,27 @@ Không sửa shared canonical file chỉ để lưu một discovery của task.
 
 Chi tiết: `docs/03-knowledge/README.md`.
 
+### `docs/01-development/` là namespace phẳng
+
+Development rule/policy áp dụng cho repository được đặt trực tiếp thành file trong `docs/01-development/`.
+
+```text
+docs/01-development/coding-standards.md
+docs/01-development/git-workflow.md
+docs/01-development/ai-usage-policy.md
+docs/01-development/<development-policy>.md
+```
+
+Không phân chia thành:
+
+```text
+docs/01-development/project/
+docs/01-development/team/
+docs/team/
+```
+
+Nếu rule là của team nhưng áp dụng cho repository hiện tại, vẫn lưu trực tiếp thành file mô tả rõ nghĩa trong `docs/01-development/`.
+
 
 ## User correction phải trở thành knowledge khi phù hợp
 
