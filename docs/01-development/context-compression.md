@@ -187,10 +187,10 @@ Mục tiêu là giảm token mà không hy sinh evidence.
 
 ## Persistent mặc định cho Claude Code
 
-Trên Windows, machine setup của AI-DEV-OS cấu hình Headroom persistent bằng upstream turnkey deploy để Headroom tự chọn supervisor phù hợp:
+Trên Windows, machine setup của AI-DEV-OS cấu hình Headroom durable routing bằng upstream `init` ở user scope, không phụ thuộc Task Scheduler:
 
 ```powershell
-headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker
+headroom init -g --port 8787 claude
 ```
 
 Sau khi PASS:
@@ -199,7 +199,8 @@ Sau khi PASS:
 mở terminal mới
 → chạy claude bình thường
 → Claude Code đọc ~/.claude/settings.json
-→ ANTHROPIC_BASE_URL trỏ vào Headroom local proxy
+→ Claude user settings có ANTHROPIC_BASE_URL + Headroom SessionStart hook
+→ hook tự start/recover detached Headroom runtime khi cần
 → request Claude đi qua Headroom tự động
 ```
 
@@ -212,6 +213,6 @@ headroom install status --profile ai-dev-os
 headroom doctor
 ```
 
-`headroom wrap claude --code-memory none` chỉ còn là launcher/diagnostic hoặc fallback khi persistent runtime có vấn đề.
+`headroom wrap claude --code-memory none` chỉ còn là launcher/diagnostic hoặc fallback khi durable routing có vấn đề.
 
 AI-DEV-OS không dùng Serena từ Headroom vì đã chọn `codebase-memory-mcp` làm code-memory chuẩn.
