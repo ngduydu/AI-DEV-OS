@@ -183,3 +183,35 @@ Khi debug security/data-destructive/exact SQL
 ```
 
 Mục tiêu là giảm token mà không hy sinh evidence.
+
+
+## Persistent mặc định cho Claude Code
+
+Trên Windows, machine setup của AI-DEV-OS cấu hình Headroom persistent bằng upstream CLI:
+
+```powershell
+headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787
+```
+
+Sau khi PASS:
+
+```text
+mở terminal mới
+→ chạy claude bình thường
+→ Claude Code đọc ~/.claude/settings.json
+→ ANTHROPIC_BASE_URL trỏ vào Headroom local proxy
+→ request Claude đi qua Headroom tự động
+```
+
+Không cần mở một CMD riêng chạy `headroom wrap claude` mỗi ngày.
+
+Kiểm tra runtime:
+
+```powershell
+headroom install status --profile ai-dev-os
+headroom doctor
+```
+
+`headroom wrap claude --code-memory none` chỉ còn là launcher/diagnostic hoặc fallback khi persistent runtime có vấn đề.
+
+AI-DEV-OS không dùng Serena từ Headroom vì đã chọn `codebase-memory-mcp` làm code-memory chuẩn.
