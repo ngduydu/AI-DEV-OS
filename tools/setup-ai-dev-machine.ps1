@@ -170,10 +170,25 @@ function Resolve-CbmExecutable {
     return $null
 }
 
+function Ensure-CodebaseMemoryShim {
+    param([string]$Executable)
+
+    if (-not $Executable -or -not (Test-Path $Executable)) { return }
+
+    $binDir = Join-Path $HOME ".local\bin"
+    New-Item -ItemType Directory -Path $binDir -Force | Out-Null
+    Ensure-UserPathEntry -Path $binDir
+
+    $shimPath = Join-Path $binDir "codebase-memory-mcp.cmd"
+    $shimContent = "@echo off`r`n`"$Executable`" %*`r`n"
+    [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
+}
+
 function Ensure-CodebaseMemory {
     $existing = Resolve-CbmExecutable
     if ($existing) {
         Ensure-UserPathEntry -Path (Split-Path -Parent $existing)
+        Ensure-CodebaseMemoryShim -Executable $existing
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
             Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH user đã được đảm bảo."
@@ -222,6 +237,7 @@ function Ensure-CodebaseMemory {
         }
 
         Ensure-UserPathEntry -Path (Split-Path -Parent $installed)
+        Ensure-CodebaseMemoryShim -Executable $installed
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
         Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH user đã được đảm bảo."
         return $installed
@@ -601,6 +617,8 @@ if ($SelfTest) {
         'mattpocock-skills@mattpocock',
         'mattpocock-skills',
         'Ensure-UserPathEntry',
+        'Ensure-CodebaseMemoryShim',
+        'codebase-memory-mcp.cmd',
         'Đã cài DAB'
     )
 
