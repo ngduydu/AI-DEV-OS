@@ -35,7 +35,7 @@ def main() -> None:
         "uv": "astral-sh.uv",
         "Headroom upstream": 'headroom-ai[proxy,mcp]',
         "Headroom MCP": "headroom mcp install --force",
-        "Headroom persistent Claude": "headroom install apply --profile ai-dev-os --preset persistent-task --scope provider --providers manual --target claude --port 8787",
+        "Headroom persistent Claude": "headroom deploy --profile ai-dev-os --scope provider --providers manual --target claude --port 8787 --no-docker",
         "Headroom persistent status": "headroom install status --profile ai-dev-os",
         "codebase-memory shim": "codebase-memory-mcp.cmd",
         "Ponytail marketplace": "DietrichGebert/ponytail",
