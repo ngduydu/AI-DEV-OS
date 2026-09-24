@@ -417,6 +417,74 @@ function Ensure-Uv {
     return $true
 }
 
+
+function Test-HeadroomProxyReady {
+    try {
+        $response = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:8787/readyz" -TimeoutSec 2
+        return $response.StatusCode -eq 200 -and $response.Content -match '"service"\s*:\s*"headroom-proxy"'
+    }
+    catch {
+        return $false
+    }
+}
+
+function Ensure-HeadroomWindowsAutostart {
+    param([string]$HeadroomExe)
+
+    if (-not $HeadroomExe -or -not (Test-Path -LiteralPath $HeadroomExe)) {
+        return $false
+    }
+
+    $runtimeDir = Join-Path $env:LOCALAPPDATA "AI-DEV-OS\headroom"
+    New-Item -ItemType Directory -Path $runtimeDir -Force | Out-Null
+
+    $launcherPath = Join-Path $runtimeDir "start-headroom.ps1"
+    $escapedHeadroom = $HeadroomExe.Replace("'", "''")
+
+    $launcherLines = @(
+        '$ErrorActionPreference = "SilentlyContinue"',
+        'function Test-Ready {',
+        '    try {',
+        '        $response = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:8787/readyz" -TimeoutSec 2',
+        '        return $response.StatusCode -eq 200 -and $response.Content -match ''"service"\s*:\s*"headroom-proxy"''',
+        '    } catch {',
+        '        return $false',
+        '    }',
+        '}',
+        'if (Test-Ready) { exit 0 }',
+        ('$headroomExe = ''' + $escapedHeadroom + ''''),
+        'if (-not (Test-Path -LiteralPath $headroomExe)) { exit 2 }',
+        '& $headroomExe init hook ensure --profile init-user | Out-Null',
+        'for ($i = 0; $i -lt 90; $i++) {',
+        '    if (Test-Ready) { exit 0 }',
+        '    Start-Sleep -Milliseconds 500',
+        '}',
+        'exit 3'
+    )
+
+    [System.IO.File]::WriteAllLines(
+        $launcherPath,
+        $launcherLines,
+        (New-Object System.Text.UTF8Encoding($true))
+    )
+
+    # Không dùng Task Scheduler vì môi trường doanh nghiệp có thể chặn quyền schtasks.
+    # HKCU Run không cần admin và chạy lại sau mỗi Windows sign-in/reboot.
+    $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+    $runName = "AI-DEV-OS-Headroom"
+    New-Item -Path $runKey -Force | Out-Null
+    $runCommand = "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$launcherPath`""
+    Set-ItemProperty -Path $runKey -Name $runName -Value $runCommand
+
+    # Start ngay trong lần setup hiện tại để không phải reboot hoặc chạy lệnh repair thủ công.
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcherPath | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        return $false
+    }
+
+    return (Test-HeadroomProxyReady)
+}
+
 function Ensure-Headroom {
     param([bool]$UvReady)
 
@@ -492,9 +560,18 @@ function Ensure-Headroom {
             Add-Result "Headroom" "BLOCKED" "Durable routing cho Claude thất bại: $installDetail"
             return
         }
+
+        $headroomCommand = Get-Command "headroom" -ErrorAction SilentlyContinue
+        $headroomExe = if ($headroomCommand) { $headroomCommand.Source } else { $null }
+
+        Write-Host "Đang cấu hình Headroom tự khởi động lại sau Windows reboot/sign-in..." -ForegroundColor Cyan
+        if (-not (Ensure-HeadroomWindowsAutostart -HeadroomExe $headroomExe)) {
+            Add-Result "Headroom" "BLOCKED" "Đã cấu hình Claude routing nhưng Headroom runtime chưa ready hoặc chưa đăng ký được HKCU autostart. Không để Claude trỏ vào localhost:8787 khi proxy chưa sẵn sàng."
+            return
+        }
     }
 
-    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; MCP + durable Claude routing sẵn sàng. Chạy claude bình thường; SessionStart hook tự start/recover Headroom runtime."
+    Add-Result "Headroom" "PASS" "Đã cài upstream: $version; MCP + Claude routing + Windows user autostart sẵn sàng. Setup một lần; sau reboot/sign-in Headroom tự ensure runtime trước khi dùng Claude. SessionStart hook chỉ là lớp recovery bổ sung."
 }
 
 function Invoke-ClaudePluginCommand {
