@@ -6,6 +6,13 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+### Fixed
+
+- Windows machine setup đăng ký Headroom runtime ở `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` để tự ensure proxy sau reboot/sign-in mà không cần admin hoặc Task Scheduler.
+- Setup tạo launcher ẩn tại `%LOCALAPPDATA%\AI-DEV-OS\headroom\start-headroom.ps1`, kiểm tra `/readyz`, start runtime ngay trong lần setup và kiểm tra readiness trước khi báo PASS.
+- Không còn phụ thuộc duy nhất vào Claude `SessionStart` hook 15 giây cho cold start; tránh `ECONNREFUSED` khi Claude đã route qua `localhost:8787` nhưng Headroom chưa chạy.
+- Đây là machine-tool fix; không bump framework version và không yêu cầu product repo chạy `/update-ai-dev-os`.
+
 ## 2.8.6 — Headroom durable init on Windows
 
 ### Fixed
