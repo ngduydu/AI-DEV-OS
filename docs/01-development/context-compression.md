@@ -196,30 +196,13 @@ headroom init -g --port 8787 claude
 Sau khi PASS:
 
 ```text
-Windows sign-in / reboot
-→ HKCU Run gọi launcher ẩn của AI-DEV-OS
-→ launcher chạy headroom init hook ensure --profile init-user
-→ chờ http://127.0.0.1:8787/readyz PASS
-→ mở Claude bình thường
+mở terminal mới
+→ chạy claude bình thường
+→ Claude Code đọc ~/.claude/settings.json
+→ Claude user settings có ANTHROPIC_BASE_URL + Headroom SessionStart hook
+→ hook tự start/recover detached Headroom runtime khi cần
 → request Claude đi qua Headroom tự động
 ```
-
-Machine setup tạo launcher tại:
-
-```text
-%LOCALAPPDATA%\AI-DEV-OS\headroom\start-headroom.ps1
-```
-
-và đăng ký user autostart:
-
-```text
-HKCU\Software\Microsoft\Windows\CurrentVersion\Run
-→ AI-DEV-OS-Headroom
-```
-
-Không dùng Task Scheduler và không cần admin.
-
-Lý do: Headroom 0.37.0 có thể cold-start lâu hơn timeout 15 giây của Claude `SessionStart` hook. Vì Claude đã route `ANTHROPIC_BASE_URL` vào localhost:8787, chỉ dựa vào hook có thể tạo `ECONNREFUSED` sau reboot. AI-DEV-OS vì vậy chủ động ensure runtime ngay khi Windows sign-in; SessionStart hook chỉ còn là lớp recovery bổ sung.
 
 Không cần mở một CMD riêng chạy `headroom wrap claude` mỗi ngày.
 
