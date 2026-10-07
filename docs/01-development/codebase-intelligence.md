@@ -149,7 +149,7 @@ repo lớn/đang làm active
 → index + watcher nếu hữu ích
 
 repo nhỏ/task cục bộ
-→ direct read / rg thường đủ
+→ vẫn query graph trước; sau đó direct read / rg cho evidence cụ thể
 
 nhiều repo hoặc máy thiếu RAM/CPU
 → low-resource profile
