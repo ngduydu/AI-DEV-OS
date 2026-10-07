@@ -443,7 +443,7 @@ CODEBASE-MAP
 → direct read nếu đã biết file
 → targeted text search
 → structural search nếu cần
-→ graph/MCP nếu codebase lớn và đã bật
+→ graph/MCP **bắt buộc cho code task** trước source discovery
 → source/test thật
 → broaden/history chỉ khi evidence chưa đủ
 ~~~
@@ -453,7 +453,7 @@ Stack 2.2.0:
 - **ripgrep** — default text search.
 - **ast-grep** — optional structural search.
 - **Repomix** — optional bootstrap/snapshot/handoff.
-- **codebase-memory-mcp** — optional pilot cho large codebase.
+- **codebase-memory-mcp** — mandatory Codebase Memory Gate cho mọi code task; graph phải được dùng trước source discovery.
 - **Headroom** — optional local compression/retrieve layer cho tool output/log/RAG/file context lớn.
 - **SQL MCP Server (Microsoft DAB)** — optional per-project runtime SQL Server diagnostics với allowlist + least privilege.
 - **Sourcegraph MCP** — enterprise alternative khi tổ chức đã có Sourcegraph.
@@ -551,7 +551,7 @@ powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
 
 Script này không được copy sang product repo. Nó cài/verify `ripgrep`, `ast-grep`, `Repomix`, `codebase-memory-mcp`, đăng ký Claude MCP ở user scope và cài personal `/update-ai-dev-os`.
 
-Sau setup, tool có sẵn trên máy nhưng Claude vẫn chỉ dùng theo retrieval policy, không gọi bừa cho mọi task.
+Sau setup, `codebase-memory-mcp` không phải tool cài cho có: mọi code task phải qua Codebase Memory Gate và dùng graph trước source discovery. Chỉ task thuần docs/config/metadata không có code path được miễn.
 
 
 ## Apply AI-DEV-OS vào repo mới bằng một lệnh
@@ -630,7 +630,7 @@ AI-DEV-OS dùng **upstream-first** cho stack team đã chọn:
 - mattpocock/skills → cài plugin upstream thật; ưu tiên các workflow upstream như `/grill-with-docs`, `/to-spec`, `/implement`, `/tdd`, `/code-review`.
 - Headroom → cài upstream thật; proxy/wrap cho automatic savings, MCP cho compress/retrieve/stats.
 - Microsoft SQL MCP Server → cài DAB CLI; database config vẫn least-privilege/per-project.
-- codebase-memory-mcp → cài binary upstream thật + Claude MCP + Graph UI.
+- codebase-memory-mcp → cài binary upstream thật + Claude MCP + Graph UI; **bắt buộc trong Codebase Memory Gate cho code task**.
 
 Các skill AI-DEV-OS tương tự vẫn tồn tại để hỗ trợ generic agent/fallback, không thay thế upstream trên Claude Code.
 
