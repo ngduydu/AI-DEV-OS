@@ -188,7 +188,7 @@ Codebase Memory:
 
 Không có evidence này thì task chưa qua gate và không được báo Done.
 
-## 5. Understanding Gate
+## 4. Understanding Gate
 
 **Không bắt đầu implementation nếu còn ambiguity quan trọng có thể thay đổi behavior, dữ liệu, API/public contract, architecture, security hoặc Acceptance Criteria.**
 
@@ -218,7 +218,7 @@ Ví dụ phải hỏi nếu repository chưa chứng minh được:
 - auth/permission mong muốn;
 - Acceptance Criteria có hai cách hiểu dẫn tới implementation khác nhau.
 
-## 4. Reuse Gate
+## 5. Reuse Gate
 
 Trước khi tạo mới service/helper/component/validator/query/mapper/DTO pattern/business logic:
 
@@ -233,7 +233,7 @@ Không duplicate business rule quan trọng ở nhiều nơi nếu có thể có
 
 Không reuse chỉ vì tên giống nhau nếu semantics khác.
 
-## 5. Simplicity Gate
+## 6. Simplicity Gate
 
 Trước khi viết thêm code, đi theo thứ tự:
 
@@ -258,7 +258,7 @@ Rules:
 
 Đây là rule core lấy theo tinh thần "senior dev lười đúng chỗ": giảm code phải sở hữu, giảm surface bug và giảm maintenance.
 
-## 6. Dependency Gate
+## 7. Dependency Gate
 
 Trước khi thêm package/library/service bên ngoài:
 
@@ -270,7 +270,7 @@ Trước khi thêm package/library/service bên ngoài:
 
 Dependency ảnh hưởng architecture/public contract/deployment phải được xem như decision/risk tương ứng.
 
-## 7. Plan
+## 8. Plan
 
 Task nhỏ có thể implement ngay sau khi qua các gate trên.
 
@@ -287,7 +287,7 @@ Task vừa/lớn cần plan đủ để trả lời:
 
 Không plan vượt quá scope task.
 
-## 8. Implement
+## 9. Implement
 
 - Bám đúng scope và Acceptance Criteria.
 - Theo convention thật của project.
@@ -299,7 +299,7 @@ Không plan vượt quá scope task.
 - Không hard-code output chỉ để test hiện tại pass.
 - Với schema/data destructive, phải thiết kế rollback/recovery hoặc nêu rõ vì sao không thể rollback.
 
-## 9. Verify
+## 10. Verify
 
 Verification là evidence, không phải cảm giác.
 
@@ -311,7 +311,7 @@ Verification là evidence, không phải cảm giác.
 6. Không sửa/xóa test đúng chỉ để né failure; nếu test sai, phải giải thích bằng evidence.
 7. Test phải xác minh behavior, không chỉ implementation detail vô nghĩa.
 
-## 10. Cleanup Gate
+## 11. Cleanup Gate
 
 Trước review/Done:
 
@@ -322,7 +322,7 @@ Trước review/Done:
 - không format/refactor hàng loạt file ngoài scope;
 - không để duplicate helper/business logic mà Reuse Gate lẽ ra phải phát hiện.
 
-## 11. Independent Review
+## 12. Independent Review
 
 Không cần spawn reviewer cho mọi typo nhỏ.
 
@@ -335,7 +335,7 @@ Claude Code có thể dùng:
 
 Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năng gây sai behavior hoặc production incident hơn style preference.
 
-## 12. Knowledge Sync — bắt buộc
+## 13. Knowledge Sync — bắt buộc
 
 ### Conflict-safe Knowledge Sync
 
@@ -376,7 +376,7 @@ Knowledge Sync: no durable changes
 Policy đầy đủ: `docs/03-knowledge/README.md`.
 
 
-## 13. Production Gate
+## 14. Production Gate
 
 Trước khi gọi change là Production Candidate, đánh giá những mục liên quan:
 
@@ -395,7 +395,7 @@ Không phải task nào cũng cần mọi mục. Nhưng mục có liên quan kh�
 
 Nếu có production risk chưa được giải quyết hoặc chưa xác minh, không báo `Production Ready`; nêu rõ blocker/risk.
 
-## 14. Final Report
+## 15. Final Report
 
 Báo ngắn gọn và dựa trên evidence:
 
@@ -431,7 +431,7 @@ Knowledge mới → không để chết trong chat.
 Risk production chưa xử lý → không gọi Production Ready.
 ```
 
-## 15. Context Efficiency Gate
+## 16. Context Efficiency Gate
 
 Trước khi mở rộng investigation:
 
