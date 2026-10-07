@@ -429,3 +429,29 @@ Sau khi mattpocock-skills được cài ở Claude Code, mỗi product repo ch�
 - Generic agents vẫn có các adapter/fallback của AI-DEV-OS.
 - Claude Code ưu tiên upstream Ponytail và mattpocock-skills thật.
 - Database connection/permission của SQL MCP vẫn là project-specific; setup machine không tự kết nối production.
+
+## 2.8.7 — Mandatory Codebase Memory Gate
+
+Mục tiêu của 2.8.7: sửa contract để `codebase-memory-mcp` không còn là tool cài sẵn nhưng chỉ dùng khi agent tự thấy cần.
+
+Từ 2.8.7:
+
+- mọi task có đọc/sửa code phải qua **Codebase Memory Gate** trước khi inspect code bằng `rg` hoặc `ast-grep`;
+- repo chưa index thì agent phải index trước;
+- MCP chưa Connected, index lỗi hoặc coverage không usable → task code **BLOCKED**;
+- graph chỉ dùng để định vị/trace/impact; source và test vẫn là ground truth;
+- report task code phải có evidence Codebase Memory đã được dùng;
+- task thuần docs/config/metadata không có code path được miễn gate.
+
+Framework artifacts mới:
+
+- `.claude/skills/codebase-memory-gate/SKILL.md`;
+- `.agents/skills/codebase-memory-gate/SKILL.md`.
+
+Product repo đang ở 2.8.6 hoặc cũ hơn chạy:
+
+```text
+/update-ai-dev-os
+```
+
+Updater phải preserve project knowledge và cập nhật framework-owned instruction/skills theo ownership contract.
