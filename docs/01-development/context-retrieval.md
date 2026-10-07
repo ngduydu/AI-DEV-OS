@@ -114,7 +114,7 @@ rg "ContractStatus" src
 rg "ma_vt" Database App_Data
 ~~~
 
-Nếu search text đã tìm đúng nơi, không cần gọi MCP.
+Text search chỉ là retrieval bổ sung sau Codebase Memory Gate; không được dùng nó để bỏ qua graph.
 
 ## ast-grep
 
@@ -151,7 +151,7 @@ Nếu project bật tool này, verify trong Claude Code bằng:
 /mcp
 ~~~
 
-Nếu không Connected, fallback về STANDARD profile.
+Nếu không Connected, task code là `BLOCKED`; không fallback để tiếp tục implementation.
 
 ## SQL Server / Legacy SQL / XML / DSL
 
@@ -165,9 +165,9 @@ Với SQL Server:
 
 Với SQL stored procedure, XML metadata/controller, generated/vendor code hoặc DSL:
 
-- dùng CODEBASE-MAP để biết area;
-- targeted search/read;
-- chỉ dùng graph/AST khi tool thực sự hiểu file type đó đủ tốt.
+- vẫn qua Codebase Memory Gate trước;
+- sau graph mới dùng targeted search/read;
+- chỉ dùng graph/AST sâu hơn khi tool thực sự hiểu file type đó đủ tốt.
 
 Không giả định tool coverage = repository coverage.
 
@@ -203,16 +203,16 @@ Không kéo một chat qua nhiều task độc lập chỉ để agent nhớ pro
 
 ## Escalation rule
 
-Chỉ nâng mức retrieval khi mức trước chưa đủ bằng chứng:
+Code task retrieval order:
 
 ~~~text
-direct read
-→ text search
-→ structural search
-→ graph
-→ optional output compression khi result lớn/noisy
-→ broad search
-→ history
+Codebase Memory Gate
+→ graph query
+→ source/test
+→ targeted text search nếu cần
+→ ast-grep nếu cần
+→ broaden search nếu evidence chưa đủ
+→ history nếu cần historical evidence
 ~~~
 
 Mục tiêu là giảm rediscovery/context rác mà không giảm correctness.
@@ -237,7 +237,7 @@ Sau setup, các tool có thể sẵn sàng trên mọi repo của máy:
 
 Có tool sẵn **không còn là cài cho có**. `codebase-memory-mcp` là dependency của Codebase Memory Gate và phải được dùng trong mọi code task.
 
-Trước khi dùng graph/memory cho một repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, fallback về CODEBASE-MAP + targeted search + source.
+Trước mỗi code task ở repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, index/re-index; nếu vẫn không usable thì BLOCKED.
 
 
 ## Output compression
