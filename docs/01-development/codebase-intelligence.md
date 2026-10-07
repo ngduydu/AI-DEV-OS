@@ -1,6 +1,6 @@
 # Codebase Intelligence
 
-Mục tiêu: dùng `codebase-memory-mcp` như lớp code intelligence cho cả AI và developer, đặc biệt ở codebase lớn/legacy/cross-module.
+Mục tiêu: dùng `codebase-memory-mcp` làm **lớp code intelligence bắt buộc cho mọi code task**, cho cả AI và developer; task lớn/legacy/cross-module có thể khai thác graph sâu hơn.
 
 ## Dùng để làm gì?
 
@@ -18,7 +18,9 @@ AI có thể dùng graph thay cho việc mở hàng loạt file khi cần:
 
 Graph là retrieval accelerator. Source/test hiện tại vẫn là ground truth cuối cùng.
 
-## Khi nào AI nên ưu tiên codebase-memory?
+## Codebase Memory Gate — bắt buộc
+
+Mọi code task phải có ít nhất một truy vấn graph trước khi inspect code bằng text search hoặc lần theo file thủ công.
 
 Nếu câu hỏi là kiểu:
 
@@ -43,10 +45,12 @@ Không grep/read hàng chục file trước nếu graph đã trả lời đúng 
 Nếu graph stale/coverage thiếu:
 
 ~~~text
-re-index hoặc fallback
-→ targeted search
-→ source/test
+re-index / kiểm tra coverage
+→ query lại
+→ nếu vẫn thiếu → BLOCKED
 ~~~
+
+Không fallback âm thầm sang `rg` để bỏ qua gate.
 
 ## Graph UI cho người
 
@@ -145,7 +149,7 @@ repo lớn/đang làm active
 → index + watcher nếu hữu ích
 
 repo nhỏ/task cục bộ
-→ direct read / rg thường đủ
+→ vẫn query graph trước; sau đó direct read / rg cho evidence cụ thể
 
 nhiều repo hoặc máy thiếu RAM/CPU
 → low-resource profile

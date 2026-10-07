@@ -13,6 +13,8 @@ Classify
 ↓
 Load Relevant Context
 ↓
+Codebase Memory Gate
+↓
 Inspect Existing Code / Tests
 ↓
 Understanding Gate
@@ -112,7 +114,81 @@ Git history không nằm trong default retrieval path.
 
 Không đưa ra kết luận về code chưa đọc hoặc behavior repository chưa chứng minh.
 
-## 3. Understanding Gate
+## 3. Codebase Memory Gate — bắt buộc
+
+Đây là gate bắt buộc cho mọi task có đọc/sửa code.
+
+### Rule
+
+Trước khi inspect source theo kiểu lần mò, trước khi chạy `rg`/`ast-grep` để tìm code path, agent phải dùng **`codebase-memory-mcp`** để tạo structural context cho task.
+
+```text
+Task
+→ xác định project root
+→ kiểm tra codebase-memory đã Connected + repo đã index
+→ chưa index → index repository
+→ query graph theo task
+→ lấy symbol/file/relationship/impact liên quan
+→ đọc source + test thật để xác minh
+→ mới được plan/implement
+```
+
+Tối thiểu phải có một query graph phù hợp với task, ưu tiên:
+
+- `search_graph` — tìm symbol/class/function/module liên quan;
+- `trace_path` — caller/callee hoặc control-flow relationship;
+- `get_architecture` — architecture/area overview;
+- `get_file_outline` — route declaration trong file đã xác định;
+- `detect_changes` — impact của change hiện tại;
+- `query_graph` — quan hệ nhiều bước khi các query chuyên biệt chưa đủ.
+
+### Index / connection failure
+
+Nếu repo chưa có graph:
+
+```text
+index_repository(repo_path=<absolute project root>)
+→ chờ index hoàn tất / kiểm tra status
+→ query graph
+```
+
+Nếu MCP chưa Connected, index thất bại hoặc coverage không đủ:
+
+```text
+Codebase Memory Gate = BLOCKED
+```
+
+**Không được tự động hạ xuống `rg`/`ast-grep` để tiếp tục implementation.** Phải báo blocker để sửa MCP/index trước.
+
+Fallback chỉ được dùng khi chính task là troubleshooting của `codebase-memory-mcp` hoặc task thuần docs/config/metadata không có code path.
+
+### Graph không phải source of truth
+
+Graph chỉ dùng để định vị và phân tích structural relationship. Sau graph query:
+
+```text
+graph evidence
+→ mở source thật
+→ mở test/config liên quan
+→ xác minh behavior
+```
+
+Không được kết luận behavior chỉ từ graph.
+
+### Evidence bắt buộc trong report
+
+Với task có code:
+
+```text
+Codebase Memory:
+- Indexed: PASS
+- Query: <query/tool đã dùng>
+- Area/symbols discovered: <...>
+```
+
+Không có evidence này thì task chưa qua gate và không được báo Done.
+
+## 4. Understanding Gate
 
 **Không bắt đầu implementation nếu còn ambiguity quan trọng có thể thay đổi behavior, dữ liệu, API/public contract, architecture, security hoặc Acceptance Criteria.**
 
@@ -142,7 +218,7 @@ Ví dụ phải hỏi nếu repository chưa chứng minh được:
 - auth/permission mong muốn;
 - Acceptance Criteria có hai cách hiểu dẫn tới implementation khác nhau.
 
-## 4. Reuse Gate
+## 5. Reuse Gate
 
 Trước khi tạo mới service/helper/component/validator/query/mapper/DTO pattern/business logic:
 
@@ -157,7 +233,7 @@ Không duplicate business rule quan trọng ở nhiều nơi nếu có thể có
 
 Không reuse chỉ vì tên giống nhau nếu semantics khác.
 
-## 5. Simplicity Gate
+## 6. Simplicity Gate
 
 Trước khi viết thêm code, đi theo thứ tự:
 
@@ -182,7 +258,7 @@ Rules:
 
 Đây là rule core lấy theo tinh thần "senior dev lười đúng chỗ": giảm code phải sở hữu, giảm surface bug và giảm maintenance.
 
-## 6. Dependency Gate
+## 7. Dependency Gate
 
 Trước khi thêm package/library/service bên ngoài:
 
@@ -194,7 +270,7 @@ Trước khi thêm package/library/service bên ngoài:
 
 Dependency ảnh hưởng architecture/public contract/deployment phải được xem như decision/risk tương ứng.
 
-## 7. Plan
+## 8. Plan
 
 Task nhỏ có thể implement ngay sau khi qua các gate trên.
 
@@ -211,7 +287,7 @@ Task vừa/lớn cần plan đủ để trả lời:
 
 Không plan vượt quá scope task.
 
-## 8. Implement
+## 9. Implement
 
 - Bám đúng scope và Acceptance Criteria.
 - Theo convention thật của project.
@@ -223,7 +299,7 @@ Không plan vượt quá scope task.
 - Không hard-code output chỉ để test hiện tại pass.
 - Với schema/data destructive, phải thiết kế rollback/recovery hoặc nêu rõ vì sao không thể rollback.
 
-## 9. Verify
+## 10. Verify
 
 Verification là evidence, không phải cảm giác.
 
@@ -235,7 +311,7 @@ Verification là evidence, không phải cảm giác.
 6. Không sửa/xóa test đúng chỉ để né failure; nếu test sai, phải giải thích bằng evidence.
 7. Test phải xác minh behavior, không chỉ implementation detail vô nghĩa.
 
-## 10. Cleanup Gate
+## 11. Cleanup Gate
 
 Trước review/Done:
 
@@ -246,7 +322,7 @@ Trước review/Done:
 - không format/refactor hàng loạt file ngoài scope;
 - không để duplicate helper/business logic mà Reuse Gate lẽ ra phải phát hiện.
 
-## 11. Independent Review
+## 12. Independent Review
 
 Không cần spawn reviewer cho mọi typo nhỏ.
 
@@ -259,7 +335,7 @@ Claude Code có thể dùng:
 
 Reviewer chỉ đưa findings có bằng chứng, ưu tiên lỗi có khả năng gây sai behavior hoặc production incident hơn style preference.
 
-## 12. Knowledge Sync — bắt buộc
+## 13. Knowledge Sync — bắt buộc
 
 ### Conflict-safe Knowledge Sync
 
@@ -300,7 +376,7 @@ Knowledge Sync: no durable changes
 Policy đầy đủ: `docs/03-knowledge/README.md`.
 
 
-## 13. Production Gate
+## 14. Production Gate
 
 Trước khi gọi change là Production Candidate, đánh giá những mục liên quan:
 
@@ -319,7 +395,7 @@ Không phải task nào cũng cần mọi mục. Nhưng mục có liên quan kh�
 
 Nếu có production risk chưa được giải quyết hoặc chưa xác minh, không báo `Production Ready`; nêu rõ blocker/risk.
 
-## 14. Final Report
+## 15. Final Report
 
 Báo ngắn gọn và dựa trên evidence:
 
@@ -355,7 +431,7 @@ Knowledge mới → không để chết trong chat.
 Risk production chưa xử lý → không gọi Production Ready.
 ```
 
-## 15. Context Efficiency Gate
+## 16. Context Efficiency Gate
 
 Trước khi mở rộng investigation:
 
