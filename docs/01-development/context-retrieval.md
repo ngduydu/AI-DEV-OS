@@ -11,21 +11,23 @@ docs/README.md
 ↓
 docs/00-overview/codebase-map.md
 ↓
+**Codebase Memory Gate — bắt buộc cho code task**
+↓
 module/domain docs liên quan
 ↓
 standards / commands / testing cần cho task
 ↓
-biết file/path rồi?
-├─ Có → đọc trực tiếp
-└─ Không
-   ↓
-   targeted text search / ripgrep
-   ↓
-   cần structural pattern?
-   → ast-grep nếu có
-   ↓
-   codebase lớn + cần graph/dependency/impact?
-   → codebase-memory-mcp nếu máy đã setup + MCP Connected
+**Mọi code task:**
+→ codebase-memory-mcp: kiểm tra/index repo
+→ `search_graph` / `trace_path` / `get_architecture` / query phù hợp
+→ xác định area/symbol/dependency/impact
+→ sau đó mới đọc source/test
+
+Sau khi graph đã route đúng:
+→ biết file/path rồi? → đọc trực tiếp
+→ cần text literal/config/non-code? → targeted `rg`
+→ cần structural pattern ngoài graph? → `ast-grep`
+→ graph coverage chưa đủ → BLOCKED; sửa/re-index MCP trước khi tiếp tục
    ↓
    output/log/RAG/result quá lớn và noisy?
    → Headroom MCP nếu đã Connected; retrieve original khi cần exact evidence
@@ -58,11 +60,12 @@ Source / tests / config hiện tại
 
 Nếu docs hoặc graph stale, sửa knowledge/index theo source hiện tại.
 
-## STANDARD profile
+## Mandatory profile
 
 Dùng mặc định cho mọi project:
 
-- đọc CODEBASE-MAP trước khi search rộng;
+- đọc CODEBASE-MAP;
+- **mọi code task phải qua Codebase Memory Gate trước source search/read**;
 - đọc file trực tiếp khi đã biết path;
 - targeted text search, ưu tiên `rg` nếu có;
 - chỉ broaden search khi evidence chưa đủ;
@@ -72,22 +75,16 @@ Dùng mặc định cho mọi project:
 - cùng task nhưng context lớn → `/compact`;
 - investigation lớn có thể đưa sang subagent context riêng.
 
-Không cần MCP để dùng profile này.
+Không được bỏ qua MCP Gate cho code task.
 
-## LARGE-CODEBASE profile
+## Graph profile
 
-Dùng thêm khi repository lớn/legacy/monorepo hoặc cross-module navigation khó:
+Các query graph được dùng cho **mọi code task**; với repository lớn/legacy/monorepo hoặc cross-module navigation khó thì tăng độ sâu:
 
 - `ast-grep` cho structural search khi text search không đủ;
 - `codebase-memory-mcp` cho symbol, caller/callee, dependency, impact/blast radius, architecture overview.
 
-MCP là optional. Nếu MCP lỗi hoặc chưa cài:
-
-~~~text
-CODEBASE-MAP
-→ targeted search
-→ source
-~~~
+MCP không còn optional trong code-task workflow. Nếu MCP lỗi/chưa index/chưa Connected, task code phải `BLOCKED` và sửa MCP/index trước.
 
 ## BOOTSTRAP / SNAPSHOT profile
 
@@ -221,7 +218,7 @@ direct read
 Mục tiêu là giảm rediscovery/context rác mà không giảm correctness.
 
 
-## Machine tooling 2.4.0
+## Machine tooling
 
 Team có thể setup tool một lần trên mỗi máy từ repository AI-DEV-OS:
 
@@ -238,7 +235,7 @@ Sau setup, các tool có thể sẵn sàng trên mọi repo của máy:
 - `Repomix`;
 - `codebase-memory-mcp` qua Claude MCP user-scope.
 
-Có tool sẵn **không có nghĩa task nào cũng phải gọi**. Vẫn dùng escalation order của tài liệu này.
+Có tool sẵn **không còn là cài cho có**. `codebase-memory-mcp` là dependency của Codebase Memory Gate và phải được dùng trong mọi code task.
 
 Trước khi dùng graph/memory cho một repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, fallback về CODEBASE-MAP + targeted search + source.
 
