@@ -2,7 +2,9 @@
 
 Trước mọi task trong repository, đọc `docs/README.md` và chỉ nạp tài liệu/code liên quan đến task hiện tại.
 
-Tuân theo `docs/01-development/ai-development.md`: không implement khi còn ambiguity quan trọng, không tạo mới trước khi kiểm tra khả năng reuse, và không coi task là Done trước khi Verify + Knowledge Sync + Production Gate.
+**Codebase Memory Gate — bắt buộc:** Với mọi task có đọc/sửa code, trước khi inspect source hoặc dùng `rg`/`ast-grep` để lần theo code, phải dùng `codebase-memory-mcp` để định vị structural context của task. Nếu repo chưa được index thì index trước; nếu MCP chưa Connected hoặc index không usable thì **BLOCKED**, không được âm thầm fallback sang text search. Sau khi graph định vị area/symbol/dependency/impact, vẫn phải đọc source/test thật để xác minh. Chỉ task thuần docs/config/metadata không có code path mới được miễn gate này.
+
+Tuân theo `docs/01-development/ai-development.md` và `docs/01-development/context-retrieval.md`: không implement khi còn ambiguity quan trọng, không tạo mới trước khi kiểm tra khả năng reuse, và không coi task là Done trước khi Verify + Knowledge Sync + Production Gate.
 
 ## Ngôn ngữ mặc định
 
