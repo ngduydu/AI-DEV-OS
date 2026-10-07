@@ -13,6 +13,8 @@ Classify
 ↓
 Load Relevant Context
 ↓
+Codebase Memory Gate
+↓
 Inspect Existing Code / Tests
 ↓
 Understanding Gate
@@ -112,7 +114,81 @@ Git history không nằm trong default retrieval path.
 
 Không đưa ra kết luận về code chưa đọc hoặc behavior repository chưa chứng minh.
 
-## 3. Understanding Gate
+## 3. Codebase Memory Gate — bắt buộc
+
+Đây là gate bắt buộc cho mọi task có đọc/sửa code.
+
+### Rule
+
+Trước khi inspect source theo kiểu lần mò, trước khi chạy `rg`/`ast-grep` để tìm code path, agent phải dùng **`codebase-memory-mcp`** để tạo structural context cho task.
+
+```text
+Task
+→ xác định project root
+→ kiểm tra codebase-memory đã Connected + repo đã index
+→ chưa index → index repository
+→ query graph theo task
+→ lấy symbol/file/relationship/impact liên quan
+→ đọc source + test thật để xác minh
+→ mới được plan/implement
+```
+
+Tối thiểu phải có một query graph phù hợp với task, ưu tiên:
+
+- `search_graph` — tìm symbol/class/function/module liên quan;
+- `trace_path` — caller/callee hoặc control-flow relationship;
+- `get_architecture` — architecture/area overview;
+- `get_file_outline` — route declaration trong file đã xác định;
+- `detect_changes` — impact của change hiện tại;
+- `query_graph` — quan hệ nhiều bước khi các query chuyên biệt chưa đủ.
+
+### Index / connection failure
+
+Nếu repo chưa có graph:
+
+```text
+index_repository(repo_path=<absolute project root>)
+→ chờ index hoàn tất / kiểm tra status
+→ query graph
+```
+
+Nếu MCP chưa Connected, index thất bại hoặc coverage không đủ:
+
+```text
+Codebase Memory Gate = BLOCKED
+```
+
+**Không được tự động hạ xuống `rg`/`ast-grep` để tiếp tục implementation.** Phải báo blocker để sửa MCP/index trước.
+
+Fallback chỉ được dùng khi chính task là troubleshooting của `codebase-memory-mcp` hoặc task thuần docs/config/metadata không có code path.
+
+### Graph không phải source of truth
+
+Graph chỉ dùng để định vị và phân tích structural relationship. Sau graph query:
+
+```text
+graph evidence
+→ mở source thật
+→ mở test/config liên quan
+→ xác minh behavior
+```
+
+Không được kết luận behavior chỉ từ graph.
+
+### Evidence bắt buộc trong report
+
+Với task có code:
+
+```text
+Codebase Memory:
+- Indexed: PASS
+- Query: <query/tool đã dùng>
+- Area/symbols discovered: <...>
+```
+
+Không có evidence này thì task chưa qua gate và không được báo Done.
+
+## 5. Understanding Gate
 
 **Không bắt đầu implementation nếu còn ambiguity quan trọng có thể thay đổi behavior, dữ liệu, API/public contract, architecture, security hoặc Acceptance Criteria.**
 
