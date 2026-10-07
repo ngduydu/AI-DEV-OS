@@ -22,7 +22,7 @@ Trước khi thêm tool vào recommended/default:
 | ripgrep | text search nhanh | Recommended/default search |
 | ast-grep | structural/syntax-aware search | Machine tool, dùng khi cần |
 | Repomix | bootstrap/snapshot/handoff | Machine tool, dùng khi cần |
-| codebase-memory-mcp | graph/dependency/impact cho codebase lớn | Cài upstream thật ở machine setup + MCP user-scope |
+| codebase-memory-mcp | **mandatory code intelligence gate**: graph/dependency/impact cho mọi code task | Cài upstream thật ở machine setup + MCP user-scope; bắt buộc dùng trước source discovery |
 | Headroom | compress/cache-align/retrieve context, tool output, logs, RAG và file result | Cài upstream thật ở machine setup; proxy/wrap + MCP |
 | Ponytail | always-on minimal-code discipline, hooks, review/audit/debt/gain | Cài upstream Claude plugin thật; default full |
 | mattpocock/skills | grilling/spec/TDD/debug/design/review/implementation workflows | Cài upstream Claude plugin thật; mỗi repo chạy setup upstream một lần |
@@ -120,3 +120,29 @@ Chi tiết: `docs/01-development/context-compression.md`.
 Dùng Microsoft Data API builder SQL MCP Server làm profile khuyến nghị vì permission/entity surface rõ và có stdio.
 
 Chi tiết: `docs/01-development/sql-server-mcp.md`.
+
+## Codebase Memory adoption rule
+
+`codebase-memory-mcp` là **framework dependency của code-task workflow**, không còn là optional retrieval accelerator.
+
+```text
+Machine setup
+→ cài + register MCP
+
+Product repo
+→ index project
+
+Mỗi code task
+→ Codebase Memory Gate
+→ graph query
+→ source/test verification
+→ implementation
+```
+
+Không được dùng lý do “task nhỏ”, “biết file rồi”, hoặc “rg nhanh hơn” để bỏ qua gate. Chỉ task thuần docs/config/metadata không có code path được miễn.
+
+```text
+BLOCKED
+→ repair/re-index
+→ tiếp tục task
+```
