@@ -144,7 +144,7 @@ def main() -> None:
     if args != expected:
         fail(f"SQL MCP template args differ: {args!r}")
 
-    print("PASS: AI engineering stack 2.8.6 contract")
+    print("PASS: AI engineering stack 2.8.8 contract")
 
 
 if __name__ == "__main__":
