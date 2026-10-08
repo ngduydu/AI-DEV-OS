@@ -74,29 +74,24 @@ UI là công cụ khám phá/review, không thay code review hoặc source.
 
 Không auto-index mọi repository trên máy.
 
-Upstream mặc định:
+AI-DEV-OS chuẩn hóa profile tự động ở trên để developer không phải quản lý index thủ công.
+
+### Profile tự động — khuyến nghị
+
+AI-DEV-OS mặc định bật cơ chế tự quản lý index:
 
 ~~~text
-auto_index = false
-auto_watch = true
-watcher_enabled = true
-~~~
-
-AI-DEV-OS giữ nguyên nguyên tắc **index có chủ đích**.
-
-### Profile cân bằng — khuyến nghị
-
-~~~text
-auto_index = false
+auto_index = true
 auto_watch = true
 watcher_enabled = true
 ~~~
 
 Ý nghĩa:
 
-- repo mới không tự bị index chỉ vì mở Claude;
-- repo đã chủ động index có thể được watcher cập nhật khi session sử dụng;
-- không phải scan toàn bộ workspace.
+- repo chưa có graph sẽ được tự index khi Codebase Memory cần làm việc với repo;
+- watcher theo dõi thay đổi source và tự cập nhật graph;
+- developer/AI **không phải nhớ chạy index/re-index thủ công** sau mỗi lần tạo/sửa code;
+- graph vẫn chỉ là bản đồ; source/test thật là ground truth.
 
 Kiểm tra config:
 
@@ -104,11 +99,7 @@ Kiểm tra config:
 codebase-memory-mcp config list
 ~~~
 
-Index repo khi thật sự cần bằng MCP/agent, ví dụ yêu cầu:
-
-~~~text
-Index this project
-~~~
+Chỉ cần index/re-index thủ công khi troubleshooting, recovery hoặc muốn ép cập nhật ngay.
 
 ### Profile ít tài nguyên
 
