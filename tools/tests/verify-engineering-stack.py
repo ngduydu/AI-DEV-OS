@@ -41,6 +41,8 @@ def main() -> None:
         "dependency project đang có",
         "shape-task",
         "decision-tree interview",
+        "auto-index/watcher",
+        "không yêu cầu developer/AI index thủ công",
     ]:
         require(task, needle, "task execution")
 
@@ -74,6 +76,7 @@ def main() -> None:
         "auto_index = false",
         "auto_watch",
         "watcher_enabled",
+        "auto_index = true",
         "Profile ít tài nguyên",
     ]:
         require(codebase, needle, "codebase intelligence")
@@ -101,6 +104,9 @@ def main() -> None:
         "mattpocock-skills",
         "Ensure-UserPathEntry",
         "Chưa cấu hình database/project",
+        'config", "set", "auto_index", "true',
+        'config", "set", "auto_watch", "true',
+        'config", "set", "watcher_enabled", "true',
     ]:
         require(setup, needle, "machine setup")
 
