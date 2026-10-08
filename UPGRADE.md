@@ -448,7 +448,7 @@ Framework artifacts mới:
 - `.claude/skills/codebase-memory-gate/SKILL.md`;
 - `.agents/skills/codebase-memory-gate/SKILL.md`.
 
-Product repo đang ở 2.8.6 hoặc cũ hơn chạy:
+Product repo đang ở 2.8.7 hoặc cũ hơn chạy:
 
 ```text
 /update-ai-dev-os
