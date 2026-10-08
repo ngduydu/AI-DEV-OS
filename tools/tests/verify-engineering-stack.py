@@ -20,8 +20,8 @@ def main() -> None:
 
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
-    if version != "2.8.6":
-        fail(f"expected 2.8.6, got {version!r}")
+    if version != "2.8.8":
+        fail(f"expected 2.8.8, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
@@ -71,7 +71,7 @@ def main() -> None:
     for needle in [
         "Graph UI",
         "localhost:9749",
-        "auto_index = false",
+        "auto_index = true",
         "auto_watch",
         "watcher_enabled",
         "Profile ít tài nguyên",
