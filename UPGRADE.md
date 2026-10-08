@@ -448,10 +448,28 @@ Framework artifacts mới:
 - `.claude/skills/codebase-memory-gate/SKILL.md`;
 - `.agents/skills/codebase-memory-gate/SKILL.md`.
 
-Product repo đang ở 2.8.6 hoặc cũ hơn chạy:
+Product repo đang ở 2.8.7 hoặc cũ hơn chạy:
 
 ```text
 /update-ai-dev-os
 ```
 
 Updater phải preserve project knowledge và cập nhật framework-owned instruction/skills theo ownership contract.
+
+## 2.8.8 — Self-managing Codebase Memory index
+
+Khi nâng project repository lên 2.8.8:
+
+- Chạy `/update-ai-dev-os` để nhận framework changes trong product repo.
+- Machine setup 2.8.8 mặc định bật `auto_index=true`, `auto_watch=true` và `watcher_enabled=true` cho Codebase Memory.
+- Nếu máy đã setup trước 2.8.8, chạy lại `tools/setup-ai-dev-machine.ps1` một lần để áp dụng profile auto-index/auto-watch mới.
+- Không cần chạy lại setup chỉ vì update framework nếu máy đã có đúng profile trên.
+- Không cần developer/AI index hoặc re-index thủ công trong workflow bình thường; chỉ dùng manual index/re-index cho troubleshooting, recovery hoặc force refresh.
+
+Verification:
+
+~~~powershell
+codebase-memory-mcp config list
+~~~
+
+Xác nhận cả ba setting là `true`.

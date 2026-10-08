@@ -20,8 +20,8 @@ def main() -> None:
 
     version = (root / ".ai-dev-os" / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((root / ".ai-dev-os" / "manifest.json").read_text(encoding="utf-8"))
-    if version != "2.8.6":
-        fail(f"expected 2.8.6, got {version!r}")
+    if version != "2.8.8":
+        fail(f"expected 2.8.8, got {version!r}")
     if manifest.get("framework_version") != version:
         fail("manifest version mismatch")
 
@@ -41,6 +41,8 @@ def main() -> None:
         "dependency project đang có",
         "shape-task",
         "decision-tree interview",
+        "auto-index/watcher",
+        "không yêu cầu developer/AI index thủ công",
     ]:
         require(task, needle, "task execution")
 
@@ -74,6 +76,7 @@ def main() -> None:
         "auto_index = false",
         "auto_watch",
         "watcher_enabled",
+        "auto_index = true",
         "Profile ít tài nguyên",
     ]:
         require(codebase, needle, "codebase intelligence")
@@ -101,6 +104,9 @@ def main() -> None:
         "mattpocock-skills",
         "Ensure-UserPathEntry",
         "Chưa cấu hình database/project",
+        'config", "set", "auto_index", "true',
+        'config", "set", "auto_watch", "true',
+        'config", "set", "watcher_enabled", "true',
     ]:
         require(setup, needle, "machine setup")
 
@@ -144,7 +150,7 @@ def main() -> None:
     if args != expected:
         fail(f"SQL MCP template args differ: {args!r}")
 
-    print("PASS: AI engineering stack 2.8.6 contract")
+    print("PASS: AI engineering stack 2.8.8 contract")
 
 
 if __name__ == "__main__":

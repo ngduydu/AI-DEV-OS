@@ -6,7 +6,7 @@ description: Research an unfamiliar feature, bug, subsystem, or code path before
 # Research Codebase
 
 1. Read `AGENTS.md` and only the relevant project docs.
-2. **Pass the Codebase Memory Gate first:** verify/index the repository and query `codebase-memory-mcp` for the task's relevant symbols/architecture/relationships. Do not start with `rg`/`ast-grep`.
+2. **Pass the Codebase Memory Gate first:** verify Codebase Memory connectivity/coverage and query `codebase-memory-mcp`; rely on auto-index/auto-watch for normal indexing for the task's relevant symbols/architecture/relationships. Do not start with `rg`/`ast-grep`.
 3. Locate entry points from graph results, then read the actual source/test files. Use targeted text/structural search only after the graph route is established.
 4. Trace data/control flow end to end far enough to explain the behavior.
 5. Separate verified facts from hypotheses.

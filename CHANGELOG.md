@@ -4,12 +4,6 @@ Các thay đổi đáng chú ý của AI-DEV-OS được ghi lại tại đây.
 
 Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow và structure chỉ nên thay đổi khi giúp agent làm task đáng tin cậy hơn.
 
-## Unreleased
-
-### Changed
-
-- Codebase Memory machine setup mặc định bật `auto_index`, `auto_watch` và `watcher_enabled`; index và graph refresh được tự quản lý, không yêu cầu developer/AI index thủ công trong workflow bình thường.
-
 ## 2.8.8 — Self-managing Codebase Memory index
 
 ### Changed

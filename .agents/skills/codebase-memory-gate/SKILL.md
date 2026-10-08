@@ -1,6 +1,6 @@
 ---
 name: codebase-memory-gate
-description: Mandatory structural codebase discovery before any code task. Use codebase-memory-mcp to index/check coverage and query symbols, architecture, relationships, or impact before source search/read.
+description: Mandatory structural codebase discovery before any code task. Use codebase-memory-mcp to check MCP connectivity/coverage and query symbols, architecture, relationships, or impact before source search/read. Let the configured auto-index/auto-watch prepare the graph in the normal workflow.
 ---
 
 # Codebase Memory Gate
@@ -11,8 +11,8 @@ description: Mandatory structural codebase discovery before any code task. Use c
 
 1. Xác định absolute repository root.
 2. Kiểm tra `codebase-memory-mcp` đã Connected.
-3. Kiểm tra project đã được index và graph có coverage.
-4. Nếu chưa index, gọi `index_repository` rồi kiểm tra trạng thái.
+3. Kiểm tra MCP đã Connected và cơ chế auto-index/auto-watch đang sẵn sàng; graph coverage sẽ được tự chuẩn bị trong workflow bình thường.
+4. Nếu graph chưa sẵn sàng, chờ/kiểm tra auto-index; chỉ dùng `index_repository` thủ công khi troubleshooting, recovery hoặc force refresh.
 5. Query graph phù hợp với task, tối thiểu một query trước khi dùng `rg`/`ast-grep` để lần theo code.
 6. Dùng graph để định vị area/symbol/file/relationship/impact.
 7. Đọc source và test thật để xác minh graph evidence.
