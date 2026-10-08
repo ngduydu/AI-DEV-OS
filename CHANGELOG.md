@@ -6,6 +6,18 @@ Dự án vẫn đang được kiểm nghiệm qua usage thực tế; workflow v�
 
 ## Unreleased
 
+### Changed
+
+- Codebase Memory machine setup mặc định bật `auto_index`, `auto_watch` và `watcher_enabled`; index và graph refresh được tự quản lý, không yêu cầu developer/AI index thủ công trong workflow bình thường.
+
+## 2.8.8 — Self-managing Codebase Memory index
+
+### Changed
+
+- Chuẩn hóa Codebase Memory theo hướng auto-index + background watcher.
+- Code task vẫn bắt buộc qua Codebase Memory Gate, nhưng không còn coi manual `index_repository` là bước workflow thông thường.
+
+
 ### Fixed
 
 - Windows machine setup đăng ký Headroom runtime ở `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` để tự ensure proxy sau reboot/sign-in mà không cần admin hoặc Task Scheduler.

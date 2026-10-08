@@ -125,8 +125,8 @@ Trước khi inspect source theo kiểu lần mò, trước khi chạy `rg`/`ast
 ```text
 Task
 → xác định project root
-→ kiểm tra codebase-memory đã Connected + repo đã index
-→ chưa index → index repository
+→ kiểm tra codebase-memory đã Connected + auto-index/watcher hoạt động
+→ để Codebase Memory tự index nếu repo chưa có graph
 → query graph theo task
 → lấy symbol/file/relationship/impact liên quan
 → đọc source + test thật để xác minh
@@ -144,15 +144,16 @@ Tối thiểu phải có một query graph phù hợp với task, ưu tiên:
 
 ### Index / connection failure
 
-Nếu repo chưa có graph:
+Nếu repo chưa có graph, **không yêu cầu developer/AI index thủ công trong workflow bình thường**. Với cấu hình chuẩn `auto_index=true`, Codebase Memory tự khởi tạo index khi cần.
 
 ```text
-index_repository(repo_path=<absolute project root>)
-→ chờ index hoàn tất / kiểm tra status
+Codebase Memory
+→ auto-index repo nếu cần
+→ chờ graph usable
 → query graph
 ```
 
-Nếu MCP chưa Connected, index thất bại hoặc coverage không đủ:
+Nếu MCP chưa Connected, auto-index/watcher không hoạt động, hoặc coverage không đủ:
 
 ```text
 Codebase Memory Gate = BLOCKED
