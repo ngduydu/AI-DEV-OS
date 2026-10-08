@@ -71,7 +71,7 @@ def main() -> None:
     for needle in [
         "Graph UI",
         "localhost:9749",
-        "auto_index = true",
+        "auto_index = false",
         "auto_watch",
         "watcher_enabled",
         "Profile ít tài nguyên",
