@@ -551,7 +551,7 @@ powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
 
 Script này không được copy sang product repo. Nó cài/verify `ripgrep`, `ast-grep`, `Repomix`, `codebase-memory-mcp`, đăng ký Claude MCP ở user scope và cài personal `/update-ai-dev-os`.
 
-Sau setup, `codebase-memory-mcp` không phải tool cài cho có: mọi code task phải qua Codebase Memory Gate và dùng graph trước source discovery. Chỉ task thuần docs/config/metadata không có code path được miễn.
+Sau setup, `codebase-memory-mcp` không phải tool cài cho có: machine setup mặc định bật `auto_index + auto_watch + watcher_enabled`, nên index/refresh graph được tự quản lý; mọi code task vẫn phải qua Codebase Memory Gate và dùng graph trước source discovery. Chỉ task thuần docs/config/metadata không có code path được miễn.
 
 
 ## Apply AI-DEV-OS vào repo mới bằng một lệnh
