@@ -430,6 +430,24 @@ Sau khi mattpocock-skills được cài ở Claude Code, mỗi product repo ch�
 - Claude Code ưu tiên upstream Ponytail và mattpocock-skills thật.
 - Database connection/permission của SQL MCP vẫn là project-specific; setup machine không tự kết nối production.
 
+## 2.8.8 — Self-managing Codebase Memory index
+
+Khi nâng project repository lên 2.8.8:
+
+- Chạy `/update-ai-dev-os` để nhận framework changes trong product repo.
+- Machine setup 2.8.8 mặc định bật `auto_index=true`, `auto_watch=true` và `watcher_enabled=true` cho Codebase Memory.
+- Nếu máy đã setup trước 2.8.8, chạy lại `tools/setup-ai-dev-machine.ps1` một lần để áp dụng profile auto-index/auto-watch mới.
+- Không cần chạy lại setup chỉ vì update framework nếu máy đã có đúng profile trên.
+- Không cần developer/AI index hoặc re-index thủ công trong workflow bình thường; chỉ dùng manual index/re-index cho troubleshooting, recovery hoặc force refresh.
+
+Verification:
+
+~~~powershell
+codebase-memory-mcp config list
+~~~
+
+Xác nhận cả ba setting là `true`.
+
 ## 2.8.7 — Mandatory Codebase Memory Gate
 
 Mục tiêu của 2.8.7: sửa contract để `codebase-memory-mcp` không còn là tool cài sẵn nhưng chỉ dùng khi agent tự thấy cần.
