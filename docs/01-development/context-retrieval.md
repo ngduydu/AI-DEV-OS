@@ -237,7 +237,7 @@ Sau setup, các tool có thể sẵn sàng trên mọi repo của máy:
 
 Có tool sẵn **không còn là cài cho có**. `codebase-memory-mcp` là dependency của Codebase Memory Gate và phải được dùng trong mọi code task.
 
-Trước mỗi code task ở repo mới, xác nhận MCP Connected và index/coverage của repo đã sẵn sàng. Nếu chưa, index/re-index; nếu vẫn không usable thì BLOCKED.
+Trước mỗi code task ở repo mới, xác nhận MCP Connected và để cơ chế auto-index/auto-watch chuẩn bị graph. Không yêu cầu developer/AI index/re-index thủ công trong workflow bình thường; nếu auto-index/watcher không usable thì repair theo hướng dẫn hoặc BLOCKED.
 
 
 ## Output compression
