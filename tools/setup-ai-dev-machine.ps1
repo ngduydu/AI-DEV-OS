@@ -195,16 +195,57 @@ function Ensure-CodebaseMemoryShim {
     [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
 }
 
+function Ensure-CodebaseMemoryAutoIndex {
+    param([string]$Executable)
+
+    if (-not $Executable -or -not (Test-Path $Executable)) {
+        Add-Result "Codebase Memory auto-index" "BLOCKED" "Không tìm thấy executable để cấu hình."
+        return
+    }
+
+    # AI-DEV-OS không bắt người dùng/agent nhớ index thủ công.
+    # auto_index xử lý repo mới khi MCP session bắt đầu; auto_watch + watcher_enabled
+    # để background daemon tự cập nhật graph sau khi code thay đổi.
+    $commands = @(
+        @("config", "set", "auto_index", "true"),
+        @("config", "set", "auto_watch", "true"),
+        @("config", "set", "watcher_enabled", "true")
+    )
+
+    foreach ($args in $commands) {
+        & $Executable @args 2>&1 | ForEach-Object { Write-Host $_ }
+        if ($LASTEXITCODE -ne 0) {
+            Add-Result "Codebase Memory auto-index" "FAIL" "Không cấu hình được: codebase-memory-mcp $($args -join ' ')"
+            return
+        }
+    }
+
+    # watcher_enabled được daemon đọc khi daemon khởi động; restart daemon để
+    # cấu hình chắc chắn có hiệu lực ngay, không bắt user phải tự xử lý.
+    & $Executable daemon stop 2>&1 | ForEach-Object { Write-Host $_ }
+
+    $config = & $Executable config list 2>&1
+    $configText = ($config | Out-String)
+    if ($configText -match 'auto_index[^\r\n]*(true|1)' -and
+        $configText -match 'auto_watch[^\r\n]*(true|1)' -and
+        $configText -match 'watcher_enabled[^\r\n]*(true|1)') {
+        Add-Result "Codebase Memory auto-index" "PASS" "Đã bật auto_index + auto_watch + watcher_enabled; daemon sẽ tự cập nhật graph."
+    } else {
+        Add-Result "Codebase Memory auto-index" "BLOCKED" "Đã ghi cấu hình nhưng chưa xác minh được cả 3 setting."
+    }
+}
+
 function Ensure-CodebaseMemory {
     $existing = Resolve-CbmExecutable
     if ($existing) {
         Ensure-UserPathEntry -Path (Split-Path -Parent $existing)
         Ensure-CodebaseMemoryShim -Executable $existing
+        Ensure-CodebaseMemoryAutoIndex -Executable $existing
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH user đã được đảm bảo."
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH + auto-index + watcher đã được đảm bảo."
         } catch {
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing"
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing; auto-index + watcher đã được đảm bảo."
         }
         return $existing
     }
@@ -249,8 +290,9 @@ function Ensure-CodebaseMemory {
 
         Ensure-UserPathEntry -Path (Split-Path -Parent $installed)
         Ensure-CodebaseMemoryShim -Executable $installed
+        Ensure-CodebaseMemoryAutoIndex -Executable $installed
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
-        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH user đã được đảm bảo."
+        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH + auto-index + watcher đã được đảm bảo."
         return $installed
     } catch {
         Add-Result "codebase-memory-mcp" "FAIL" $_.Exception.Message
@@ -736,6 +778,10 @@ if ($SelfTest) {
         'mattpocock-skills',
         'Ensure-UserPathEntry',
         'Ensure-CodebaseMemoryShim',
+        'Ensure-CodebaseMemoryAutoIndex',
+        'config set auto_index true',
+        'config set auto_watch true',
+        'config set watcher_enabled true',
         'codebase-memory-mcp.cmd',
         'Luôn ưu tiên binary thật',
         '[5/12] Kiểm tra codebase-memory-mcp...',
