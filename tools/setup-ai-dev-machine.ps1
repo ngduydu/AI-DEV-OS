@@ -188,6 +188,12 @@ function Ensure-CodebaseMemoryShim {
         throw "Shim codebase-memory-mcp không được trỏ vào chính nó."
     }
 
+    if (Test-Path -LiteralPath $shimPath) {
+        $existingShim = Get-Content -LiteralPath $shimPath -Raw
+        if ($existingShim -match [regex]::Escape($Executable)) { return }
+        Write-Host "Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè." -ForegroundColor Yellow
+        return
+    }
     $shimContent = "@echo off`r`n`"$Executable`" %*`r`n"
     [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
 }
@@ -372,11 +378,7 @@ function Ensure-SqlServerMcp {
         try {
             $versionText = (& dab --version 2>&1 | Select-Object -First 1)
             $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
-            if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
-                Add-Result "SQL Server MCP" "PASS" "Đã có DAB đủ MCP profile: $versionText"
-                return
-            }
-            Write-Host "DAB hiện có chưa đạt baseline 2.0; sẽ update lên 2.0.12..." -ForegroundColor Cyan
+            Write-Host "Đang cập nhật DAB lên stable mới nhất..." -ForegroundColor Cyan
             & dotnet tool update --global Microsoft.DataApiBuilder
             if ($LASTEXITCODE -ne 0) {
                 Add-Result "SQL Server MCP" "FAIL" "dotnet tool update Microsoft.DataApiBuilder thất bại với mã $LASTEXITCODE."
@@ -787,6 +789,7 @@ if ($SelfTest) {
         'Ensure-CodebaseMemoryAutoIndex',
         'Chỉ đặt default cho key chưa tồn tại',
         'codebase-memory-mcp.cmd',
+        'Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè.'
         'Giữ nguyên Headroom launcher đã tồn tại',
         'Giữ nguyên Windows autostart entry đã tồn tại',
         'Luôn ưu tiên binary thật',
