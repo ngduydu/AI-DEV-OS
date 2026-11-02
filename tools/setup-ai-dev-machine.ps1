@@ -545,7 +545,7 @@ function Ensure-Headroom {
 
     if (-not (Test-Command "headroom")) {
         Write-Host "Headroom chưa có; đang cài stable mới nhất (proxy + MCP)..." -ForegroundColor Cyan
-        & uv tool install --python 3.13 "headroom-ai[proxy,mcp]"
+        & uv tool install --reinstall --python 3.13 "headroom-ai[proxy,mcp]"
         if ($LASTEXITCODE -ne 0) {
             Add-Result "Headroom" "FAIL" "uv cài Headroom thất bại với mã $LASTEXITCODE."
             return
