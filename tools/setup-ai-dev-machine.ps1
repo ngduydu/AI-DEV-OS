@@ -117,10 +117,47 @@ function Ensure-WingetPackage {
 
 function Ensure-Repomix {
     if (Test-Command "repomix") {
-        $version = (& repomix --version 2>&1 | Select-Object -First 1)
-        Add-Result "Repomix" "PASS" "Đã có: $version; không cập nhật."
+        try {
+            $version = (& repomix --version 2>&1 | Select-Object -First 1)
+            Add-Result "Repomix" "PASS" "Đã có: $version"
+        } catch {
+            Add-Result "Repomix" "PASS" "Đã có command repomix."
+        }
         return
     }
+
+    if (-not (Test-Command "npm")) {
+        Add-Result "Repomix" "BLOCKED" "Thiếu npm/Node.js. Repomix hiện yêu cầu Node.js >= 22. Cài Node phù hợp môi trường team rồi chạy lại."
+        return
+    }
+
+    try {
+        $nodeVersionText = (& node --version 2>&1 | Select-Object -First 1)
+        $nodeMajor = [int](($nodeVersionText -replace '^v','').Split('.')[0])
+        if ($nodeMajor -lt 22) {
+            Add-Result "Repomix" "BLOCKED" "Node hiện tại là $nodeVersionText; Repomix yêu cầu Node.js >= 22. Không tự nâng Node để tránh ảnh hưởng project khác."
+            return
+        }
+    } catch {
+        Add-Result "Repomix" "BLOCKED" "Không xác định được Node version."
+        return
+    }
+
+    Write-Host "Đang cài Repomix..." -ForegroundColor Cyan
+    & npm install -g repomix@latest
+    if ($LASTEXITCODE -ne 0) {
+        Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
+        return
+    }
+
+    Refresh-ProcessPath
+    if (Test-Command "repomix") {
+        $version = (& repomix --version 2>&1 | Select-Object -First 1)
+        Add-Result "Repomix" "PASS" "Đã cài: $version"
+    } else {
+        Add-Result "Repomix" "BLOCKED" "Đã cài nhưng terminal hiện tại chưa thấy repomix. Mở terminal mới rồi chạy lại."
+    }
+}
 
 function Resolve-CbmExecutable {
     # Luôn ưu tiên binary thật. Không lấy shim .cmd do chính AI-DEV-OS tạo,
@@ -179,6 +216,7 @@ function Ensure-CodebaseMemoryAutoIndex {
         @{ Key = "auto_watch"; Value = "true" },
         @{ Key = "watcher_enabled"; Value = "true" }
     )
+    $settingsChanged = $false
     foreach ($setting in $defaults) {
         $keyPattern = "(?im)^\s*" + [regex]::Escape($setting.Key) + "\s*[:=]"
         if ($configText -match $keyPattern) {
@@ -191,11 +229,13 @@ function Ensure-CodebaseMemoryAutoIndex {
             Add-Result "Codebase Memory auto-index" "FAIL" "Không đặt được default: $($setting.Key)"
             return
         }
+        $settingsChanged = $true
     }
 
-    # watcher_enabled được daemon đọc khi daemon khởi động; restart daemon để
-    # cấu hình chắc chắn có hiệu lực ngay, không bắt user phải tự xử lý.
-    # Không restart daemon hiện tại chỉ vì chạy lại setup.
+    # Chỉ restart daemon khi script vừa bổ sung setting mặc định.
+    if ($settingsChanged) {
+        & $Executable daemon stop 2>&1 | ForEach-Object { Write-Host $_ }
+    }
 
     $config = & $Executable config list 2>&1
     $configText = ($config | Out-String)
@@ -641,6 +681,12 @@ function Ensure-Ponytail {
         return
     }
 
+    $pluginList = (& claude plugin list 2>&1 | Out-String)
+    if ($pluginList -match "(?im)ponytail@ponytail|ponytail") {
+        Add-Result "Ponytail" "PASS" "Đã cài plugin; giữ nguyên, không cài lại."
+        return
+    }
+
     Write-Host "Đang thêm Ponytail marketplace upstream..." -ForegroundColor Cyan
     $market = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "marketplace", "add", "DietrichGebert/ponytail") -PluralArgs @("plugins", "marketplace", "add", "DietrichGebert/ponytail")
     $market.Output | ForEach-Object { Write-Host $_ }
@@ -670,6 +716,12 @@ function Ensure-MattPocockSkills {
 
     if (-not (Test-Command "claude")) {
         Add-Result "Matt Pocock skills" "BLOCKED" "Không tìm thấy Claude Code CLI."
+        return
+    }
+
+    $pluginList = (& claude plugin list 2>&1 | Out-String)
+    if ($pluginList -match "(?im)mattpocock-skills") {
+        Add-Result "Matt Pocock skills" "PASS" "Đã cài plugin; giữ nguyên, không cài lại."
         return
     }
 
@@ -709,6 +761,13 @@ function Ensure-PersonalUpdater {
         return
     }
 
+    $targetSkill = Join-Path $HOME ".claude\skills\update-ai-dev-os\SKILL.md"
+    $targetApplySkill = Join-Path $HOME ".claude\skills\apply-ai-dev-os\SKILL.md"
+    if ((Test-Path -LiteralPath $targetSkill) -and (Test-Path -LiteralPath $targetApplySkill)) {
+        Add-Result "Personal updater" "PASS" "Đã có updater/apply skill; giữ nguyên, không ghi đè."
+        return
+    }
+
     try {
         & powershell -NoProfile -ExecutionPolicy Bypass -File $installer
         if ($LASTEXITCODE -ne 0) {
@@ -735,8 +794,8 @@ if ($SelfTest) {
         'claude mcp list',
         '[switch]$SkipSqlServerMcp',
         '[switch]$SkipExternalAiStack',
-        'dotnet tool update --global Microsoft.DataApiBuilder',
-        'uv tool install --upgrade --python 3.13 "headroom-ai[proxy,mcp]"',
+        'dotnet tool install --global Microsoft.DataApiBuilder',
+        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]"',
         'headroom mcp install',
         'headroom init -g --port 8787 claude',
         'Invoke-ClaudePluginCommand',
@@ -750,9 +809,14 @@ if ($SelfTest) {
         'Ensure-CodebaseMemoryAutoIndex',
         'Chỉ đặt default cho key chưa tồn tại',
         'codebase-memory-mcp.cmd',
-        'Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè.'
+        'Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè.',
         'Giữ nguyên Headroom launcher đã tồn tại',
         'Giữ nguyên Windows autostart entry đã tồn tại',
+        'npm install -g repomix@latest',
+        'if (-not (Test-Command "headroom"))',
+        'if (-not (Test-Command "repomix"))',
+        'Đã cài plugin; giữ nguyên, không cài lại.',
+        'Đã có updater/apply skill; giữ nguyên, không ghi đè.',
         'Luôn ưu tiên binary thật',
         '[5/12] Kiểm tra codebase-memory-mcp...',
         'Đã cài DAB'
