@@ -801,7 +801,7 @@ if ($SelfTest) {
         '[switch]$SkipSqlServerMcp',
         '[switch]$SkipExternalAiStack',
         'dotnet tool install --global Microsoft.DataApiBuilder',
-        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]"',
+        'uv tool install --reinstall --python 3.13 "headroom-ai[proxy,mcp]"',
         'headroom mcp install',
         'headroom init -g --port 8787 claude',
         'Invoke-ClaudePluginCommand',
