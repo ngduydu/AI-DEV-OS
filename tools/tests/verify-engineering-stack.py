@@ -100,7 +100,7 @@ def main() -> None:
         "[switch]$SkipExternalAiStack",
         "dotnet tool install --global Microsoft.DataApiBuilder",
         "headroom-ai[proxy,mcp]",
-        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]"',
+        'uv tool install --reinstall --python 3.13 "headroom-ai[proxy,mcp]"',
         "ponytail@ponytail",
         "mattpocock-skills",
         "Ensure-UserPathEntry",
