@@ -543,16 +543,15 @@ Updater không tự cài/bật MCP, codebase-memory-mcp, ast-grep hoặc Repomix
 
 ## Setup tool cho máy dev
 
-Tool stack dùng chung của AI-DEV-OS được cài **một lần trên mỗi máy**, từ repository AI-DEV-OS local:
+Tool stack dùng chung của AI-DEV-OS được cài ở cấp máy/user. Script được thiết kế **idempotent: có thể chạy lại nhiều lần** để kiểm tra và cập nhật tool:
 
 ~~~powershell
-powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
+powershell -ExecutionPolicy Bypass -File .\\tools\\setup-ai-dev-machine.ps1
 ~~~
 
-Script này không được copy sang product repo. Nó cài/verify `ripgrep`, `ast-grep`, `Repomix`, `codebase-memory-mcp`, đăng ký Claude MCP ở user scope và cài personal `/update-ai-dev-os`.
+Script không được copy sang product repo. Các integration/config đã tồn tại được giữ nguyên; script chỉ thêm entry còn thiếu. Nếu entry hiện có xung đột hoặc trỏ tới executable khác, script báo `BLOCKED` thay vì tự xóa/ghi đè.
 
-Sau setup, `codebase-memory-mcp` không phải tool cài cho có: machine setup mặc định bật `auto_index + auto_watch + watcher_enabled`, nên index/refresh graph được tự quản lý; mọi code task vẫn phải qua Codebase Memory Gate và dùng graph trước source discovery. Chỉ task thuần docs/config/metadata không có code path được miễn.
-
+Headroom, Repomix và Microsoft Data API builder được cài/cập nhật stable mới nhất, không ghim phiên bản trong script. Việc cập nhật binary/tool không đồng nghĩa với việc reset cấu hình người dùng.
 
 ## Apply AI-DEV-OS vào repo mới bằng một lệnh
 
