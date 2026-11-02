@@ -81,9 +81,17 @@ function Ensure-WingetPackage {
     param([string]$DisplayName, [string]$CommandName, [string]$PackageId)
 
     if (Test-Command $CommandName) {
+        if (Test-Command "winget") {
+            & winget upgrade --id $PackageId -e --accept-source-agreements --accept-package-agreements --silent
+            if ($LASTEXITCODE -ne 0) {
+                Add-Result $DisplayName "BLOCKED" "Giữ nguyên bản hiện tại; WinGet không cập nhật được (mã $LASTEXITCODE)."
+                return
+            }
+            Refresh-ProcessPath
+        }
         try {
             $version = (& $CommandName --version 2>&1 | Select-Object -First 1)
-            Add-Result $DisplayName "PASS" "Đã có: $version"
+            Add-Result $DisplayName "PASS" "Đã có/cập nhật: $version"
         } catch {
             Add-Result $DisplayName "PASS" "Đã có command '$CommandName'."
         }
@@ -136,7 +144,7 @@ function Ensure-Repomix {
     Write-Host "Đang cài/cập nhật Repomix stable mới nhất..." -ForegroundColor Cyan
     & npm install -g repomix@latest
     if ($LASTEXITCODE -ne 0) {
-        Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
+        Add-Result "Repomix" "FAIL" "npm install -g repomix@latest thất bại với mã $LASTEXITCODE."
         return
     }
 
@@ -504,7 +512,7 @@ function Ensure-HeadroomWindowsAutostart {
     }
 
     # Chỉ tạo registry entry khi chưa có; không ghi đè giá trị người dùng.
-    $runKey = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+    $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     $runName = "AI-DEV-OS-Headroom"
     New-Item -Path $runKey -Force | Out-Null
     $existingRun = (Get-ItemProperty -Path $runKey -Name $runName -ErrorAction SilentlyContinue).$runName
@@ -580,7 +588,7 @@ function Ensure-Headroom {
             Write-Host "Giữ nguyên Headroom MCP entry hiện tại." -ForegroundColor DarkGray
         }
 
-        $claudeSettings = Join-Path $HOME ".claude\\settings.json"
+        $claudeSettings = Join-Path $HOME ".claude\settings.json"
         $hasHeadroomSettings = (Test-Path -LiteralPath $claudeSettings) -and
             (Select-String -LiteralPath $claudeSettings -Pattern "headroom" -Quiet)
         if (-not $hasHeadroomSettings) {
