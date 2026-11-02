@@ -21,7 +21,7 @@ def main() -> None:
     required = {
         "ripgrep": "BurntSushi.ripgrep.MSVC",
         "ast-grep": "ast-grep.ast-grep",
-        "Repomix": "npm install -g repomix",
+        "Repomix": "npm install -g repomix@latest",
         "codebase-memory-mcp": "codebase-memory-mcp",
         "skip config": "--skip-config",
         "Claude MCP user scope": "--scope user",
@@ -30,11 +30,11 @@ def main() -> None:
         "no project MCP mutation": "Không sửa .mcp.json của project",
         "skip SQL MCP flag": "[switch]$SkipSqlServerMcp",
         "skip external stack flag": "[switch]$SkipExternalAiStack",
-        "Microsoft SQL MCP": "Microsoft.DataApiBuilder --version 2.0.12",
+        "Microsoft SQL MCP": "dotnet tool install --global Microsoft.DataApiBuilder",
         "SQL MCP remains project-specific": "Chưa cấu hình database/project",
         "uv": "astral-sh.uv",
         "Headroom upstream": 'headroom-ai[proxy,mcp]',
-        "Headroom MCP": "headroom mcp install --force",
+        "Headroom MCP": "headroom mcp install",
         "Headroom durable Claude": "headroom init -g --port 8787 claude",
         "Headroom Windows autostart": "AI-DEV-OS-Headroom",
         "Headroom user Run key": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
@@ -47,6 +47,9 @@ def main() -> None:
         "Matt Pocock plugin": "mattpocock-skills",
         "persistent user PATH": "Ensure-UserPathEntry",
     }
+
+    if "winget upgrade" in text or "uv tool install --upgrade" in text or "dotnet tool update --global Microsoft.DataApiBuilder" in text:
+        fail("machine setup must not update already-installed tools")
 
     for name, needle in required.items():
         if needle not in text:
