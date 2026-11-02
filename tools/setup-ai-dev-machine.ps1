@@ -133,8 +133,8 @@ function Ensure-Repomix {
         return
     }
 
-    Write-Host "Đang cài Repomix..." -ForegroundColor Cyan
-    & npm install -g repomix@1.18.0
+    Write-Host "Đang cài/cập nhật Repomix stable mới nhất..." -ForegroundColor Cyan
+    & npm install -g repomix@latest
     if ($LASTEXITCODE -ne 0) {
         Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
         return
@@ -192,26 +192,31 @@ function Ensure-CodebaseMemoryAutoIndex {
         return
     }
 
-    # AI-DEV-OS không bắt người dùng/agent nhớ index thủ công.
-    # auto_index xử lý repo mới khi MCP session bắt đầu; auto_watch + watcher_enabled
-    # để background daemon tự cập nhật graph sau khi code thay đổi.
-    $commands = @(
-        @("config", "set", "auto_index", "true"),
-        @("config", "set", "auto_watch", "true"),
-        @("config", "set", "watcher_enabled", "true")
+    # Chỉ đặt default cho key chưa tồn tại; giữ nguyên mọi giá trị đã được cấu hình.
+    $config = & $Executable config list 2>&1
+    $configText = ($config | Out-String)
+    $defaults = @(
+        @{ Key = "auto_index"; Value = "true" },
+        @{ Key = "auto_watch"; Value = "true" },
+        @{ Key = "watcher_enabled"; Value = "true" }
     )
-
-    foreach ($args in $commands) {
-        & $Executable @args 2>&1 | ForEach-Object { Write-Host $_ }
+    foreach ($setting in $defaults) {
+        $keyPattern = "(?im)^\s*" + [regex]::Escape($setting.Key) + "\s*[:=]"
+        if ($configText -match $keyPattern) {
+            Write-Host "Giữ nguyên Codebase Memory setting '$($setting.Key)'." -ForegroundColor DarkGray
+            continue
+        }
+        $settingArgs = @("config", "set", $setting.Key, $setting.Value)
+        & $Executable @settingArgs 2>&1 | ForEach-Object { Write-Host $_ }
         if ($LASTEXITCODE -ne 0) {
-            Add-Result "Codebase Memory auto-index" "FAIL" "Không cấu hình được: codebase-memory-mcp $($args -join ' ')"
+            Add-Result "Codebase Memory auto-index" "FAIL" "Không đặt được default: $($setting.Key)"
             return
         }
     }
 
     # watcher_enabled được daemon đọc khi daemon khởi động; restart daemon để
     # cấu hình chắc chắn có hiệu lực ngay, không bắt user phải tự xử lý.
-    & $Executable daemon stop 2>&1 | ForEach-Object { Write-Host $_ }
+    # Không restart daemon hiện tại chỉ vì chạy lại setup.
 
     $config = & $Executable config list 2>&1
     $configText = ($config | Out-String)
@@ -558,7 +563,7 @@ function Ensure-Headroom {
 
     if (-not $SkipMcp -and (Test-Command "claude")) {
         $claudeMcpList = (& claude mcp list 2>&1 | Out-String)
-        if ($claudeMcpList -notmatch "(?im)^\\s*headroom\\b") {
+        if ($claudeMcpList -notmatch "(?im)^\s*headroom\b") {
             $previousErrorActionPreference = $ErrorActionPreference
             try {
                 $ErrorActionPreference = "Continue"
@@ -754,13 +759,12 @@ if ($SelfTest) {
         '$CodebaseMemoryVersion = "v0.11.0"',
         '$env:CBM_DOWNLOAD_URL = $CodebaseMemoryReleaseUrl',
         'Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer',
-        'claude mcp remove --scope user codebase-memory-mcp',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',
         'claude mcp list',
         '[switch]$SkipSqlServerMcp',
         '[switch]$SkipExternalAiStack',
-        'Microsoft.DataApiBuilder --version 2.0.12',
+        'dotnet tool update --global Microsoft.DataApiBuilder',
         'uv tool install --upgrade --python 3.13 "headroom-ai[proxy,mcp]"',
         'headroom mcp install',
         'headroom init -g --port 8787 claude',
@@ -773,10 +777,10 @@ if ($SelfTest) {
         'Ensure-UserPathEntry',
         'Ensure-CodebaseMemoryShim',
         'Ensure-CodebaseMemoryAutoIndex',
-        'config set auto_index true',
-        'config set auto_watch true',
-        'config set watcher_enabled true',
+        'Chỉ đặt default cho key chưa tồn tại',
         'codebase-memory-mcp.cmd',
+        'Giữ nguyên Headroom launcher đã tồn tại',
+        'Giữ nguyên Windows autostart entry đã tồn tại',
         'Luôn ưu tiên binary thật',
         '[5/12] Kiểm tra codebase-memory-mcp...',
         'Đã cài DAB'
@@ -796,7 +800,7 @@ Write-Host ""
 Write-Host "AI-DEV-OS - THIẾT LẬP TOOL CHO MÁY DEV" -ForegroundColor Cyan
 Write-Host "Repo nguồn: $RepoRoot"
 Write-Host ""
-Write-Host "Script này cài tool ở cấp máy/user, Không sửa .mcp.json của project" -ForegroundColor DarkGray
+Write-Host "Script này cài/cập nhật tool ở cấp máy/user; không sửa cấu hình project" -ForegroundColor DarkGray
 Write-Host "CodeGraph: KHÔNG cài vì overlap với codebase-memory-mcp." -ForegroundColor DarkGray
 Write-Host ""
 
@@ -852,7 +856,7 @@ if ($blocked -gt 0) {
     exit 2
 }
 
-Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng." -ForegroundColor Green
+Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng; có thể chạy lại script an toàn." -ForegroundColor Green
 Write-Host "Restart Claude Code rồi dùng /mcp để xác nhận codebase-memory-mcp Connected." -ForegroundColor Green
 Write-Host ""
 Write-Host "Lưu ý: setup mặc định cài toàn bộ upstream stack đã chuẩn hóa: codebase-memory-mcp, Headroom, Ponytail, mattpocock-skills và Microsoft SQL MCP/DAB." -ForegroundColor DarkGray
