@@ -791,8 +791,8 @@ if ($SelfTest) {
 
     $required = @(
         '$installOutput = & powershell',
-        '$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"',
-        '$CodebaseMemoryVersion = "v0.11.0"',
+        '$CodebaseMemoryInstallerCommit = "a5b248f47272413189746589b9a2c551c6b6c5ec"',
+        '$CodebaseMemoryVersion = "v0.12.1"',
         '$env:CBM_DOWNLOAD_URL = $CodebaseMemoryReleaseUrl',
         'Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
@@ -842,7 +842,7 @@ Write-Host ""
 Write-Host "AI-DEV-OS - THIẾT LẬP TOOL CHO MÁY DEV" -ForegroundColor Cyan
 Write-Host "Repo nguồn: $RepoRoot"
 Write-Host ""
-Write-Host "Script này chỉ cài tool cấp máy/user; không sửa .mcp.json của project" -ForegroundColor DarkGray
+Write-Host "Script này chỉ cài tool cấp máy/user. Không sửa .mcp.json của project." -ForegroundColor DarkGray
 Write-Host "CodeGraph: KHÔNG cài vì overlap với codebase-memory-mcp." -ForegroundColor DarkGray
 Write-Host ""
 
