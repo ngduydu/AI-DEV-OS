@@ -842,7 +842,7 @@ Write-Host ""
 Write-Host "AI-DEV-OS - THIẾT LẬP TOOL CHO MÁY DEV" -ForegroundColor Cyan
 Write-Host "Repo nguồn: $RepoRoot"
 Write-Host ""
-Write-Host "Script này cài/cập nhật tool ở cấp máy/user; không sửa cấu hình project" -ForegroundColor DarkGray
+Write-Host "Script này chỉ cài tool cấp máy/user; không sửa .mcp.json của project" -ForegroundColor DarkGray
 Write-Host "CodeGraph: KHÔNG cài vì overlap với codebase-memory-mcp." -ForegroundColor DarkGray
 Write-Host ""
 
