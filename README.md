@@ -543,7 +543,7 @@ Updater không tự cài/bật MCP, codebase-memory-mcp, ast-grep hoặc Repomix
 
 ## Setup tool cho máy dev
 
-Tool stack dùng chung của AI-DEV-OS được cài ở cấp máy/user. Script được thiết kế **idempotent: có thể chạy lại nhiều lần** để kiểm tra và cập nhật tool:
+Tool stack dùng chung của AI-DEV-OS được cài ở cấp máy/user. Script được thiết kế **idempotent: có thể chạy lại nhiều lần** để kiểm tra và chỉ cài những tool còn thiếu:
 
 ~~~powershell
 powershell -ExecutionPolicy Bypass -File .\\tools\\setup-ai-dev-machine.ps1
@@ -551,7 +551,7 @@ powershell -ExecutionPolicy Bypass -File .\\tools\\setup-ai-dev-machine.ps1
 
 Script không được copy sang product repo. Các integration/config đã tồn tại được giữ nguyên; script chỉ thêm entry còn thiếu. Nếu entry hiện có xung đột hoặc trỏ tới executable khác, script báo `BLOCKED` thay vì tự xóa/ghi đè.
 
-Headroom, Repomix và Microsoft Data API builder được cài/cập nhật stable mới nhất, không ghim phiên bản trong script. Việc cập nhật binary/tool không đồng nghĩa với việc reset cấu hình người dùng.
+Tool chưa có sẽ được cài bằng phiên bản stable mới nhất tại thời điểm chạy. Tool đã có sẽ được giữ nguyên phiên bản, không tự cập nhật hoặc downgrade. Một số installer upstream được ghim theo commit đã review để bảo đảm nguồn cài đặt; không tự ý bỏ pin bảo mật đó.
 
 ## Apply AI-DEV-OS vào repo mới bằng một lệnh
 
