@@ -67,7 +67,7 @@ AI-DEV-OS cung cấp một setup command cho Windows:
 powershell -ExecutionPolicy Bypass -File .\tools\setup-ai-dev-machine.ps1
 ~~~
 
-Chạy từ repository AI-DEV-OS local. Mỗi developer chạy một lần trên máy, không chạy theo từng product repo.
+Chạy từ repository AI-DEV-OS local. Có thể chạy lại để kiểm tra/khôi phục thành phần còn thiếu, không chạy theo từng product repo. Lần đầu cài stable mới nhất; tool/plugin đã có được giữ nguyên, không update hoặc cài đè. Installer Codebase Memory tiếp tục pin theo commit immutable đã review và checksum; chỉ nâng pin sau khi review upstream release/installer.
 
 Script:
 
