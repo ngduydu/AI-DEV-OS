@@ -81,17 +81,9 @@ function Ensure-WingetPackage {
     param([string]$DisplayName, [string]$CommandName, [string]$PackageId)
 
     if (Test-Command $CommandName) {
-        if (Test-Command "winget") {
-            & winget upgrade --id $PackageId -e --accept-source-agreements --accept-package-agreements --silent
-            if ($LASTEXITCODE -ne 0) {
-                Add-Result $DisplayName "BLOCKED" "Giữ nguyên bản hiện tại; WinGet không cập nhật được (mã $LASTEXITCODE)."
-                return
-            }
-            Refresh-ProcessPath
-        }
         try {
             $version = (& $CommandName --version 2>&1 | Select-Object -First 1)
-            Add-Result $DisplayName "PASS" "Đã có/cập nhật: $version"
+            Add-Result $DisplayName "PASS" "Đã có: $version"
         } catch {
             Add-Result $DisplayName "PASS" "Đã có command '$CommandName'."
         }
@@ -124,38 +116,11 @@ function Ensure-WingetPackage {
 }
 
 function Ensure-Repomix {
-    if (-not (Test-Command "npm")) {
-        Add-Result "Repomix" "BLOCKED" "Thiếu npm/Node.js. Repomix hiện yêu cầu Node.js >= 22. Cài Node phù hợp môi trường team rồi chạy lại."
-        return
-    }
-
-    try {
-        $nodeVersionText = (& node --version 2>&1 | Select-Object -First 1)
-        $nodeMajor = [int](($nodeVersionText -replace '^v','').Split('.')[0])
-        if ($nodeMajor -lt 22) {
-            Add-Result "Repomix" "BLOCKED" "Node hiện tại là $nodeVersionText; Repomix yêu cầu Node.js >= 22. Không tự nâng Node để tránh ảnh hưởng project khác."
-            return
-        }
-    } catch {
-        Add-Result "Repomix" "BLOCKED" "Không xác định được Node version."
-        return
-    }
-
-    Write-Host "Đang cài/cập nhật Repomix stable mới nhất..." -ForegroundColor Cyan
-    & npm install -g repomix@latest
-    if ($LASTEXITCODE -ne 0) {
-        Add-Result "Repomix" "FAIL" "npm install -g repomix@latest thất bại với mã $LASTEXITCODE."
-        return
-    }
-
-    Refresh-ProcessPath
     if (Test-Command "repomix") {
         $version = (& repomix --version 2>&1 | Select-Object -First 1)
-        Add-Result "Repomix" "PASS" "Đã cài: $version"
-    } else {
-        Add-Result "Repomix" "BLOCKED" "Đã cài nhưng terminal hiện tại chưa thấy repomix. Mở terminal mới rồi chạy lại."
+        Add-Result "Repomix" "PASS" "Đã có: $version; không cập nhật."
+        return
     }
-}
 
 function Resolve-CbmExecutable {
     # Luôn ưu tiên binary thật. Không lấy shim .cmd do chính AI-DEV-OS tạo,
@@ -251,9 +216,9 @@ function Ensure-CodebaseMemory {
         Ensure-CodebaseMemoryAutoIndex -Executable $existing
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH + auto-index + watcher đã được đảm bảo."
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; giữ nguyên phiên bản và áp dụng profile auto-index theo cấu hình hiện có."
         } catch {
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing; auto-index + watcher đã được đảm bảo."
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing; giữ nguyên phiên bản và cấu hình hiện có."
         }
         return $existing
     }
@@ -300,7 +265,7 @@ function Ensure-CodebaseMemory {
         Ensure-CodebaseMemoryShim -Executable $installed
         Ensure-CodebaseMemoryAutoIndex -Executable $installed
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
-        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH + auto-index + watcher đã được đảm bảo."
+        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH + profile auto-index đã được kiểm tra."
         return $installed
     } catch {
         Add-Result "codebase-memory-mcp" "FAIL" $_.Exception.Message
@@ -375,23 +340,14 @@ function Ensure-SqlServerMcp {
     Refresh-ProcessPath
 
     if (Test-Command "dab") {
-        try {
-            $versionText = (& dab --version 2>&1 | Select-Object -First 1)
-            $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
-            Write-Host "Đang cập nhật DAB lên stable mới nhất..." -ForegroundColor Cyan
-            & dotnet tool update --global Microsoft.DataApiBuilder
-            if ($LASTEXITCODE -ne 0) {
-                Add-Result "SQL Server MCP" "FAIL" "dotnet tool update Microsoft.DataApiBuilder thất bại với mã $LASTEXITCODE."
-                return
-            }
-            Refresh-ProcessPath
-            $updatedVersion = (& dab --version 2>&1 | Select-Object -First 1)
-            Add-Result "SQL Server MCP" "PASS" "Đã update DAB: $updatedVersion. Chưa cấu hình database/project."
-            return
-        } catch {
-            Add-Result "SQL Server MCP" "BLOCKED" "Có command dab nhưng không xác minh được version: $($_.Exception.Message)"
-            return
+        $versionText = (& dab --version 2>&1 | Select-Object -First 1)
+        $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
+        if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
+            Add-Result "SQL Server MCP" "PASS" "Đã có DAB: $versionText; không cập nhật."
+        } else {
+            Add-Result "SQL Server MCP" "BLOCKED" "Đã có DAB nhưng version không đạt baseline 2.0: $versionText. Giữ nguyên, không tự nâng cấp."
         }
+        return
     }
 
     if (-not (Test-Command "dotnet")) {
@@ -547,11 +503,16 @@ function Ensure-Headroom {
         return
     }
 
-    Write-Host "Đang cài/cập nhật Headroom stable mới nhất (proxy + MCP) bằng uv..." -ForegroundColor Cyan
-    & uv tool install --upgrade --python 3.13 "headroom-ai[proxy,mcp]"
-    if ($LASTEXITCODE -ne 0) {
-        Add-Result "Headroom" "FAIL" "uv cài/cập nhật Headroom thất bại với mã $LASTEXITCODE."
-        return
+    if (-not (Test-Command "headroom")) {
+        Write-Host "Headroom chưa có; đang cài stable mới nhất (proxy + MCP)..." -ForegroundColor Cyan
+        & uv tool install --python 3.13 "headroom-ai[proxy,mcp]"
+        if ($LASTEXITCODE -ne 0) {
+            Add-Result "Headroom" "FAIL" "uv cài Headroom thất bại với mã $LASTEXITCODE."
+            return
+        }
+    } else {
+        $installedVersion = (& headroom --version 2>&1 | Select-Object -First 1)
+        Write-Host "Giữ nguyên Headroom đã cài: $installedVersion" -ForegroundColor DarkGray
     }
 
     try {
