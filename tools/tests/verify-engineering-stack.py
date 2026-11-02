@@ -98,8 +98,9 @@ def main() -> None:
     for needle in [
         "[switch]$SkipSqlServerMcp",
         "[switch]$SkipExternalAiStack",
-        "Microsoft.DataApiBuilder --version 2.0.12",
+        "dotnet tool install --global Microsoft.DataApiBuilder",
         "headroom-ai[proxy,mcp]",
+        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]"',
         "ponytail@ponytail",
         "mattpocock-skills",
         "Ensure-UserPathEntry",
@@ -107,8 +108,14 @@ def main() -> None:
         'config", "set", "auto_index", "true',
         'config", "set", "auto_watch", "true',
         'config", "set", "watcher_enabled", "true',
+        "npm install -g repomix@latest",
+        "Đã cài plugin; giữ nguyên, không cài lại.",
+        "Đã có updater/apply skill; giữ nguyên, không ghi đè.",
     ]:
         require(setup, needle, "machine setup")
+
+    if "winget upgrade" in setup or "uv tool install --upgrade" in setup or "dotnet tool update --global Microsoft.DataApiBuilder" in setup:
+        fail("machine setup must not update already-installed tools")
 
     manifest_paths = {item["path"] for item in manifest.get("managed_files", [])}
     required_managed = {
