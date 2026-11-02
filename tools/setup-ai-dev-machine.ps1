@@ -17,8 +17,8 @@ $Results = New-Object System.Collections.Generic.List[object]
 
 # Pin third-party installer source to an immutable reviewed commit.
 # The upstream installer then performs mandatory SHA-256 verification for the release binary.
-$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"
-$CodebaseMemoryVersion = "v0.11.0"
+$CodebaseMemoryInstallerCommit = "a5b248f47272413189746589b9a2c551c6b6c5ec"
+$CodebaseMemoryVersion = "v0.12.1"
 $CodebaseMemoryInstallerUrl = "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1"
 $CodebaseMemoryReleaseUrl = "https://github.com/DeusData/codebase-memory-mcp/releases/download/$CodebaseMemoryVersion"
 
@@ -763,8 +763,14 @@ function Ensure-PersonalUpdater {
 
     $targetSkill = Join-Path $HOME ".claude\skills\update-ai-dev-os\SKILL.md"
     $targetApplySkill = Join-Path $HOME ".claude\skills\apply-ai-dev-os\SKILL.md"
-    if ((Test-Path -LiteralPath $targetSkill) -and (Test-Path -LiteralPath $targetApplySkill)) {
+    $hasUpdater = Test-Path -LiteralPath $targetSkill
+    $hasApply = Test-Path -LiteralPath $targetApplySkill
+    if ($hasUpdater -and $hasApply) {
         Add-Result "Personal updater" "PASS" "Đã có updater/apply skill; giữ nguyên, không ghi đè."
+        return
+    }
+    if ($hasUpdater -or $hasApply) {
+        Add-Result "Personal updater" "BLOCKED" "Chỉ tồn tại một trong hai global skill; giữ nguyên để tránh ghi đè file người dùng."
         return
     }
 
