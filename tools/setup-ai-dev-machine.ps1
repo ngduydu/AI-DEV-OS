@@ -17,11 +17,10 @@ $Results = New-Object System.Collections.Generic.List[object]
 
 # Pin third-party installer source to an immutable reviewed commit.
 # The upstream installer then performs mandatory SHA-256 verification for the release binary.
-$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"
-$CodebaseMemoryVersion = "v0.11.0"
+$CodebaseMemoryInstallerCommit = "a5b248f47272413189746589b9a2c551c6b6c5ec"
+$CodebaseMemoryVersion = "v0.12.1"
 $CodebaseMemoryInstallerUrl = "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/$CodebaseMemoryInstallerCommit/install.ps1"
 $CodebaseMemoryReleaseUrl = "https://github.com/DeusData/codebase-memory-mcp/releases/download/$CodebaseMemoryVersion"
-$HeadroomVersion = "0.37.0"
 
 function Add-Result {
     param([string]$Name, [string]$Status, [string]$Detail)
@@ -145,7 +144,7 @@ function Ensure-Repomix {
     }
 
     Write-Host "Đang cài Repomix..." -ForegroundColor Cyan
-    & npm install -g repomix@1.18.0
+    & npm install -g repomix@latest
     if ($LASTEXITCODE -ne 0) {
         Add-Result "Repomix" "FAIL" "npm install -g repomix@1.18.0 thất bại với mã $LASTEXITCODE."
         return
@@ -191,6 +190,12 @@ function Ensure-CodebaseMemoryShim {
         throw "Shim codebase-memory-mcp không được trỏ vào chính nó."
     }
 
+    if (Test-Path -LiteralPath $shimPath) {
+        $existingShim = Get-Content -LiteralPath $shimPath -Raw
+        if ($existingShim -match [regex]::Escape($Executable)) { return }
+        Write-Host "Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè." -ForegroundColor Yellow
+        return
+    }
     $shimContent = "@echo off`r`n`"$Executable`" %*`r`n"
     [System.IO.File]::WriteAllText($shimPath, $shimContent, [System.Text.Encoding]::ASCII)
 }
@@ -203,26 +208,34 @@ function Ensure-CodebaseMemoryAutoIndex {
         return
     }
 
-    # AI-DEV-OS không bắt người dùng/agent nhớ index thủ công.
-    # auto_index xử lý repo mới khi MCP session bắt đầu; auto_watch + watcher_enabled
-    # để background daemon tự cập nhật graph sau khi code thay đổi.
-    $commands = @(
-        @("config", "set", "auto_index", "true"),
-        @("config", "set", "auto_watch", "true"),
-        @("config", "set", "watcher_enabled", "true")
+    # Chỉ đặt default cho key chưa tồn tại; giữ nguyên mọi giá trị đã được cấu hình.
+    $config = & $Executable config list 2>&1
+    $configText = ($config | Out-String)
+    $defaults = @(
+        @{ Key = "auto_index"; Value = "true" },
+        @{ Key = "auto_watch"; Value = "true" },
+        @{ Key = "watcher_enabled"; Value = "true" }
     )
-
-    foreach ($args in $commands) {
-        & $Executable @args 2>&1 | ForEach-Object { Write-Host $_ }
+    $settingsChanged = $false
+    foreach ($setting in $defaults) {
+        $keyPattern = "(?im)^\s*" + [regex]::Escape($setting.Key) + "\s*[:=]"
+        if ($configText -match $keyPattern) {
+            Write-Host "Giữ nguyên Codebase Memory setting '$($setting.Key)'." -ForegroundColor DarkGray
+            continue
+        }
+        $settingArgs = @("config", "set", $setting.Key, $setting.Value)
+        & $Executable @settingArgs 2>&1 | ForEach-Object { Write-Host $_ }
         if ($LASTEXITCODE -ne 0) {
-            Add-Result "Codebase Memory auto-index" "FAIL" "Không cấu hình được: codebase-memory-mcp $($args -join ' ')"
+            Add-Result "Codebase Memory auto-index" "FAIL" "Không đặt được default: $($setting.Key)"
             return
         }
+        $settingsChanged = $true
     }
 
-    # watcher_enabled được daemon đọc khi daemon khởi động; restart daemon để
-    # cấu hình chắc chắn có hiệu lực ngay, không bắt user phải tự xử lý.
-    & $Executable daemon stop 2>&1 | ForEach-Object { Write-Host $_ }
+    # Chỉ restart daemon khi script vừa bổ sung setting mặc định.
+    if ($settingsChanged) {
+        & $Executable daemon stop 2>&1 | ForEach-Object { Write-Host $_ }
+    }
 
     $config = & $Executable config list 2>&1
     $configText = ($config | Out-String)
@@ -243,9 +256,9 @@ function Ensure-CodebaseMemory {
         Ensure-CodebaseMemoryAutoIndex -Executable $existing
         try {
             $version = (& $existing --version 2>&1 | Select-Object -First 1)
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; PATH + auto-index + watcher đã được đảm bảo."
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có: $version; giữ nguyên phiên bản và áp dụng profile auto-index theo cấu hình hiện có."
         } catch {
-            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing; auto-index + watcher đã được đảm bảo."
+            Add-Result "codebase-memory-mcp" "PASS" "Đã có executable: $existing; giữ nguyên phiên bản và cấu hình hiện có."
         }
         return $existing
     }
@@ -292,7 +305,7 @@ function Ensure-CodebaseMemory {
         Ensure-CodebaseMemoryShim -Executable $installed
         Ensure-CodebaseMemoryAutoIndex -Executable $installed
         $version = (& $installed --version 2>&1 | Select-Object -First 1)
-        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH + auto-index + watcher đã được đảm bảo."
+        Add-Result "codebase-memory-mcp" "PASS" "Đã cài: $version; PATH + profile auto-index đã được kiểm tra."
         return $installed
     } catch {
         Add-Result "codebase-memory-mcp" "FAIL" $_.Exception.Message
@@ -320,24 +333,23 @@ function Ensure-ClaudeMcp {
         return
     }
 
-    # Entry này do AI-DEV-OS quản lý. Luôn đăng ký lại canonical command để
-    # tự sửa mọi config cũ/hỏng và tránh logic so sánh path phức tạp.
-    $removeOutput = & claude mcp remove --scope user codebase-memory-mcp 2>&1
-    $removeOutput | ForEach-Object { Write-Host $_ }
-
-    Write-Host "Đang đăng ký codebase-memory-mcp cho Claude Code ở user scope..." -ForegroundColor Cyan
-    $addOutput = & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe 2>&1
-    $addExitCode = $LASTEXITCODE
-    $addOutput | ForEach-Object { Write-Host $_ }
-
-    if ($addExitCode -ne 0) {
-        Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $addExitCode."
-        return
-    }
-
+    # Đọc trước; entry đã có thì giữ nguyên, không remove/re-add.
     $getOutput = & claude mcp get codebase-memory-mcp 2>&1
     $getExitCode = $LASTEXITCODE
     $getText = ($getOutput | Out-String).Trim()
+    if ($getExitCode -ne 0) {
+        Write-Host "Chưa có codebase-memory-mcp; đang thêm entry mới..." -ForegroundColor Cyan
+        $addOutput = & claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe 2>&1
+        $addExitCode = $LASTEXITCODE
+        $addOutput | ForEach-Object { Write-Host $_ }
+        if ($addExitCode -ne 0) {
+            Add-Result "Claude MCP" "FAIL" "claude mcp add thất bại với mã $addExitCode."
+            return
+        }
+        $getOutput = & claude mcp get codebase-memory-mcp 2>&1
+        $getExitCode = $LASTEXITCODE
+        $getText = ($getOutput | Out-String).Trim()
+    }
 
     if ($getExitCode -ne 0) {
         Add-Result "Claude MCP" "FAIL" "Đăng ký xong nhưng không đọc lại được MCP config."
@@ -345,7 +357,7 @@ function Ensure-ClaudeMcp {
     }
 
     if ($getText -notmatch [regex]::Escape($CbmExe)) {
-        Add-Result "Claude MCP" "FAIL" "MCP config chưa trỏ đúng executable canonical: $CbmExe"
+        Add-Result "Claude MCP" "BLOCKED" "MCP entry đang trỏ executable khác; giữ nguyên, không ghi đè. Kiểm tra: $CbmExe"
         return
     }
 
@@ -368,27 +380,14 @@ function Ensure-SqlServerMcp {
     Refresh-ProcessPath
 
     if (Test-Command "dab") {
-        try {
-            $versionText = (& dab --version 2>&1 | Select-Object -First 1)
-            $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
-            if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
-                Add-Result "SQL Server MCP" "PASS" "Đã có DAB đủ MCP profile: $versionText"
-                return
-            }
-            Write-Host "DAB hiện có chưa đạt baseline 2.0; sẽ update lên 2.0.12..." -ForegroundColor Cyan
-            & dotnet tool update --global Microsoft.DataApiBuilder --version 2.0.12
-            if ($LASTEXITCODE -ne 0) {
-                Add-Result "SQL Server MCP" "FAIL" "dotnet tool update Microsoft.DataApiBuilder 2.0.12 thất bại với mã $LASTEXITCODE."
-                return
-            }
-            Refresh-ProcessPath
-            $updatedVersion = (& dab --version 2>&1 | Select-Object -First 1)
-            Add-Result "SQL Server MCP" "PASS" "Đã update DAB: $updatedVersion. Chưa cấu hình database/project."
-            return
-        } catch {
-            Add-Result "SQL Server MCP" "BLOCKED" "Có command dab nhưng không xác minh được version: $($_.Exception.Message)"
-            return
+        $versionText = (& dab --version 2>&1 | Select-Object -First 1)
+        $match = [regex]::Match([string]$versionText, '(\d+\.\d+\.\d+)')
+        if ($match.Success -and ([version]$match.Groups[1].Value) -ge [version]"2.0.0") {
+            Add-Result "SQL Server MCP" "PASS" "Đã có DAB: $versionText; không cập nhật."
+        } else {
+            Add-Result "SQL Server MCP" "BLOCKED" "Đã có DAB nhưng version không đạt baseline 2.0: $versionText. Giữ nguyên, không tự nâng cấp."
         }
+        return
     }
 
     if (-not (Test-Command "dotnet")) {
@@ -408,10 +407,10 @@ function Ensure-SqlServerMcp {
         return
     }
 
-    Write-Host "Đang cài Microsoft Data API builder 2.0.12 cho SQL MCP..." -ForegroundColor Cyan
-    & dotnet tool install --global Microsoft.DataApiBuilder --version 2.0.12
+    Write-Host "Đang cài Microsoft Data API builder stable mới nhất cho SQL MCP..." -ForegroundColor Cyan
+    & dotnet tool install --global Microsoft.DataApiBuilder
     if ($LASTEXITCODE -ne 0) {
-        Add-Result "SQL Server MCP" "FAIL" "dotnet tool install Microsoft.DataApiBuilder 2.0.12 thất bại với mã $LASTEXITCODE."
+        Add-Result "SQL Server MCP" "FAIL" "dotnet tool install Microsoft.DataApiBuilder thất bại với mã $LASTEXITCODE."
         return
     }
 
@@ -504,19 +503,23 @@ function Ensure-HeadroomWindowsAutostart {
         'exit 3'
     )
 
-    [System.IO.File]::WriteAllLines(
-        $launcherPath,
-        $launcherLines,
-        (New-Object System.Text.UTF8Encoding($true))
-    )
+    if (-not (Test-Path -LiteralPath $launcherPath)) {
+        [System.IO.File]::WriteAllLines($launcherPath,$launcherLines,(New-Object System.Text.UTF8Encoding($true)))
+    } else {
+        Write-Host "Giữ nguyên Headroom launcher đã tồn tại." -ForegroundColor DarkGray
+    }
 
-    # Không dùng Task Scheduler vì môi trường doanh nghiệp có thể chặn quyền schtasks.
-    # HKCU Run không cần admin và chạy lại sau mỗi Windows sign-in/reboot.
+    # Chỉ tạo registry entry khi chưa có; không ghi đè giá trị người dùng.
     $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     $runName = "AI-DEV-OS-Headroom"
     New-Item -Path $runKey -Force | Out-Null
-    $runCommand = "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$launcherPath`""
-    Set-ItemProperty -Path $runKey -Name $runName -Value $runCommand
+    $existingRun = (Get-ItemProperty -Path $runKey -Name $runName -ErrorAction SilentlyContinue).$runName
+    if (-not $existingRun) {
+        $runCommand = "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$launcherPath`""
+        New-ItemProperty -Path $runKey -Name $runName -Value $runCommand -PropertyType String | Out-Null
+    } else {
+        Write-Host "Giữ nguyên Windows autostart entry đã tồn tại." -ForegroundColor DarkGray
+    }
 
     # Start ngay trong lần setup hiện tại để không phải reboot hoặc chạy lệnh repair thủ công.
     & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcherPath | Out-Null
@@ -540,11 +543,16 @@ function Ensure-Headroom {
         return
     }
 
-    Write-Host "Đang cài/refresh Headroom $HeadroomVersion (proxy + MCP) bằng uv..." -ForegroundColor Cyan
-    & uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"
-    if ($LASTEXITCODE -ne 0) {
-        Add-Result "Headroom" "FAIL" "uv tool install Headroom thất bại với mã $LASTEXITCODE."
-        return
+    if (-not (Test-Command "headroom")) {
+        Write-Host "Headroom chưa có; đang cài stable mới nhất (proxy + MCP)..." -ForegroundColor Cyan
+        & uv tool install --reinstall --python 3.13 "headroom-ai[proxy,mcp]"
+        if ($LASTEXITCODE -ne 0) {
+            Add-Result "Headroom" "FAIL" "uv cài Headroom thất bại với mã $LASTEXITCODE."
+            return
+        }
+    } else {
+        $installedVersion = (& headroom --version 2>&1 | Select-Object -First 1)
+        Write-Host "Giữ nguyên Headroom đã cài: $installedVersion" -ForegroundColor DarkGray
     }
 
     try {
@@ -565,42 +573,44 @@ function Ensure-Headroom {
     $version = (& headroom --version 2>&1 | Select-Object -First 1)
 
     if (-not $SkipMcp -and (Test-Command "claude")) {
-        Write-Host "Đang đăng ký Headroom MCP theo installer upstream..." -ForegroundColor Cyan
-        $previousErrorActionPreference = $ErrorActionPreference
-        try {
-            $ErrorActionPreference = "Continue"
-            $mcpOutput = & headroom mcp install --force 2>&1
-            $mcpExit = $LASTEXITCODE
-        }
-        finally {
-            $ErrorActionPreference = $previousErrorActionPreference
-        }
-        $mcpOutput | ForEach-Object { Write-Host $_ }
-        if ($mcpExit -ne 0) {
-            Add-Result "Headroom" "BLOCKED" "Headroom đã cài ($version) nhưng MCP install thất bại."
-            return
+        $claudeMcpList = (& claude mcp list 2>&1 | Out-String)
+        if ($claudeMcpList -notmatch "(?im)^\s*headroom\b") {
+            $previousErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = "Continue"
+                $mcpOutput = & headroom mcp install 2>&1
+                $mcpExit = $LASTEXITCODE
+            }
+            finally { $ErrorActionPreference = $previousErrorActionPreference }
+            $mcpOutput | ForEach-Object { Write-Host $_ }
+            if ($mcpExit -ne 0) {
+                Add-Result "Headroom" "BLOCKED" "Headroom đã cài ($version) nhưng không thêm được MCP entry."
+                return
+            }
+        } else {
+            Write-Host "Giữ nguyên Headroom MCP entry hiện tại." -ForegroundColor DarkGray
         }
 
-        Write-Host "Đang cấu hình Headroom durable routing cho Claude Code..." -ForegroundColor Cyan
-        $previousErrorActionPreference = $ErrorActionPreference
-        try {
-            $ErrorActionPreference = "Continue"
-            # headroom init -g claude là upstream path dành cho durable Claude integration.
-            # Nó không cần quyền tạo Scheduled Task: ghi user-scope Claude settings + hooks,
-            # và SessionStart hook sẽ tự start/recover detached Headroom runtime khi cần.
-            $installOutput = & headroom init -g --port 8787 claude 2>&1
-            $installExit = $LASTEXITCODE
-        }
-        finally {
-            $ErrorActionPreference = $previousErrorActionPreference
-        }
-        $installOutput | ForEach-Object { Write-Host $_ }
-
-        if ($installExit -ne 0) {
-            $installDetail = (($installOutput | Select-Object -Last 5) -join " | ").Trim()
-            if (-not $installDetail) { $installDetail = "Không có diagnostic output." }
-            Add-Result "Headroom" "BLOCKED" "Durable routing cho Claude thất bại: $installDetail"
-            return
+        $claudeSettings = Join-Path $HOME ".claude\settings.json"
+        $hasHeadroomSettings = (Test-Path -LiteralPath $claudeSettings) -and
+            (Select-String -LiteralPath $claudeSettings -Pattern "headroom" -Quiet)
+        if (-not $hasHeadroomSettings) {
+            $previousErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = "Continue"
+                $installOutput = & headroom init -g --port 8787 claude 2>&1
+                $installExit = $LASTEXITCODE
+            }
+            finally { $ErrorActionPreference = $previousErrorActionPreference }
+            $installOutput | ForEach-Object { Write-Host $_ }
+            if ($installExit -ne 0) {
+                $installDetail = (($installOutput | Select-Object -Last 5) -join " | ").Trim()
+                if (-not $installDetail) { $installDetail = "Không có diagnostic output." }
+                Add-Result "Headroom" "BLOCKED" "Durable routing cho Claude thất bại: $installDetail"
+                return
+            }
+        } else {
+            Write-Host "Giữ nguyên Headroom hooks/routing đã có." -ForegroundColor DarkGray
         }
 
         $headroomCommand = Get-Command "headroom" -ErrorAction SilentlyContinue
@@ -671,6 +681,12 @@ function Ensure-Ponytail {
         return
     }
 
+    $pluginList = (& claude plugin list 2>&1 | Out-String)
+    if ($pluginList -match "(?im)ponytail@ponytail|ponytail") {
+        Add-Result "Ponytail" "PASS" "Đã cài plugin; giữ nguyên, không cài lại."
+        return
+    }
+
     Write-Host "Đang thêm Ponytail marketplace upstream..." -ForegroundColor Cyan
     $market = Invoke-ClaudePluginCommand -SingularArgs @("plugin", "marketplace", "add", "DietrichGebert/ponytail") -PluralArgs @("plugins", "marketplace", "add", "DietrichGebert/ponytail")
     $market.Output | ForEach-Object { Write-Host $_ }
@@ -700,6 +716,12 @@ function Ensure-MattPocockSkills {
 
     if (-not (Test-Command "claude")) {
         Add-Result "Matt Pocock skills" "BLOCKED" "Không tìm thấy Claude Code CLI."
+        return
+    }
+
+    $pluginList = (& claude plugin list 2>&1 | Out-String)
+    if ($pluginList -match "(?im)mattpocock-skills") {
+        Add-Result "Matt Pocock skills" "PASS" "Đã cài plugin; giữ nguyên, không cài lại."
         return
     }
 
@@ -739,6 +761,19 @@ function Ensure-PersonalUpdater {
         return
     }
 
+    $targetSkill = Join-Path $HOME ".claude\skills\update-ai-dev-os\SKILL.md"
+    $targetApplySkill = Join-Path $HOME ".claude\skills\apply-ai-dev-os\SKILL.md"
+    $hasUpdater = Test-Path -LiteralPath $targetSkill
+    $hasApply = Test-Path -LiteralPath $targetApplySkill
+    if ($hasUpdater -and $hasApply) {
+        Add-Result "Personal updater" "PASS" "Đã có updater/apply skill; giữ nguyên, không ghi đè."
+        return
+    }
+    if ($hasUpdater -or $hasApply) {
+        Add-Result "Personal updater" "BLOCKED" "Chỉ tồn tại một trong hai global skill; giữ nguyên để tránh ghi đè file người dùng."
+        return
+    }
+
     try {
         & powershell -NoProfile -ExecutionPolicy Bypass -File $installer
         if ($LASTEXITCODE -ne 0) {
@@ -756,19 +791,18 @@ if ($SelfTest) {
 
     $required = @(
         '$installOutput = & powershell',
-        '$CodebaseMemoryInstallerCommit = "aacf96a20e3b9c450ba968c8aae663da25598992"',
-        '$CodebaseMemoryVersion = "v0.11.0"',
+        '$CodebaseMemoryInstallerCommit = "a5b248f47272413189746589b9a2c551c6b6c5ec"',
+        '$CodebaseMemoryVersion = "v0.12.1"',
         '$env:CBM_DOWNLOAD_URL = $CodebaseMemoryReleaseUrl',
         'Invoke-WebRequest -UseBasicParsing -Uri $CodebaseMemoryInstallerUrl -OutFile $installer',
-        'claude mcp remove --scope user codebase-memory-mcp',
         'claude mcp add --transport stdio --scope user codebase-memory-mcp -- $CbmExe',
         'claude mcp get codebase-memory-mcp',
         'claude mcp list',
         '[switch]$SkipSqlServerMcp',
         '[switch]$SkipExternalAiStack',
-        'Microsoft.DataApiBuilder --version 2.0.12',
-        'uv tool install --python 3.13 "headroom-ai[proxy,mcp]==$HeadroomVersion"',
-        'headroom mcp install --force',
+        'dotnet tool install --global Microsoft.DataApiBuilder',
+        'uv tool install --reinstall --python 3.13 "headroom-ai[proxy,mcp]"',
+        'headroom mcp install',
         'headroom init -g --port 8787 claude',
         'Invoke-ClaudePluginCommand',
         'DietrichGebert/ponytail',
@@ -779,10 +813,16 @@ if ($SelfTest) {
         'Ensure-UserPathEntry',
         'Ensure-CodebaseMemoryShim',
         'Ensure-CodebaseMemoryAutoIndex',
-        'config set auto_index true',
-        'config set auto_watch true',
-        'config set watcher_enabled true',
+        'Chỉ đặt default cho key chưa tồn tại',
         'codebase-memory-mcp.cmd',
+        'Giữ nguyên shim codebase-memory-mcp đã tồn tại; không ghi đè.',
+        'Giữ nguyên Headroom launcher đã tồn tại',
+        'Giữ nguyên Windows autostart entry đã tồn tại',
+        'npm install -g repomix@latest',
+        'if (-not (Test-Command "headroom"))',
+        'if (-not (Test-Command "repomix"))',
+        'Đã cài plugin; giữ nguyên, không cài lại.',
+        'Đã có updater/apply skill; giữ nguyên, không ghi đè.',
         'Luôn ưu tiên binary thật',
         '[5/12] Kiểm tra codebase-memory-mcp...',
         'Đã cài DAB'
@@ -802,7 +842,7 @@ Write-Host ""
 Write-Host "AI-DEV-OS - THIẾT LẬP TOOL CHO MÁY DEV" -ForegroundColor Cyan
 Write-Host "Repo nguồn: $RepoRoot"
 Write-Host ""
-Write-Host "Script này cài tool ở cấp máy/user, Không sửa .mcp.json của project" -ForegroundColor DarkGray
+Write-Host "Script này chỉ cài tool cấp máy/user. Không sửa .mcp.json của project." -ForegroundColor DarkGray
 Write-Host "CodeGraph: KHÔNG cài vì overlap với codebase-memory-mcp." -ForegroundColor DarkGray
 Write-Host ""
 
@@ -858,7 +898,7 @@ if ($blocked -gt 0) {
     exit 2
 }
 
-Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng." -ForegroundColor Green
+Write-Host "KẾT QUẢ: PASS - máy đã sẵn sàng; có thể chạy lại script an toàn." -ForegroundColor Green
 Write-Host "Restart Claude Code rồi dùng /mcp để xác nhận codebase-memory-mcp Connected." -ForegroundColor Green
 Write-Host ""
 Write-Host "Lưu ý: setup mặc định cài toàn bộ upstream stack đã chuẩn hóa: codebase-memory-mcp, Headroom, Ponytail, mattpocock-skills và Microsoft SQL MCP/DAB." -ForegroundColor DarkGray
